@@ -25,6 +25,10 @@ $pageType = isset($_GET['type']) ? $_GET['type'] : '';
 	<div class="nav-bar">
 		<div class="container nav-bar__content">
 			<a class="brand" href="index.php">GoTravel</a>
+			<form class="nav-search" action="package-list.php" method="get">
+				<input type="text" name="keyword" placeholder="Tìm kiếm tour...">
+				<button type="submit"><i class="fa fa-search"></i></button>
+			</form>
 			<button class="nav-toggle" type="button" aria-label="Mở menu" aria-expanded="false">
 				<span></span>
 				<span></span>
