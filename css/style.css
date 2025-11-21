@@ -263,13 +263,6 @@ section + section {
   margin-bottom: 1rem;
 }
 
-.hero__eyebrow {
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.2rem;
-  color: var(--muted);
-}
-
 .hero__cta {
   display: flex;
   gap: 1rem;
