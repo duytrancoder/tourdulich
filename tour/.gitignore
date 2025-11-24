@@ -1,0 +1,22 @@
+
+# Environment
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# Build
+build/
+dist/
+
+# Logs
+*.log
+
+# Dependencies
+vendor/
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db

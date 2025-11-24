@@ -36,37 +36,37 @@ $error="Có lỗi xảy ra. Vui lòng thử lại";
 	<title>GoTravel | Liên hệ</title>
 	<link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('admin/pacakgeimages/tour_halong.webp') no-repeat center center; background-size: cover;">
 <?php include('includes/header.php');?>
 <main class="page">
 	<div class="container">
 		<section class="page-head">
-			<h1>Liên hệ đội ngũ GoTravel</h1>
-			<p>Gửi câu hỏi về tour, thanh toán hoặc hợp tác. Chúng tôi phản hồi trong 2 giờ.</p>
+			<h1 style="color: #fff">Liên hệ đội ngũ GoTravel</h1>
+			<p style="color: #e5e7eb">Gửi câu hỏi về tour, thanh toán hoặc hợp tác. Chúng tôi phản hồi trong 2 giờ.</p>
 		</section>
-		<section class="card">
+		<section class="card" style="background: transparent; border: none;">
 			<?php if($error){?><div class="alert error"><strong>Lỗi:</strong> <?php echo htmlentities($error); ?> </div><?php } elseif($msg){?><div class="alert success"><strong>Thành công:</strong> <?php echo htmlentities($msg); ?> </div><?php }?>
 			<form name="enquiry" method="post" class="form-stack">
 				<div class="form-grid">
 					<div class="form-group">
-						<label for="fname">Họ và tên</label>
+						<label for="fname" style="color: #fff">Họ và tên</label>
 						<input type="text" name="fname" id="fname" placeholder="Nguyễn Văn A" required>
 					</div>
 					<div class="form-group">
-						<label for="email">Email</label>
+						<label for="email" style="color: #fff">Email</label>
 						<input type="email" name="email" id="email" placeholder="ban@example.com" required>
 					</div>
 					<div class="form-group">
-						<label for="mobileno">Số điện thoại</label>
+						<label for="mobileno" style="color: #fff">Số điện thoại</label>
 						<input type="text" name="mobileno" id="mobileno" maxlength="10" placeholder="10 chữ số" required>
 					</div>
 					<div class="form-group">
-						<label for="subject">Chủ đề</label>
+						<label for="subject" style="color: #fff">Chủ đề</label>
 						<input type="text" name="subject" id="subject" placeholder="Ví dụ: Tour Đà Lạt" required>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="description">Nội dung</label>
+					<label for="description" style="color: #fff">Nội dung</label>
 					<textarea name="description" id="description" rows="5" placeholder="Chia sẻ chi tiết nhu cầu của bạn" required></textarea>
 				</div>
 				<button type="submit" name="submit1" class="btn">Gửi yêu cầu</button>

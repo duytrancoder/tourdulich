@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
 :root {
   --brand: #0ea5e9;
   --brand-dark: #0369a1;
@@ -20,7 +22,7 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-family: 'Poppins', sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -186,10 +188,18 @@ button, input, select, textarea {
 }
 
 .admin-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   padding: 0.6rem 0.8rem;
   border-radius: 0.6rem;
   color: rgba(226, 232, 240, 0.9);
   font-weight: 500;
+}
+
+.admin-nav a i {
+  width: 1.2rem;
+  text-align: center;
 }
 
 .admin-nav a.is-active,
@@ -423,11 +433,8 @@ button, input, select, textarea {
 
 .auth-card {
   width: min(420px, 100%);
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
+  background: transparent;
   padding: 2rem;
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
 }
 
 .auth-card h1 {

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
 :root {
   --brand: #0ea5e9;
   --brand-dark: #0284c7;
@@ -20,7 +22,7 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-family: 'Poppins', sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
@@ -186,6 +188,28 @@ section + section {
   color: var(--brand-dark);
 }
 
+.nav-search {
+	position: relative;
+	width: 300px;
+}
+
+.nav-search input {
+	padding-right: 2.5rem;
+}
+
+.nav-search button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 100%;
+	width: 2.5rem;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	color: var(--muted);
+	font-size: 1.1rem;
+}
+
 .nav-toggle {
   display: none;
   flex-direction: column;
@@ -223,8 +247,10 @@ section + section {
 }
 
 .hero {
-  background: linear-gradient(135deg, #e0f2fe, #f8fafc);
-  padding: 4rem 0 3rem;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../admin/pacakgeimages/tour_halong.webp') no-repeat center center;
+  background-size: cover;
+  padding: 6rem 0 5rem;
+  color: #fff;
 }
 
 .hero__grid {
@@ -237,13 +263,6 @@ section + section {
 .hero__content h1 {
   font-size: clamp(2rem, 5vw, 3.2rem);
   margin-bottom: 1rem;
-}
-
-.hero__eyebrow {
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  letter-spacing: 0.2rem;
-  color: var(--muted);
 }
 
 .hero__cta {
@@ -487,6 +506,26 @@ section + section {
   color: #e2e8f0;
 }
 
+.newsletter-form {
+	display: flex;
+	margin-top: 1rem;
+}
+
+.newsletter-form input {
+	flex-grow: 1;
+	border-radius: 999px 0 0 999px;
+	border-right: none;
+}
+
+.newsletter-form button {
+	border-radius: 0 999px 999px 0;
+	background: var(--brand);
+	color: #fff;
+	border: none;
+	padding: 0 1.5rem;
+	cursor: pointer;
+}
+
 .site-footer__bottom {
   margin-top: 2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -594,10 +633,20 @@ section + section {
   .site-nav.is-open {
     display: flex;
   }
+  
+  .nav-search {
+    display: none;
+    width: 100%;
+    margin-top: 1rem;
+  }
+  
+  .nav-search.is-open {
+    display: block;
+  }
 
   .nav-bar__content {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: space-between;
   }
 
   .cta__content {

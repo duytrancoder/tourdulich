@@ -30,23 +30,23 @@ if(isset($_POST['login']))
 	<title>GoTravel Admin | Đăng nhập</title>
 	<link rel="stylesheet" href="css/style.css">
 </head>
-<body class="auth-page">
+<body class="auth-page" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../admin/pacakgeimages/tour_halong.webp') no-repeat center center; background-size: cover;">
 	<div class="auth-card">
-		<h1>Đăng nhập quản trị</h1>
-		<p class="helper-text">Sử dụng thông tin tài khoản được cấp để truy cập hệ thống quản trị.</p>
+		<h1 style="color:#fff">Đăng nhập quản trị</h1>
+		<p class="helper-text" style="color:#e5e7eb">Sử dụng thông tin tài khoản được cấp để truy cập hệ thống quản trị.</p>
 		<?php if($loginError){?><div class="alert error"><?php echo htmlentities($loginError);?></div><?php } ?>
 		<form method="post">
 			<div class="form-group">
-				<label for="username">Tên đăng nhập</label>
+				<label for="username" style="color:#fff">Tên đăng nhập</label>
 				<input type="text" name="username" id="username" required>
 			</div>
 			<div class="form-group">
-				<label for="password">Mật khẩu</label>
+				<label for="password" style="color:#fff">Mật khẩu</label>
 				<input type="password" name="password" id="password" required>
 			</div>
 			<button type="submit" name="login" class="btn btn-primary">Đăng nhập</button>
 		</form>
-		<p class="helper-text"><a href="../index.php">← Quay lại trang khách</a></p>
+		<p class="helper-text"><a href="../index.php" style="color:#e5e7eb">← Quay lại trang khách</a></p>
 	</div>
 	<script src="js/app.js" defer></script>
 </body>

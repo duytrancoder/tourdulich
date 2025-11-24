@@ -18,6 +18,14 @@
 			<p>Email: hello@gotravel.vn</p>
 			<p>***</p>
 		</div>
+		<div>
+			<h5>Bản tin</h5>
+			<p>Đăng ký để nhận thông tin cập nhật và ưu đãi mới nhất.</p>
+			<form class="newsletter-form">
+				<input type="email" placeholder="Nhập email của bạn">
+				<button type="submit">Đăng ký</button>
+			</form>
+		</div>
 	</div>
 	<div class="site-footer__bottom">
 		<div class="container">

@@ -9,11 +9,15 @@ const ready = (callback) => {
 ready(() => {
   const navToggle = document.querySelector('.nav-toggle');
   const nav = document.getElementById('siteNav');
+  const search = document.querySelector('.nav-search');
 
   if (navToggle && nav) {
     navToggle.addEventListener('click', () => {
       const isOpen = nav.classList.toggle('is-open');
       navToggle.setAttribute('aria-expanded', isOpen);
+      if (search) {
+        search.classList.toggle('is-open');
+      }
     });
   }
 
