@@ -28,8 +28,8 @@ $locations = $locationQuery->fetchAll(PDO::FETCH_OBJ);
 	<section class="hero">
 		<div class="container hero__grid">
 			<div class="hero__content">
-				<p class="hero__eyebrow">GoTravel</p>
-				<h1>Đặt tour du lịch dễ dàng chỉ trong vài phút</h1>
+				<p class="hero__eyebrow" style="text-shadow: 2px 20px 5px rgba(0,0,0,1);">GoTravel</p>
+				<h1>ĐẶT TOUR DU LỊCH DỄ DÀNG CHỈ TRONG VÀI PHÚT</h1>
 				<p>Hệ thống gọn nhẹ giúp bạn khám phá tour phù hợp, quản lý lịch sử đặt và nhận hỗ trợ tức thời. Thiết kế hướng tới trải nghiệm rõ ràng, tối giản.</p>
 				<div class="hero__cta">
 					<a class="btn" href="package-list.php">Khám phá gói tour</a>
@@ -60,9 +60,9 @@ $locations = $locationQuery->fetchAll(PDO::FETCH_OBJ);
 					<label for="price">Ngân sách dự kiến</label>
 					<select name="price" id="price">
 						<option value="">Bất kỳ</option>
-						<option value="under-200">Dưới 200 USD</option>
-						<option value="200-500">200 - 500 USD</option>
-						<option value="over-500">Trên 500 USD</option>
+						<option value="under-200">Dưới 4.800.000 VND</option>
+						<option value="200-500">4.800.000 - 12.000.000 VND</option>
+						<option value="over-500">Trên 12.000.000 VND</option>
 					</select>
 				</div>
 				<button class="btn w-100" type="submit">Xem tour phù hợp</button>
@@ -112,7 +112,7 @@ $locations = $locationQuery->fetchAll(PDO::FETCH_OBJ);
 							</div>
 							<p><?php echo htmlentities($package->PackageFetures);?></p>
 							<div class="tour-card__footer">
-								<span class="price">USD <?php echo htmlentities($package->PackagePrice);?></span>
+								<span class="price"><?php echo number_format($package->PackagePrice * 24000, 0, ',', '.');?> VND</span>
 								<a class="btn btn-ghost" href="package-details.php?pkgid=<?php echo htmlentities($package->PackageId);?>">Chi tiết</a>
 							</div>
 						</article>
@@ -127,16 +127,16 @@ $locations = $locationQuery->fetchAll(PDO::FETCH_OBJ);
 	<section class="section">
 		<div class="container stats-grid">
 			<div class="stat-card">
-				<h3>1.200+</h3>
-				<p>Khách hàng đặt tour mỗi tháng</p>
+				<h3>1.000+ tours</h3>
+				<p>Chất lượng trong và ngoài nước</p>
 			</div>
 			<div class="stat-card">
-				<h3>98%</h3>
-				<p>Tỷ lệ phản hồi yêu cầu trong 2 giờ</p>
+				<h3>10K+ đánh giá 5 sao</h3>
+				<p>Từ những khách hàng đã đặt tour</p>
 			</div>
 			<div class="stat-card">
-				<h3>4.8/5</h3>
-				<p>Mức độ hài lòng trên toàn hệ thống</p>
+				<h3>100+ ưu đãi mỗi ngày</h3>
+				<p>Cho khách đặt sớm, theo nhóm, phút chót</p>
 			</div>
 		</div>
 	</section>

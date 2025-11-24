@@ -13,7 +13,7 @@ if(isset($_POST['submit']))
 $pname=$_POST['packagename'];
 $ptype=$_POST['packagetype'];	
 $plocation=$_POST['packagelocation'];
-$pprice=$_POST['packageprice'];	
+$pprice=$_POST['packageprice'] / 24000; // Chuyển VND sang USD để lưu vào DB
 $pfeatures=$_POST['packagefeatures'];
 $pdetails=$_POST['packagedetails'];	
 $pimage=$_FILES["packageimage"]["name"];
@@ -64,8 +64,8 @@ $msg="Cập nhật gói tour thành công";
 						<input type="text" name="packagelocation" id="packagelocation" value="<?php echo htmlentities($package->PackageLocation);?>" required>
 					</div>
 					<div class="form-group">
-						<label for="packageprice">Giá gói (USD)</label>
-						<input type="number" min="0" step="0.01" name="packageprice" id="packageprice" value="<?php echo htmlentities($package->PackagePrice);?>" required>
+						<label for="packageprice">Giá gói (VND)</label>
+						<input type="number" min="0" step="1000" name="packageprice" id="packageprice" value="<?php echo number_format($package->PackagePrice * 24000, 0, '', '');?>" placeholder="Ví dụ: 4800000" required>
 					</div>
 				</div>
 				<div class="form-group">

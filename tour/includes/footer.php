@@ -21,7 +21,7 @@
 	</div>
 	<div class="site-footer__bottom">
 		<div class="container">
-			<p>© <?php echo date('Y');?> © 2024 Travel Admin Panel. Developed by Uy.</p>
+			<p>© <?php echo date('Y');?> Travel Admin Panel. Developed by Uy.</p>
 		</div>
 	</div>
 </footer>

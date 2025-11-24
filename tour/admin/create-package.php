@@ -12,7 +12,7 @@ if(isset($_POST['submit']))
 $pname=$_POST['packagename'];
 $ptype=$_POST['packagetype'];	
 $plocation=$_POST['packagelocation'];
-$pprice=$_POST['packageprice'];	
+$pprice=$_POST['packageprice'] / 24000; // Chuyển VND sang USD để lưu vào DB
 $pfeatures=$_POST['packagefeatures'];
 $pdetails=$_POST['packagedetails'];	
 $pimage=$_FILES["packageimage"]["name"];
@@ -67,8 +67,8 @@ $error="Có lỗi xảy ra. Vui lòng thử lại";
 						<input type="text" name="packagelocation" id="packagelocation" required>
 					</div>
 					<div class="form-group">
-						<label for="packageprice">Giá gói (USD)</label>
-						<input type="number" min="0" step="0.01" name="packageprice" id="packageprice" required>
+						<label for="packageprice">Giá gói (VND)</label>
+						<input type="number" min="0" step="1000" name="packageprice" id="packageprice" placeholder="Ví dụ: 4800000" required>
 					</div>
 				</div>
 				<div class="form-group">

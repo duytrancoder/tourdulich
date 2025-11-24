@@ -51,7 +51,7 @@ include('includes/layout-start.php');
 							<th>Tên gói</th>
 							<th>Loại gói</th>
 							<th>Địa điểm</th>
-							<th>Giá (USD)</th>
+							<th>Giá (VND)</th>
 							<th>Ngày tạo</th>
 							<th>Thao tác</th>
 						</tr>
@@ -68,7 +68,7 @@ include('includes/layout-start.php');
 							<td><?php echo htmlentities($result->PackageName);?></td>
 							<td><?php echo htmlentities($result->PackageType);?></td>
 							<td><?php echo htmlentities($result->PackageLocation);?></td>
-							<td><?php echo htmlentities($result->PackagePrice);?></td>
+							<td><?php echo number_format($result->PackagePrice * 24000, 0, ',', '.');?></td>
 							<td><?php echo htmlentities($result->Creationdate);?></td>
 							<td>
 								<a class="btn btn-ghost" href="update-package.php?pid=<?php echo htmlentities($result->PackageId);?>">Xem chi tiết</a>

@@ -75,9 +75,9 @@ $locations = $locationStmt->fetchAll(PDO::FETCH_OBJ);
 					<label for="price">Ngân sách</label>
 					<select id="price" name="price">
 						<option value="" <?php if($priceFilter==='') echo 'selected';?>>Bất kỳ</option>
-						<option value="under-200" <?php if($priceFilter==='under-200') echo 'selected';?>>Dưới 200 USD</option>
-						<option value="200-500" <?php if($priceFilter==='200-500') echo 'selected';?>>200 - 500 USD</option>
-						<option value="over-500" <?php if($priceFilter==='over-500') echo 'selected';?>>Trên 500 USD</option>
+						<option value="under-200" <?php if($priceFilter==='under-200') echo 'selected';?>>Dưới 4.800.000 VND</option>
+						<option value="200-500" <?php if($priceFilter==='200-500') echo 'selected';?>>4.800.000 - 12.000.000 VND</option>
+						<option value="over-500" <?php if($priceFilter==='over-500') echo 'selected';?>>Trên 12.000.000 VND</option>
 					</select>
 				</div>
 				<div class="form-group" style="align-self:flex-end;">
@@ -100,7 +100,7 @@ $locations = $locationStmt->fetchAll(PDO::FETCH_OBJ);
 							</div>
 							<p><?php echo htmlentities($package->PackageFetures);?></p>
 							<div class="tour-card__footer">
-								<span class="price">USD <?php echo htmlentities($package->PackagePrice);?></span>
+								<span class="price"><?php echo number_format($package->PackagePrice * 24000, 0, ',', '.');?> VND</span>
 								<a class="btn btn-ghost" href="package-details.php?pkgid=<?php echo htmlentities($package->PackageId);?>">Chi tiết</a>
 							</div>
 						</article>

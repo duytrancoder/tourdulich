@@ -22,6 +22,7 @@ $chngpwd1-> bindParam(':contact', $contact, PDO::PARAM_STR);
 $chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
 $chngpwd1->execute();
 $msg="Đặt lại mật khẩu thành công";
+
 }
 else {
 $error="Email hoặc số điện thoại không hợp lệ";

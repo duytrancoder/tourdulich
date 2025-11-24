@@ -65,7 +65,7 @@ $results=$query->fetchAll(PDO::FETCH_OBJ);
 						<ul class="summary-list">
 							<li><span>Loại gói</span><strong><?php echo htmlentities($result->PackageType);?></strong></li>
 							<li><span>Địa điểm</span><strong><?php echo htmlentities($result->PackageLocation);?></strong></li>
-							<li><span>Giá</span><strong>USD <?php echo htmlentities($result->PackagePrice);?></strong></li>
+							<li><span>Giá</span><strong><?php echo number_format($result->PackagePrice * 24000, 0, ',', '.');?> VND</strong></li>
 						</ul>
 						<p><?php echo htmlentities($result->PackageFetures);?></p>
 					</section>

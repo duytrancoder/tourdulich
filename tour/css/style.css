@@ -29,7 +29,6 @@ body {
 img {
   max-width: 100%;
   height: auto;
-  border-radius: 1rem;
   display: block;
 }
 
@@ -97,13 +96,16 @@ section + section {
   border: none;
   cursor: pointer;
   background: var(--brand);
-  color: #fff;
+  color:#000;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: 0.2s all ease;
 }
 
 .btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 20px rgba(14, 165, 233, 0.25);
+  color: rgb(237, 7, 7);
+  transform: scale(1.1);
 }
 
 .btn:disabled {
@@ -134,8 +136,10 @@ section + section {
   font-size: 0.9rem;
 }
 
+
 .btn.w-100 {
   width: 100%;
+  margin-top: 10px;
 }
 
 .link-muted {
@@ -179,11 +183,33 @@ section + section {
   gap: 1rem;
   padding: 1rem 0;
 }
+.nav-bar__content_left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo_posster,
+.logo_poster {
+  display: flex;
+  align-items: center;
+}
+
+.logo_posster img,
+.logo_poster img {
+  width: auto;
+  height: 50px;
+  max-height: 50px;
+  border-radius: 0;
+  object-fit: contain;
+}
 
 .brand {
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--brand-dark);
+  display: flex;
+  align-items: center;
 }
 
 .nav-toggle {
@@ -223,8 +249,10 @@ section + section {
 }
 
 .hero {
-  background: linear-gradient(135deg, #e0f2fe, #f8fafc);
+  background-image: url(../images/poster_tour.jpg);
   padding: 4rem 0 3rem;
+  background-size: cover;
+  background-position: center;
 }
 
 .hero__grid {
@@ -237,15 +265,25 @@ section + section {
 .hero__content h1 {
   font-size: clamp(2rem, 5vw, 3.2rem);
   margin-bottom: 1rem;
+  color: white;
+   text-shadow:
+    2px 2px 0 #000,
+    4px 4px 0 #000,
+    6px 6px 0 #000;
+}
+.hero__content p{
+  color: rgb(228, 223, 223);
+  font-size: 15px;
+  font-family:Arial, Helvetica, sans-serif;
+  
 }
 
 .hero__eyebrow {
   text-transform: uppercase;
   font-size: 0.85rem;
   letter-spacing: 0.2rem;
-  color: var(--muted);
+  color: #000;
 }
-
 .hero__cta {
   display: flex;
   gap: 1rem;
@@ -254,7 +292,7 @@ section + section {
 }
 
 .hero__card {
-  background: #fff;
+  background: rgba(90, 192, 239, 0.5);
   padding: 2rem;
   border-radius: 1.5rem;
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
@@ -296,6 +334,11 @@ section + section {
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
 }
 
+.tour-card {
+  display: flex;
+  flex-direction: column;
+}
+
 .feature-card h4 {
   margin: 0 0 0.5rem;
 }
@@ -306,6 +349,7 @@ section + section {
 }
 
 .tour-card img {
+  width: 100%;
   border-radius: 1rem;
   margin-bottom: 1rem;
   height: 200px;
@@ -329,7 +373,8 @@ section + section {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 1rem;
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
 .price {
