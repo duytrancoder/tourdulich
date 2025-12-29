@@ -24,6 +24,15 @@ define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') ?: '');
 define('DB_NAME', getenv('DB_NAME') ?: 'webdulich');
 
+// Base URL for admin
+if (!defined('BASE_URL')) {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $scriptPath = dirname(dirname($_SERVER['SCRIPT_NAME']));
+    $basePath = rtrim(str_replace('\\', '/', $scriptPath), '/');
+    define('BASE_URL', $protocol . '://' . $host . ($basePath !== '/' ? $basePath : '') . '/');
+}
+
 // Establish database connection.
 try
 {

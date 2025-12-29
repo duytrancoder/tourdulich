@@ -144,7 +144,7 @@
 			<?php if (empty($_SESSION["login"])): ?>
 				<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>enquiry">Gửi hỏi đáp</a>
 			<?php else: ?>
-				<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>issue/tickets">Gửi yêu cầu</a>
+				<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>issue">Gửi yêu cầu</a>
 			<?php endif; ?>
 		</div>
 	</section>

@@ -29,4 +29,4 @@
 	<div class="site-footer__bottom">
 	</div>
 </footer>
-<script src="js/app.js"></script>
+<script src="<?php echo BASE_URL; ?>js/app.js"></script>

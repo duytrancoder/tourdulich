@@ -1,8 +1,19 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-
-    # Redirect all requests to the public directory
+    
+    # Prevent directory listing
+    Options -Indexes
+    
+    # Redirect root to public directory
+    RewriteCond %{REQUEST_URI} ^/tour1/?$
+    RewriteRule ^(.*)$ public/index.php [L]
+    
+    # Redirect all other requests to the public directory
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ public/index.php?url=$1 [L,QSA]
 </IfModule>
+
+# Prevent directory listing if mod_rewrite is not available
+Options -Indexes
+

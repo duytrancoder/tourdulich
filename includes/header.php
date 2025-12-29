@@ -8,10 +8,10 @@ $isLoggedIn = !empty($_SESSION["login"]); ?>
 					<span class="link-muted">Xin chào, <?php echo htmlentities(
          $_SESSION["login"],
      ); ?></span>
-					<a class="link-muted" href="<?php echo BASE_URL; ?>app/views/user/profile">Hồ sơ</a>
-					<a class="link-muted" href="<?php echo BASE_URL; ?>app/views/user/change-password">Đổi mật khẩu</a>
-					<a class="link-muted" href="<?php echo BASE_URL; ?>app/views/tour/history">Lịch sử tour</a>
-					<a class="btn btn-ghost btn-compact" href="<?php echo BASE_URL; ?>admin/logout">Đăng xuất</a>
+					<a class="link-muted" href="<?php echo BASE_URL; ?>user/profile">Hồ sơ</a>
+					<a class="link-muted" href="<?php echo BASE_URL; ?>user/change-password">Đổi mật khẩu</a>
+					<a class="link-muted" href="<?php echo BASE_URL; ?>tour/history">Lịch sử tour</a>
+					<a class="btn btn-ghost btn-compact" href="<?php echo BASE_URL; ?>admin/logout.php">Đăng xuất</a>
 				<?php else: ?>
 					<a class="link-muted" href="<?php echo BASE_URL; ?>admin/index.php">Quản trị</a>
 					<a class="link-muted" href="#" data-modal-target="signup-modal">Đăng ký</a>

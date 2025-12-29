@@ -1,5 +1,6 @@
 <?php
 session_start(); 
+include('includes/config.php');
 $_SESSION = array();
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
@@ -10,6 +11,6 @@ if (ini_get("session.use_cookies")) {
 }
 unset($_SESSION['alogin']);
 session_destroy(); 
-header("location:index.php"); 
+header("location:" . BASE_URL . "admin/index.php"); 
 ?>
 
