@@ -1,12 +1,9 @@
 <?php
 session_start();
 
-// Basic path definitions
 define("ROOT", dirname(__DIR__));
 define("APP", ROOT . "/app");
 define("BASE_URL", "http://" . $_SERVER["HTTP_HOST"] . "/");
-
-// Autoload core and models
 spl_autoload_register(function ($className) {
     $corePath = ROOT . "/core/" . str_replace("\\", "/", $className) . ".php";
     if (file_exists($corePath)) {
@@ -27,7 +24,6 @@ spl_autoload_register(function ($className) {
     }
 });
 
-// Load the main App class and start the application
 require_once ROOT . "/core/App.php";
 $app = new App();
 
