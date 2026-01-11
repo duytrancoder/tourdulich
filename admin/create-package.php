@@ -9,34 +9,64 @@ header('location:index.php');
 else{
 if(isset($_POST['submit']))
 {
-$pname=$_POST['packagename'];
-$ptype=$_POST['packagetype'];	
-$plocation=$_POST['packagelocation'];
-$pprice=$_POST['packageprice'];	
-$pfeatures=$_POST['packagefeatures'];
-$pdetails=$_POST['packagedetails'];	
-$pimage=$_FILES["packageimage"]["name"];
-move_uploaded_file($_FILES["packageimage"]["tmp_name"],"pacakgeimages/".$_FILES["packageimage"]["name"]);
-$sql="INSERT INTO TblTourPackages(PackageName,PackageType,PackageLocation,PackagePrice,PackageFetures,PackageDetails,PackageImage) VALUES(:pname,:ptype,:plocation,:pprice,:pfeatures,:pdetails,:pimage)";
+$pname = trim($_POST['packagename'] ?? '');
+$ptype = trim($_POST['packagetype'] ?? '');	
+$plocation = trim($_POST['packagelocation'] ?? '');
+$pprice = intval($_POST['packageprice'] ?? 0);	
+$pfeatures = trim($_POST['packagefeatures'] ?? '');
+$pdetails = trim($_POST['packagedetails'] ?? '');	
+$pimage = '';
+
+// Validate inputs
+if (empty($pname) || empty($ptype) || empty($plocation) || $pprice <= 0 || empty($pfeatures) || empty($pdetails)) {
+	$error = "Vui lòng điền đầy đủ thông tin";
+} elseif (!isset($_FILES["packageimage"]) || $_FILES["packageimage"]["error"] !== UPLOAD_ERR_OK) {
+	$error = "Vui lòng chọn hình ảnh";
+} else {
+	// Validate file upload
+	$allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+	$fileType = $_FILES["packageimage"]["type"];
+	$fileSize = $_FILES["packageimage"]["size"];
+	
+	if (!in_array($fileType, $allowedTypes)) {
+		$error = "Chỉ chấp nhận file ảnh (JPEG, PNG, GIF, WEBP)";
+	} elseif ($fileSize > 5 * 1024 * 1024) { // 5MB limit
+		$error = "Kích thước file không được vượt quá 5MB";
+	} else {
+		// Sanitize filename
+		$pimage = basename($_FILES["packageimage"]["name"]);
+		$pimage = preg_replace('/[^a-zA-Z0-9._-]/', '_', $pimage);
+		$uploadPath = "pacakgeimages/" . $pimage;
+		
+		if (move_uploaded_file($_FILES["packageimage"]["tmp_name"], $uploadPath)) {
+			// File uploaded successfully, continue with database insert
+		} else {
+			$error = "Không thể tải lên file. Vui lòng thử lại";
+		}
+	}
+}
+
+if (!isset($error)) {
+$sql="INSERT INTO tbltourpackages(PackageName,PackageType,PackageLocation,PackagePrice,PackageFetures,PackageDetails,PackageImage) VALUES(:pname,:ptype,:plocation,:pprice,:pfeatures,:pdetails,:pimage)";
 $query = $dbh->prepare($sql);
 $query->bindParam(':pname',$pname,PDO::PARAM_STR);
 $query->bindParam(':ptype',$ptype,PDO::PARAM_STR);
 $query->bindParam(':plocation',$plocation,PDO::PARAM_STR);
-$query->bindParam(':pprice',$pprice,PDO::PARAM_STR);
+$query->bindParam(':pprice',$pprice,PDO::PARAM_INT);
 $query->bindParam(':pfeatures',$pfeatures,PDO::PARAM_STR);
 $query->bindParam(':pdetails',$pdetails,PDO::PARAM_STR);
 $query->bindParam(':pimage',$pimage,PDO::PARAM_STR);
-$query->execute();
-$lastInsertId = $dbh->lastInsertId();
-if($lastInsertId)
-{
-$msg="Tạo gói tour thành công";
+	$query->execute();
+	$lastInsertId = $dbh->lastInsertId();
+	if($lastInsertId)
+	{
+		$msg="Tạo gói tour thành công";
+	}
+	else 
+	{
+		$error="Có lỗi xảy ra. Vui lòng thử lại";
+	}
 }
-else 
-{
-$error="Có lỗi xảy ra. Vui lòng thử lại";
-}
-
 }
 
 	$pageTitle = "GoTravel Admin | Tạo gói tour";
@@ -67,8 +97,9 @@ $error="Có lỗi xảy ra. Vui lòng thử lại";
 						<input type="text" name="packagelocation" id="packagelocation" required>
 					</div>
 					<div class="form-group">
-						<label for="packageprice">Giá gói (USD)</label>
-						<input type="number" min="0" step="0.01" name="packageprice" id="packageprice" required>
+						<label for="packageprice">Giá gói (VNĐ)</label>
+						<input type="number" min="0" step="1000" name="packageprice" id="packageprice" required>
+						<small style="color: var(--muted); font-size: 0.85rem;">Nhập giá bằng VNĐ. Ví dụ: 4.800.000</small>
 					</div>
 				</div>
 				<div class="form-group">

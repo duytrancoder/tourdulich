@@ -4,9 +4,9 @@ require_once(ROOT . '/core/Model.php');
 
 class PackageModel extends Model {
     public function getFeaturedPackages($limit = 4) {
-        $sql = "SELECT * FROM tbltourpackages ORDER BY rand() LIMIT :limit";
+        $limit = (int)$limit;
+        $sql = "SELECT * FROM tbltourpackages ORDER BY rand() LIMIT " . $limit;
         $query = $this->db->prepare($sql);
-        $query->bindParam(':limit', $limit, PDO::PARAM_INT);
         $query->execute();
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
@@ -27,11 +27,11 @@ class PackageModel extends Model {
             $sql .= " AND PackageLocation = :location";
         }
         if($price === 'under-200') {
-            $sql .= " AND PackagePrice < 200";
+            $sql .= " AND PackagePrice < 4800000"; // dưới 4.8 triệu
         } elseif($price === '200-500') {
-            $sql .= " AND PackagePrice BETWEEN 200 AND 500";
+            $sql .= " AND PackagePrice BETWEEN 4800000 AND 12000000"; // 4.8 - 12 triệu
         } elseif($price === 'over-500') {
-            $sql .= " AND PackagePrice > 500";
+            $sql .= " AND PackagePrice > 12000000"; // trên 12 triệu
         }
         $sql .= " ORDER BY Creationdate DESC";
 

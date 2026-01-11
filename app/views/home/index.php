@@ -11,12 +11,12 @@
 <body>
 <?php include ROOT . "/includes/header.php"; ?>
 <main>
-	<section class="hero">
+	<section class="hero" style="background-image: url('<?php echo BASE_URL; ?>admin/images/nentour.jpg');">
 		<div class="container hero__grid">
 			<div class="hero__content">
 				<p style="color: #e5e7eb;">GoTravel</p>
-				<h1 style="color: #fff;">Đặt tour du lịch dễ dàng chỉ trong vài phút</h1>
-				<p style="color: #e5e7eb;">Hệ thống gọn nhẹ giúp bạn khám phá tour phù hợp, quản lý lịch sử đặt và nhận hỗ trợ tức thời. Thiết kế hướng tới trải nghiệm rõ ràng, tối giản.</p>
+				<h1 style="color: #ea2cc7ff;">Đặt tour du lịch dễ dàng chỉ trong vài phút</h1>
+				<p style="color: #333; font-size: 18px;">Hệ thống gọn nhẹ giúp bạn khám phá tour phù hợp, quản lý lịch sử đặt và nhận hỗ trợ tức thời. Thiết kế hướng tới trải nghiệm rõ ràng, tối giản.</p>
 				<div class="hero__cta">
 					<a class="btn" href="<?php echo BASE_URL; ?>package">Khám phá gói tour</a>
 					<?php if (empty($_SESSION["login"])): ?>
@@ -27,31 +27,34 @@
 				</div>
 			</div>
 			<form class="hero__card" action="<?php echo BASE_URL; ?>package" method="get">
-				<p style="letter-spacing: .3rem;">Tìm tour</p>
-				<h3 style="margin-top:0;">Bắt đầu với nhu cầu của bạn</h3>
+				<p style="letter-spacing: .3rem; color:black; ">Tìm tour</p>
+				<h3 style="margin-top:0; color:black; font-size:25px;">Bắt đầu với nhu cầu của bạn</h3>
 				<div class="form-group">
-					<label for="keyword">Bạn muốn đi đâu?</label>
-					<input type="text" id="keyword" name="keyword" placeholder="Ví dụ: Đà Nẵng, Sa Pa">
+					<label for="keyword" style="color:black;">Từ khóa</label>
+					<input type="text" id="keyword" name="keyword" placeholder="Nhập từ khóa: Tên tour, địa điểm (VD: Đà Nẵng, Sa Pa, Hạ Long)">
+					<small class="helper-text" style="display: block; margin-top: 0.5rem; color: var(--muted); font-size: 0.85rem;">Ví dụ: Tên tour, địa điểm bạn muốn khám phá</small>
 				</div>
 				<div class="form-group">
-					<label for="location">Địa điểm nổi bật</label>
+					<label for="location">Địa điểm</label>
 					<select name="location" id="location">
-						<option value="">Tất cả địa điểm</option>
+						<option value="">-- Chọn địa điểm bạn muốn khám phá --</option>
 						<?php foreach ($data["locations"] as $loc): ?>
 							<option value="<?php echo htmlentities(
            $loc->PackageLocation,
        ); ?>"><?php echo htmlentities($loc->PackageLocation); ?></option>
 						<?php endforeach; ?>
 					</select>
+					<small class="helper-text" style="display: block; margin-top: 0.5rem; color: var(--muted); font-size: 0.85rem;">Chọn địa điểm cụ thể hoặc để trống để xem tất cả</small>
 				</div>
 				<div class="form-group">
-					<label for="price">Ngân sách dự kiến</label>
+					<label for="price">Ngân sách</label>
 					<select name="price" id="price">
-						<option value="">Bất kỳ</option>
-						<option value="under-200">Dưới 200 USD</option>
-						<option value="200-500">200 - 500 USD</option>
-						<option value="over-500">Trên 500 USD</option>
+						<option value="">-- Chọn mức ngân sách phù hợp --</option>
+						<option value="under-200">Dưới 4.800.000 đ</option>
+						<option value="200-500">4.800.000 đ - 12.000.000 đ</option>
+						<option value="over-500">Trên 12.000.000 đ</option>
 					</select>
+					<small class="helper-text" style="display: block; margin-top: 0.5rem; color: var(--muted); font-size: 0.85rem;">Chọn khoảng giá phù hợp với ngân sách của bạn</small>
 				</div>
 				<button class="btn w-100" type="submit">Xem tour phù hợp</button>
 			</form>
@@ -102,9 +105,7 @@
 							</div>
 							<p><?php echo htmlentities($package->PackageFetures); ?></p>
 							<div class="tour-card__footer">
-								<span class="price">USD <?php echo htmlentities(
-            $package->PackagePrice,
-        ); ?></span>
+								<span class="price"><?php echo Controller::formatVND($package->PackagePrice); ?></span>
 								<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities(
     $package->PackageId,
 ); ?>">Chi tiết</a>

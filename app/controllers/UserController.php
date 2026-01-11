@@ -34,9 +34,22 @@ class UserController extends Controller {
         }
 
         if (isset($_POST['submit'])) {
-            $name = $_POST['name'];
-            $mobileno = $_POST['mobileno'];
+            $name = trim($_POST['name'] ?? '');
+            $mobileno = trim($_POST['mobileno'] ?? '');
             $email = $_SESSION['login'];
+
+            // Validate inputs
+            if (empty($name) || empty($mobileno)) {
+                $_SESSION['error'] = "Vui lòng nhập đầy đủ thông tin";
+                header('location:' . BASE_URL . 'user/profile');
+                exit;
+            }
+
+            if (!preg_match('/^[0-9]{10}$/', $mobileno)) {
+                $_SESSION['error'] = "Số điện thoại phải có 10 chữ số";
+                header('location:' . BASE_URL . 'user/profile');
+                exit;
+            }
 
             $userModel = $this->model('UserModel');
             if ($userModel->updateUserProfile($email, $name, $mobileno)) {
@@ -71,9 +84,22 @@ class UserController extends Controller {
         }
 
         if (isset($_POST['submit5'])) {
-            $password = md5($_POST['password']);
-            $newpassword = md5($_POST['newpassword']);
+            $password = $_POST['password'] ?? '';
+            $newpassword = $_POST['newpassword'] ?? '';
             $email = $_SESSION['login'];
+
+            // Validate passwords
+            if (empty($password) || empty($newpassword)) {
+                $_SESSION['error'] = "Vui lòng nhập đầy đủ thông tin";
+                header('location:' . BASE_URL . 'user/change-password');
+                exit;
+            }
+
+            if (strlen($newpassword) < 6) {
+                $_SESSION['error'] = "Mật khẩu mới phải có ít nhất 6 ký tự";
+                header('location:' . BASE_URL . 'user/change-password');
+                exit;
+            }
 
             $userModel = $this->model('UserModel');
 
@@ -103,9 +129,28 @@ class UserController extends Controller {
 
     public function resetPassword() {
         if (isset($_POST['submit'])) {
-            $contact = $_POST['mobile'];
-            $email = $_POST['email'];
-            $newpassword = md5($_POST['newpassword']);
+            $contact = trim($_POST['mobile'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $newpassword = $_POST['newpassword'] ?? '';
+
+            // Validate inputs
+            if (empty($email) || empty($contact) || empty($newpassword)) {
+                $_SESSION['error'] = "Vui lòng nhập đầy đủ thông tin";
+                header('location:' . BASE_URL . 'user/forgot-password');
+                exit;
+            }
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $_SESSION['error'] = "Email không hợp lệ";
+                header('location:' . BASE_URL . 'user/forgot-password');
+                exit;
+            }
+
+            if (strlen($newpassword) < 6) {
+                $_SESSION['error'] = "Mật khẩu mới phải có ít nhất 6 ký tự";
+                header('location:' . BASE_URL . 'user/forgot-password');
+                exit;
+            }
 
             $userModel = $this->model('UserModel');
 
@@ -146,18 +191,51 @@ class UserController extends Controller {
 
     public function signup() {
         if (isset($_POST['submit'])) {
-            $fname = $_POST['fname'];
-            $mnumber = $_POST['mobilenumber'];
-            $email = $_POST['email'];
-            $password = md5($_POST['password']);
+            $fname = trim($_POST['fname'] ?? '');
+            $mnumber = trim($_POST['mobilenumber'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $password = $_POST['password'] ?? '';
+
+            // Validate inputs
+            if (empty($fname) || empty($mnumber) || empty($email) || empty($password)) {
+                $_SESSION['error'] = "Vui lòng nhập đầy đủ thông tin";
+                header('location:' . BASE_URL);
+                exit;
+            }
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $_SESSION['error'] = "Email không hợp lệ";
+                header('location:' . BASE_URL);
+                exit;
+            }
+
+            if (strlen($password) < 6) {
+                $_SESSION['error'] = "Mật khẩu phải có ít nhất 6 ký tự";
+                header('location:' . BASE_URL);
+                exit;
+            }
+
+            if (!preg_match('/^[0-9]{10}$/', $mnumber)) {
+                $_SESSION['error'] = "Số điện thoại phải có 10 chữ số";
+                header('location:' . BASE_URL);
+                exit;
+            }
 
             $userModel = $this->model('UserModel');
+            
+            // Check if email already exists
+            if ($userModel->checkEmailAvailability($email)) {
+                $_SESSION['error'] = "Email này đã được sử dụng";
+                header('location:' . BASE_URL);
+                exit;
+            }
+
             $lastInsertId = $userModel->createUser($fname, $mnumber, $email, $password);
 
             if ($lastInsertId) {
                 $_SESSION['msg'] = "Bạn đã đăng ký thành công. Bây giờ bạn có thể đăng nhập.";
             } else {
-                $_SESSION['msg'] = "Có lỗi xảy ra. Vui lòng thử lại.";
+                $_SESSION['error'] = "Có lỗi xảy ra. Vui lòng thử lại.";
             }
             header('location:' . BASE_URL . 'thankyou');
             exit;
@@ -168,12 +246,25 @@ class UserController extends Controller {
 
     public function login() {
         if (isset($_POST['signin'])) {
-            $email = $_POST['email'];
-            $password = md5($_POST['password']);
+            $email = trim($_POST['email'] ?? '');
+            $password = $_POST['password'] ?? '';
+
+            // Validate inputs
+            if (empty($email) || empty($password)) {
+                $_SESSION['error'] = "Vui lòng nhập đầy đủ thông tin";
+                header('location:' . BASE_URL);
+                exit;
+            }
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $_SESSION['error'] = "Email không hợp lệ";
+                header('location:' . BASE_URL);
+                exit;
+            }
 
             $userModel = $this->model('UserModel');
             if ($userModel->checkPassword($email, $password)) {
-                $_SESSION['login'] = $_POST['email'];
+                $_SESSION['login'] = $email;
                 header('location:' . BASE_URL . 'package');
                 exit;
             } else {

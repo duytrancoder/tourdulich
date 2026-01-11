@@ -10,31 +10,36 @@ else{
 $pid=intval($_GET['pid']);	
 if(isset($_POST['submit']))
 {
-$pname=$_POST['packagename'];
-$ptype=$_POST['packagetype'];	
-$plocation=$_POST['packagelocation'];
-$pprice=$_POST['packageprice'];	
-$pfeatures=$_POST['packagefeatures'];
-$pdetails=$_POST['packagedetails'];	
-$pimage=$_FILES["packageimage"]["name"];
-$sql="update TblTourPackages set PackageName=:pname,PackageType=:ptype,PackageLocation=:plocation,PackagePrice=:pprice,PackageFetures=:pfeatures,PackageDetails=:pdetails where PackageId=:pid";
+$pname = trim($_POST['packagename'] ?? '');
+$ptype = trim($_POST['packagetype'] ?? '');	
+$plocation = trim($_POST['packagelocation'] ?? '');
+$pprice = intval($_POST['packageprice'] ?? 0);	
+$pfeatures = trim($_POST['packagefeatures'] ?? '');
+$pdetails = trim($_POST['packagedetails'] ?? '');	
+
+// Validate inputs
+if (empty($pname) || empty($ptype) || empty($plocation) || $pprice <= 0 || empty($pfeatures) || empty($pdetails)) {
+	$error = "Vui lòng điền đầy đủ thông tin";
+} else {
+	$sql="update tbltourpackages set PackageName=:pname,PackageType=:ptype,PackageLocation=:plocation,PackagePrice=:pprice,PackageFetures=:pfeatures,PackageDetails=:pdetails where PackageId=:pid";
 $query = $dbh->prepare($sql);
 $query->bindParam(':pname',$pname,PDO::PARAM_STR);
 $query->bindParam(':ptype',$ptype,PDO::PARAM_STR);
 $query->bindParam(':plocation',$plocation,PDO::PARAM_STR);
-$query->bindParam(':pprice',$pprice,PDO::PARAM_STR);
+$query->bindParam(':pprice',$pprice,PDO::PARAM_INT);
 $query->bindParam(':pfeatures',$pfeatures,PDO::PARAM_STR);
 $query->bindParam(':pdetails',$pdetails,PDO::PARAM_STR);
-$query->bindParam(':pid',$pid,PDO::PARAM_STR);
-$query->execute();
-$msg="Cập nhật gói tour thành công";
+	$query->bindParam(':pid',$pid,PDO::PARAM_INT);
+	$query->execute();
+	$msg="Cập nhật gói tour thành công";
+}
 }
 
 	$pageTitle = "GoTravel Admin | Cập nhật gói tour";
 	$currentPage = 'manage-packages';
-	$sql = "SELECT * from TblTourPackages where PackageId=:pid";
+	$sql = "SELECT * from tbltourpackages where PackageId=:pid";
 	$query = $dbh -> prepare($sql);
-	$query -> bindParam(':pid', $pid, PDO::PARAM_STR);
+	$query -> bindParam(':pid', $pid, PDO::PARAM_INT);
 	$query->execute();
 	$package = $query->fetch(PDO::FETCH_OBJ);
 	include('includes/layout-start.php');
@@ -64,8 +69,9 @@ $msg="Cập nhật gói tour thành công";
 						<input type="text" name="packagelocation" id="packagelocation" value="<?php echo htmlentities($package->PackageLocation);?>" required>
 					</div>
 					<div class="form-group">
-						<label for="packageprice">Giá gói (USD)</label>
-						<input type="number" min="0" step="0.01" name="packageprice" id="packageprice" value="<?php echo htmlentities($package->PackagePrice);?>" required>
+						<label for="packageprice">Giá gói (VNĐ)</label>
+						<input type="number" min="0" step="1000" name="packageprice" id="packageprice" value="<?php echo htmlentities($package->PackagePrice);?>" required>
+						<small style="color: var(--muted); font-size: 0.85rem;">Giá hiện tại: <?php echo number_format($package->PackagePrice, 0, ',', '.') . ' đ'; ?></small>
 					</div>
 				</div>
 				<div class="form-group">

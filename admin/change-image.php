@@ -10,26 +10,46 @@ else{
 	$imgid=intval($_GET['imgid']);
 if(isset($_POST['submit']))
 {
+$pimage = '';
+$error = '';
 
-$pimage=$_FILES["packageimage"]["name"];
-move_uploaded_file($_FILES["packageimage"]["tmp_name"],"pacakgeimages/".$_FILES["packageimage"]["name"]);
-$sql="update TblTourPackages set PackageImage=:pimage where PackageId=:imgid";
-$query = $dbh->prepare($sql);
-
-$query->bindParam(':imgid',$imgid,PDO::PARAM_STR);
-$query->bindParam(':pimage',$pimage,PDO::PARAM_STR);
-$query->execute();
-$msg="Cập nhật hình ảnh gói tour thành công";
-
-
-
+// Validate file upload
+if (!isset($_FILES["packageimage"]) || $_FILES["packageimage"]["error"] !== UPLOAD_ERR_OK) {
+	$error = "Vui lòng chọn hình ảnh";
+} else {
+	$allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+	$fileType = $_FILES["packageimage"]["type"];
+	$fileSize = $_FILES["packageimage"]["size"];
+	
+	if (!in_array($fileType, $allowedTypes)) {
+		$error = "Chỉ chấp nhận file ảnh (JPEG, PNG, GIF, WEBP)";
+	} elseif ($fileSize > 5 * 1024 * 1024) { // 5MB limit
+		$error = "Kích thước file không được vượt quá 5MB";
+	} else {
+		// Sanitize filename
+		$pimage = basename($_FILES["packageimage"]["name"]);
+		$pimage = preg_replace('/[^a-zA-Z0-9._-]/', '_', $pimage);
+		$uploadPath = "pacakgeimages/" . $pimage;
+		
+		if (move_uploaded_file($_FILES["packageimage"]["tmp_name"], $uploadPath)) {
+			$sql="update tbltourpackages set PackageImage=:pimage where PackageId=:imgid";
+			$query = $dbh->prepare($sql);
+			$query->bindParam(':imgid',$imgid,PDO::PARAM_INT);
+			$query->bindParam(':pimage',$pimage,PDO::PARAM_STR);
+			$query->execute();
+			$msg="Cập nhật hình ảnh gói tour thành công";
+		} else {
+			$error = "Không thể tải lên file. Vui lòng thử lại";
+		}
+	}
+}
 }
 
 	$pageTitle = "GoTravel Admin | Cập nhật hình ảnh";
 	$currentPage = 'manage-packages';
-	$sql = "SELECT PackageImage from TblTourPackages where PackageId=:imgid";
+	$sql = "SELECT PackageImage from tbltourpackages where PackageId=:imgid";
 	$query = $dbh -> prepare($sql);
-	$query -> bindParam(':imgid', $imgid, PDO::PARAM_STR);
+	$query -> bindParam(':imgid', $imgid, PDO::PARAM_INT);
 	$query->execute();
 	$package = $query->fetch(PDO::FETCH_OBJ);
 	include('includes/layout-start.php');

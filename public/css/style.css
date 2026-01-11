@@ -62,6 +62,15 @@ textarea {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+input::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+select option[disabled][selected] {
+  color: #94a3b8;
+}
+
 input:focus,
 select:focus,
 textarea:focus {
@@ -247,10 +256,19 @@ section + section {
 }
 
 .hero {
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../admin/pacakgeimages/tour_halong.webp') no-repeat center center;
+  background-color: transparent;
+  background-image: url('../../admin/images/nentour.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
   background-size: cover;
   padding: 6rem 0 5rem;
   color: #fff;
+  position: relative;
+}
+
+.hero .container {
+  position: relative;
+  z-index: 1;
 }
 
 .hero__grid {

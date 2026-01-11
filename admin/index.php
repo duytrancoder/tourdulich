@@ -4,20 +4,48 @@ include('includes/config.php');
 $loginError = '';
 if(isset($_POST['login']))
 {
-	$uname=$_POST['username'];
-	$password=md5($_POST['password']);
-	$sql ="SELECT UserName,Password FROM admin WHERE UserName=:uname and Password=:password";
-	$query= $dbh -> prepare($sql);
-	$query-> bindParam(':uname', $uname, PDO::PARAM_STR);
-	$query-> bindParam(':password', $password, PDO::PARAM_STR);
-	$query-> execute();
-	if($query->rowCount() > 0)
-	{
-		$_SESSION['alogin']=$uname;
-		header('location:dashboard.php');
-		exit;
-	} else{
-		$loginError = "Thông tin đăng nhập không hợp lệ";
+	$uname = trim($_POST['username'] ?? '');
+	$password = $_POST['password'] ?? '';
+	
+	if (empty($uname) || empty($password)) {
+		$loginError = "Vui lòng nhập đầy đủ thông tin";
+	} else {
+		$sql = "SELECT UserName,Password FROM admin WHERE UserName=:uname";
+		$query = $dbh->prepare($sql);
+		$query->bindParam(':uname', $uname, PDO::PARAM_STR);
+		$query->execute();
+		$admin = $query->fetch(PDO::FETCH_OBJ);
+		
+		if ($admin) {
+			// Support both old MD5 and new password_hash
+			$passwordValid = false;
+			if (strlen($admin->Password) === 32 && ctype_xdigit($admin->Password)) {
+				// Old MD5 hash - verify and upgrade
+				if ($admin->Password === md5($password)) {
+					$passwordValid = true;
+					// Upgrade to password_hash
+					$newHash = password_hash($password, PASSWORD_DEFAULT);
+					$updateSql = "UPDATE admin SET Password=:newpassword WHERE UserName=:uname";
+					$updateQuery = $dbh->prepare($updateSql);
+					$updateQuery->bindParam(':uname', $uname, PDO::PARAM_STR);
+					$updateQuery->bindParam(':newpassword', $newHash, PDO::PARAM_STR);
+					$updateQuery->execute();
+				}
+			} else {
+				// New password_hash
+				$passwordValid = password_verify($password, $admin->Password);
+			}
+			
+			if ($passwordValid) {
+				$_SESSION['alogin'] = $uname;
+				header('location:dashboard.php');
+				exit;
+			} else {
+				$loginError = "Thông tin đăng nhập không hợp lệ";
+			}
+		} else {
+			$loginError = "Thông tin đăng nhập không hợp lệ";
+		}
 	}
 }
 ?>

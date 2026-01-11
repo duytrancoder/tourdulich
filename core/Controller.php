@@ -30,4 +30,13 @@ class Controller {
             die('View does not exist: ' . $view);
         }
     }
+
+    /**
+     * Format giá VNĐ với dấu phân cách nghìn
+     * @param int|float $vndPrice Giá gốc (VNĐ)
+     * @return string Giá đã định dạng kèm đơn vị
+     */
+    public static function formatVND($vndPrice) {
+        return number_format($vndPrice, 0, ',', '.') . ' đ';
+    }
 }

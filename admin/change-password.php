@@ -10,25 +10,53 @@ if(strlen($_SESSION['alogin'])==0)
 
 if(isset($_POST['submit']))
 {
-	$password=md5($_POST['password']);
-	$newpassword=md5($_POST['newpassword']);
-	$username=$_SESSION['alogin'];
-	$sql ="SELECT Password FROM admin WHERE UserName=:username and Password=:password";
-	$query= $dbh -> prepare($sql);
-	$query-> bindParam(':username', $username, PDO::PARAM_STR);
-	$query-> bindParam(':password', $password, PDO::PARAM_STR);
-	$query-> execute();
-	if($query -> rowCount() > 0)
-	{
-		$con="update admin set Password=:newpassword where UserName=:username";
-		$chngpwd1 = $dbh->prepare($con);
-		$chngpwd1-> bindParam(':username', $username, PDO::PARAM_STR);
-		$chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
-		$chngpwd1->execute();
-		$msg="Mật khẩu đã được thay đổi thành công";
-	}
-	else {
-		$error="Mật khẩu hiện tại không đúng";	
+	$password = $_POST['password'] ?? '';
+	$newpassword = $_POST['newpassword'] ?? '';
+	$confirmpassword = $_POST['confirmpassword'] ?? '';
+	$username = $_SESSION['alogin'];
+	
+	// Validate inputs
+	if (empty($password) || empty($newpassword) || empty($confirmpassword)) {
+		$error = "Vui lòng nhập đầy đủ thông tin";
+	} elseif ($newpassword !== $confirmpassword) {
+		$error = "Mật khẩu mới và xác nhận mật khẩu không trùng khớp";
+	} elseif (strlen($newpassword) < 6) {
+		$error = "Mật khẩu mới phải có ít nhất 6 ký tự";
+	} else {
+		$sql = "SELECT Password FROM admin WHERE UserName=:username";
+		$query = $dbh->prepare($sql);
+		$query->bindParam(':username', $username, PDO::PARAM_STR);
+		$query->execute();
+		$admin = $query->fetch(PDO::FETCH_OBJ);
+		
+		if ($admin) {
+			// Support both old MD5 and new password_hash
+			$passwordValid = false;
+			if (strlen($admin->Password) === 32 && ctype_xdigit($admin->Password)) {
+				// Old MD5 hash
+				$passwordValid = ($admin->Password === md5($password));
+			} else {
+				// New password_hash
+				$passwordValid = password_verify($password, $admin->Password);
+			}
+			
+			if ($passwordValid) {
+				$hashedPassword = password_hash($newpassword, PASSWORD_DEFAULT);
+				$con = "UPDATE admin SET Password=:newpassword WHERE UserName=:username";
+				$chngpwd1 = $dbh->prepare($con);
+				$chngpwd1->bindParam(':username', $username, PDO::PARAM_STR);
+				$chngpwd1->bindParam(':newpassword', $hashedPassword, PDO::PARAM_STR);
+				if ($chngpwd1->execute()) {
+					$msg = "Mật khẩu đã được thay đổi thành công";
+				} else {
+					$error = "Có lỗi xảy ra. Vui lòng thử lại";
+				}
+			} else {
+				$error = "Mật khẩu hiện tại không đúng";
+			}
+		} else {
+			$error = "Không tìm thấy tài khoản";
+		}
 	}
 }
 

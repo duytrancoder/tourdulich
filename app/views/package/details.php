@@ -41,9 +41,7 @@
 							<li><span>Địa điểm</span><strong><?php echo htmlentities(
            $data["package"]->PackageLocation,
        ); ?></strong></li>
-							<li><span>Giá</span><strong>USD <?php echo htmlentities(
-           $data["package"]->PackagePrice,
-       ); ?></strong></li>
+							<li><span>Giá</span><strong><?php echo Controller::formatVND($data["package"]->PackagePrice); ?></strong></li>
 						</ul>
 						<p><?php echo htmlentities($data["package"]->PackageFetures); ?></p>
 					</section>
@@ -66,7 +64,7 @@
 								<label for="comment">Ghi chú</label>
 								<textarea id="comment" name="comment" required placeholder="Nêu thêm yêu cầu cụ thể"></textarea>
 							</div>
-							<?php if ($_SESSION["login"]): ?>
+							<?php if (!empty($_SESSION["login"])): ?>
 								<button type="submit" name="submit2" class="btn">Đặt tour</button>
 							<?php else: ?>
 								<a class="btn btn-ghost" href="#" data-modal-target="signin-modal">Đăng nhập để đặt tour</a>
@@ -76,7 +74,7 @@
 				</div>
 				<section class="card">
 					<h3>Thông tin chi tiết</h3>
-					<p><?php echo nl2br(htmlentities($data["package"]->PackageDetails)); ?></p>
+					<div class="package-details"><?php echo nl2br(htmlspecialchars($data["package"]->PackageDetails, ENT_QUOTES, 'UTF-8')); ?></div>
 				</section>
 		<?php else: ?>
 			<div class="empty-state">Không tìm thấy gói tour.</div>

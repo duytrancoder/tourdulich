@@ -44,13 +44,13 @@
       } ?>>Bất kỳ</option>
 						<option value="under-200" <?php if ($data["priceFilter"] === "under-200") {
           echo "selected";
-      } ?>>Dưới 200 USD</option>
+      } ?>>Dưới 4.800.000 đ</option>
 						<option value="200-500" <?php if ($data["priceFilter"] === "200-500") {
           echo "selected";
-      } ?>>200 - 500 USD</option>
+      } ?>>4.800.000 đ - 12.000.000 đ</option>
 						<option value="over-500" <?php if ($data["priceFilter"] === "over-500") {
           echo "selected";
-      } ?>>Trên 500 USD</option>
+      } ?>>Trên 12.000.000 đ</option>
 					</select>
 				</div>
 				<div class="form-group" style="align-self:flex-end;">
@@ -75,9 +75,7 @@
 							</div>
 							<p><?php echo htmlentities($package->PackageFetures); ?></p>
 							<div class="tour-card__footer">
-								<span class="price">USD <?php echo htmlentities(
-            $package->PackagePrice,
-        ); ?></span>
+								<span class="price"><?php echo Controller::formatVND($package->PackagePrice); ?></span>
 								<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities(
     $package->PackageId,
 ); ?>">Chi tiết</a>

@@ -15,12 +15,19 @@ class PageController extends Controller {
         $content = '';
         if ($page) {
             $content = $page->detail;
+            // Clean up deprecated HTML tags
             $content = preg_replace('/<FONT[^>]*>/i', '', $content);
             $content = str_replace('</FONT>', '', $content);
             $content = preg_replace('/<P align=[^>]*>/i', '<p>', $content);
             $content = str_replace('</P>', '</p>', $content);
             $content = preg_replace('/<STRONG>/i', '<strong>', $content);
             $content = str_replace('</STRONG>', '</strong>', $content);
+            
+            // Remove potentially dangerous script tags and event handlers
+            // Remove script tags (case-insensitive, dot matches newline)
+            $content = preg_replace('/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/is', '', $content);
+            $content = preg_replace('/on\w+\s*=\s*["\'][^"\']*["\']/i', '', $content);
+            $content = preg_replace('/on\w+\s*=\s*[^\s>]*/i', '', $content);
         }
 
         $data = [
