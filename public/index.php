@@ -24,6 +24,10 @@ if ($basePath === '' || $basePath === '.') {
 }
 
 define("BASE_URL", $protocol . '://' . $host . $basePath . '/');
+
+// Autoload Helper class
+require_once ROOT . "/core/Helper.php";
+
 spl_autoload_register(function ($className) {
     $corePath = ROOT . "/core/" . str_replace("\\", "/", $className) . ".php";
     if (file_exists($corePath)) {

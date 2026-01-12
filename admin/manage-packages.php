@@ -72,6 +72,7 @@ include('includes/layout-start.php');
 							<td><?php echo htmlentities($result->Creationdate);?></td>
 							<td>
 								<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/update-package.php?pid=<?php echo htmlentities($result->PackageId);?>">Xem chi tiết</a>
+								<a class="btn" href="<?php echo BASE_URL; ?>admin/manage-itinerary.php?pid=<?php echo htmlentities($result->PackageId);?>" style="background: var(--brand); color: white;">Quản lý lộ trình</a>
 								<a class="btn btn-danger" href="<?php echo BASE_URL; ?>admin/manage-packages.php?del=<?php echo htmlentities($result->PackageId);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa gói tour này không?');">Xóa</a>
 							</td>
 						</tr>

@@ -25,8 +25,12 @@ class PackageController extends Controller {
         $packageModel = $this->model('PackageModel');
         $package = $packageModel->getPackageById($id);
 
+        $itineraryModel = $this->model('ItineraryModel');
+        $itineraries = $itineraryModel->getByPackageId($id);
+
         $data = [
             'package' => $package,
+            'itineraries' => $itineraries,
             'error' => $_SESSION['error'] ?? null,
             'msg' => $_SESSION['msg'] ?? null
         ];
@@ -53,7 +57,7 @@ class PackageController extends Controller {
             // Validate inputs
             if (empty($fromdate) || empty($todate)) {
                 $_SESSION['error'] = "Vui lòng chọn ngày đi và ngày về";
-                header('Location: ' . BASE_URL . 'package-details/' . $pid);
+                header('Location: ' . BASE_URL . 'package/details/' . $pid);
                 exit;
             }
 
@@ -64,19 +68,19 @@ class PackageController extends Controller {
 
             if ($fromTimestamp === false || $toTimestamp === false) {
                 $_SESSION['error'] = "Ngày không hợp lệ";
-                header('Location: ' . BASE_URL . 'package-details/' . $pid);
+                header('Location: ' . BASE_URL . 'package/details/' . $pid);
                 exit;
             }
 
             if ($fromTimestamp < $todayTimestamp) {
                 $_SESSION['error'] = "Ngày đi không thể là ngày trong quá khứ";
-                header('Location: ' . BASE_URL . 'package-details/' . $pid);
+                header('Location: ' . BASE_URL . 'package/details/' . $pid);
                 exit;
             }
 
             if ($toTimestamp < $fromTimestamp) {
                 $_SESSION['error'] = "Ngày về phải sau ngày đi";
-                header('Location: ' . BASE_URL . 'package-details/' . $pid);
+                header('Location: ' . BASE_URL . 'package/details/' . $pid);
                 exit;
             }
 
@@ -94,7 +98,7 @@ class PackageController extends Controller {
             } else {
                 $_SESSION['error'] = "Có lỗi xảy ra. Vui lòng thử lại";
             }
-            header('Location: ' . BASE_URL . 'package-details/' . $pid);
+            header('Location: ' . BASE_URL . 'package/details/' . $pid);
             exit;
         }
         header('Location: ' . BASE_URL . 'package');

@@ -6,7 +6,7 @@
 	<title>GoTravel | Liên hệ</title>
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css">
 </head>
-<body style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('<?php echo BASE_URL; ?>admin/pacakgeimages/tour_halong.webp') no-repeat center center; background-size: cover;">
+<body style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('<?php echo BASE_URL; ?>admin/packageimages/tour_halong.webp') no-repeat center center; background-size: cover;">
 <?php include ROOT . "/includes/header.php"; ?>
 <main class="page">
 	<div class="container">

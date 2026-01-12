@@ -63,7 +63,7 @@
 						<tr>
 							<td><?php echo htmlentities($cnt); ?></td>
 							<td>#BK<?php echo htmlentities($result->bookid); ?></td>
-							<td><a href="<?php echo BASE_URL; ?>package-details/<?php echo htmlentities(
+							<td><a href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities(
     $result->pkgid,
 ); ?>"><?php echo htmlentities($result->packagename); ?></a></td>
 							<td><?php echo htmlentities($result->fromdate); ?></td>

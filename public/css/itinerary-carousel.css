@@ -1,0 +1,239 @@
+/* Tour Itinerary Carousel - Matching Project Design System */
+
+.itinerary-section {
+    background: var(--bg);
+    padding: 64px 0;
+}
+
+.itinerary-wrapper {
+    background: rgb(167, 198, 217);
+    border-radius: 24px;
+    padding: 48px 0 120px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.itinerary-header {
+    text-align: center;
+    padding: 0 24px 40px;
+}
+
+.itinerary-headline {
+    font: 700 2.5rem/1.2 'Playfair Display', Georgia, serif;
+    color: var(--brand);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .itinerary-headline {
+        font-size: 2rem;
+    }
+}
+
+.itinerary-cards {
+    display: flex;
+    gap: 24px;
+    padding: 0 48px;
+    margin: 0;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+.itinerary-cards::-webkit-scrollbar {
+    display: none;
+}
+
+.itinerary-card {
+    flex: 0 0 auto;
+    width: 380px;
+    background: #FFFFFF;
+    border-radius: 12px;
+    border-top: 4px solid rgb(167, 198, 217);
+    padding: 36px;
+    scroll-snap-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.itinerary-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0, 90, 156, 0.15);
+}
+
+/* Alternating card colors matching project palette */
+.itinerary-card:nth-child(odd) {
+    background: white;
+}
+
+.itinerary-card:nth-child(even) {
+    background: linear-gradient(135deg, var(--brand-soft) 0%, #F0F8FF 100%);
+}
+
+.itinerary-card:nth-child(3n) {
+    background: linear-gradient(135deg, var(--accent-soft) 0%, #FFF8F5 100%);
+}
+
+.itinerary-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 220px;
+}
+
+.itinerary-time {
+    font-size: 0.813rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: #FF7F50;
+    margin: 0;
+    padding-bottom: 8px;
+}
+
+.itinerary-activity {
+    font: 700 1.875rem/1.4 'Playfair Display', Georgia, serif;
+    color: #005A9C;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .itinerary-activity {
+        font-size: 1.5rem;
+    }
+}
+
+/* Navigation Buttons - Matching Project Style */
+.carousel-nav {
+    position: absolute;
+    bottom: 40px;
+    right: 40px;
+    display: flex;
+    gap: 16px;
+    z-index: 10;
+}
+
+.carousel-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid white;
+    background: white;
+    color: var(--brand);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carousel-btn svg {
+    width: 26px;
+    height: 26px;
+    fill: currentColor;
+    transition: transform 0.3s ease;
+}
+
+.carousel-btn:hover:not(:disabled) {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 127, 80, 0.3);
+}
+
+.carousel-btn:hover:not(:disabled) svg {
+    transform: scale(1.1);
+}
+
+.carousel-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.carousel-btn:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .itinerary-section {
+        padding: 48px 0;
+    }
+
+    .itinerary-wrapper {
+        border-radius: 16px;
+        padding-bottom: 100px;
+    }
+
+    .itinerary-cards {
+        padding: 0 24px;
+        gap: 16px;
+    }
+
+    .itinerary-card {
+        width: 320px;
+        padding: 28px;
+    }
+
+    .carousel-nav {
+        bottom: 30px;
+        right: 50%;
+        transform: translateX(50%);
+    }
+
+    .carousel-btn {
+        width: 48px;
+        height: 48px;
+    }
+
+    .carousel-btn svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+/* Smooth entrance animation */
+@media (prefers-reduced-motion: no-preference) {
+    .itinerary-card {
+        animation: fadeInUp 0.5s ease-out backwards;
+    }
+
+    .itinerary-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .itinerary-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .itinerary-card:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .itinerary-card:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .itinerary-card:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,120 @@
+/* Card Hover Effects - Professional Travel Theme */
+
+.feature-card,
+.stat-card,
+.tour-card,
+.card {
+    border: 1px solid var(--border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.feature-card:hover,
+.stat-card:hover,
+.tour-card:hover,
+.card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 12px 32px rgba(0, 90, 156, 0.12);
+    transform: translateY(-2px);
+}
+
+/* Premium Tour Cards with Ocean Blue Hover */
+.premium-card-container {
+    box-shadow:
+        0 0 0 2px rgba(0, 90, 156, 0.3),
+        0 0 25px 8px rgba(0, 90, 156, 0.1),
+        0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.premium-card-container:hover {
+    box-shadow:
+        0 0 0 3px rgba(0, 90, 156, 0.5),
+        0 0 35px 12px rgba(0, 90, 156, 0.2),
+        0 15px 50px rgba(0, 0, 0, 0.15);
+}
+
+/* Type Badge - Sunset Orange */
+.premium-type-badge {
+    background: linear-gradient(135deg, rgba(255, 127, 80, 0.95), rgba(255, 99, 71, 0.95));
+}
+
+/* Price Tag - Sunset Orange */
+.premium-price-tag {
+    background: linear-gradient(135deg, #FF7F50 0%, #FF6347 100%);
+    color: #FFFFFF;
+    font-weight: 800;
+    box-shadow:
+        inset 2px 2px 4px rgba(255, 160, 122, 0.4),
+        inset -2px -2px 4px rgba(220, 80, 50, 0.4),
+        0 4px 12px rgba(255, 127, 80, 0.3);
+}
+
+/* Tour Button - Sunset Orange */
+.premium-tour-button {
+    background: linear-gradient(135deg, #FF7F50 0%, #FF6347 100%);
+    box-shadow:
+        inset 2px 2px 4px rgba(255, 160, 122, 0.4),
+        inset -2px -2px 4px rgba(220, 80, 50, 0.4),
+        0 4px 15px rgba(255, 127, 80, 0.4);
+}
+
+.premium-tour-button:hover {
+    background: linear-gradient(135deg, #FFA07A 0%, #FF7F50 100%);
+    box-shadow:
+        inset 2px 2px 5px rgba(255, 180, 140, 0.5),
+        inset -2px -2px 5px rgba(240, 100, 70, 0.4),
+        0 6px 20px rgba(255, 127, 80, 0.5);
+}
+
+.premium-tour-button:active {
+    background: linear-gradient(135deg, #FF6347 0%, #E85A2A 100%);
+}
+
+/* Brand Logo Color */
+.brand {
+    color: var(--brand);
+}
+
+/* Navigation Links */
+.site-nav a.is-active,
+.site-nav a:hover {
+    color: var(--brand);
+    background: var(--brand-soft);
+}
+
+/* Links */
+a {
+    color: var(--brand);
+}
+
+a:hover {
+    color: var(--brand-light);
+}
+
+/* Form Focus States - Ocean Blue */
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+/* Custom Dropdown - Ocean Blue Arrow */
+.custom-select-button::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23005A9C' fill-rule='evenodd' d='M7 9a1 1 0 0 0-.707 1.707l5 5a1 1 0 0 0 1.414 0l5-5A1 1 0 0 0 17 9z' clip-rule='evenodd'/%3E%3C/svg%3E");
+}
+
+.custom-select-button:hover,
+.custom-select-button.active {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.custom-select-option:hover {
+    background: var(--brand-soft);
+    color: var(--brand);
+}
+
+.custom-select-option.selected {
+    background: var(--brand-soft);
+    color: var(--brand);
+}

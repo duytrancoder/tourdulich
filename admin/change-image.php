@@ -2,34 +2,23 @@
 session_start();
 error_reporting(0);
 include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
-	{	
-header('location:index.php');
-}
-else{
-	$imgid=intval($_GET['imgid']);
+require_once dirname(__DIR__) . '/core/Helper.php';
+Helper::requireAdminLogin();
+
+$imgid=intval($_GET['imgid']);
 if(isset($_POST['submit']))
 {
 $pimage = '';
 $error = '';
 
-// Validate file upload
-if (!isset($_FILES["packageimage"]) || $_FILES["packageimage"]["error"] !== UPLOAD_ERR_OK) {
-	$error = "Vui lòng chọn hình ảnh";
-} else {
-	$allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-	$fileType = $_FILES["packageimage"]["type"];
-	$fileSize = $_FILES["packageimage"]["size"];
-	
-	if (!in_array($fileType, $allowedTypes)) {
-		$error = "Chỉ chấp nhận file ảnh (JPEG, PNG, GIF, WEBP)";
-	} elseif ($fileSize > 5 * 1024 * 1024) { // 5MB limit
-		$error = "Kích thước file không được vượt quá 5MB";
+	// Validate file upload using Helper class
+	$validation = Helper::validateImage($_FILES["packageimage"]);
+	if (!$validation['valid']) {
+		$error = $validation['error'];
 	} else {
 		// Sanitize filename
-		$pimage = basename($_FILES["packageimage"]["name"]);
-		$pimage = preg_replace('/[^a-zA-Z0-9._-]/', '_', $pimage);
-		$uploadPath = "pacakgeimages/" . $pimage;
+		$pimage = Helper::sanitizeFilename($_FILES["packageimage"]["name"]);
+		$uploadPath = "packageimages/" . $pimage;
 		
 		if (move_uploaded_file($_FILES["packageimage"]["tmp_name"], $uploadPath)) {
 			$sql="update tbltourpackages set PackageImage=:pimage where PackageId=:imgid";
@@ -42,7 +31,6 @@ if (!isset($_FILES["packageimage"]) || $_FILES["packageimage"]["error"] !== UPLO
 			$error = "Không thể tải lên file. Vui lòng thử lại";
 		}
 	}
-}
 }
 
 	$pageTitle = "GoTravel Admin | Cập nhật hình ảnh";
@@ -66,7 +54,7 @@ if (!isset($_FILES["packageimage"]) || $_FILES["packageimage"]["error"] !== UPLO
 			<form method="post" enctype="multipart/form-data" class="form-stack">
 				<div class="form-group">
 					<label>Hình ảnh hiện tại</label>
-					<img src="<?php echo BASE_URL; ?>admin/pacakgeimages/<?php echo htmlentities($package->PackageImage);?>" alt="Ảnh gói tour" style="width:200px;border-radius:0.75rem;">
+					<img src="<?php echo BASE_URL; ?>admin/packageimages/<?php echo htmlentities($package->PackageImage);?>" alt="Ảnh gói tour" style="width:200px;border-radius:0.75rem;">
 				</div>
 				<div class="form-group">
 					<label for="packageimage">Hình ảnh mới</label>
@@ -79,4 +67,3 @@ if (!isset($_FILES["packageimage"]) || $_FILES["packageimage"]["error"] !== UPLO
 			<?php endif; ?>
 		</section>
 	<?php include('includes/layout-end.php'); ?>
-<?php } ?>

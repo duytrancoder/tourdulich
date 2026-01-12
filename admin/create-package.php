@@ -2,11 +2,9 @@
 session_start();
 error_reporting(0);
 include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
-	{	
-header('location:index.php');
-}
-else{
+require_once dirname(__DIR__) . '/core/Helper.php';
+Helper::requireAdminLogin();
+
 if(isset($_POST['submit']))
 {
 $pname = trim($_POST['packagename'] ?? '');
@@ -23,20 +21,14 @@ if (empty($pname) || empty($ptype) || empty($plocation) || $pprice <= 0 || empty
 } elseif (!isset($_FILES["packageimage"]) || $_FILES["packageimage"]["error"] !== UPLOAD_ERR_OK) {
 	$error = "Vui lòng chọn hình ảnh";
 } else {
-	// Validate file upload
-	$allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-	$fileType = $_FILES["packageimage"]["type"];
-	$fileSize = $_FILES["packageimage"]["size"];
-	
-	if (!in_array($fileType, $allowedTypes)) {
-		$error = "Chỉ chấp nhận file ảnh (JPEG, PNG, GIF, WEBP)";
-	} elseif ($fileSize > 5 * 1024 * 1024) { // 5MB limit
-		$error = "Kích thước file không được vượt quá 5MB";
+	// Validate file upload using Helper class
+	$validation = Helper::validateImage($_FILES["packageimage"]);
+	if (!$validation['valid']) {
+		$error = $validation['error'];
 	} else {
 		// Sanitize filename
-		$pimage = basename($_FILES["packageimage"]["name"]);
-		$pimage = preg_replace('/[^a-zA-Z0-9._-]/', '_', $pimage);
-		$uploadPath = "pacakgeimages/" . $pimage;
+		$pimage = Helper::sanitizeFilename($_FILES["packageimage"]["name"]);
+		$uploadPath = "packageimages/" . $pimage;
 		
 		if (move_uploaded_file($_FILES["packageimage"]["tmp_name"], $uploadPath)) {
 			// File uploaded successfully, continue with database insert
@@ -121,4 +113,3 @@ $query->bindParam(':pimage',$pimage,PDO::PARAM_STR);
 			</form>
 		</section>
 	<?php include('includes/layout-end.php'); ?>
-<?php } ?>

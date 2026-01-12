@@ -58,7 +58,7 @@ if(isset($_POST['login']))
 	<title>GoTravel Admin | Đăng nhập</title>
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/css/style.css">
 </head>
-<body class="auth-page" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../admin/pacakgeimages/tour_halong.webp') no-repeat center center; background-size: cover;">
+<body class="auth-page" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../admin/packageimages/tour_halong.webp') no-repeat center center; background-size: cover;">
 	<div class="auth-card">
 		<h1 style="color:#fff">Đăng nhập quản trị</h1>
 		<p class="helper-text" style="color:#e5e7eb">Sử dụng thông tin tài khoản được cấp để truy cập hệ thống quản trị.</p>

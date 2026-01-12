@@ -1,0 +1,256 @@
+/* Premium 3D Tour Card Styles */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap');
+
+.premium-tour-grid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    max-width: 100%;
+    padding: 1rem 0;
+}
+
+@supports (display: grid) {
+    .premium-tour-grid {
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    }
+}
+
+.premium-card-container {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 9 / 15.5;
+    max-height: 650px;
+    border-radius: 1.75rem;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    box-shadow:
+        0 0 0 2px rgba(14, 165, 233, 0.4),
+        0 0 25px 8px rgba(14, 165, 233, 0.15);
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+        box-shadow 0.4s ease-out,
+        background-size 1.5s ease-out;
+    cursor: pointer;
+    will-change: transform, box-shadow, background-size;
+}
+
+.premium-card-container:hover {
+    box-shadow:
+        0 0 0 3px rgba(14, 165, 233, 0.6),
+        0 0 35px 12px rgba(14, 165, 233, 0.25);
+}
+
+.premium-inner-border {
+    position: absolute;
+    inset: 14px;
+    border-radius: 1.375rem;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow:
+        inset 0.5px 0.5px 1.5px rgba(180, 235, 255, 0.6),
+        inset -1px -1px 1px rgba(0, 110, 160, 0.5),
+        inset 3px 3px 6px rgba(0, 0, 0, 0.25);
+    transform: translateZ(30px);
+    will-change: transform;
+    border: 1px solid rgba(14, 165, 233, 0.1);
+}
+
+.premium-content-area {
+    position: absolute;
+    inset: 14px;
+    border-radius: 1.375rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    z-index: 5;
+    transform: translateZ(60px);
+    will-change: transform;
+}
+
+.premium-type-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.95), rgba(232, 90, 42, 0.95));
+    border-radius: 9999px;
+    padding: 0.5rem 1rem;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transform: translateZ(70px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 25;
+    will-change: transform;
+    backdrop-filter: blur(8px);
+}
+
+.premium-type-badge svg {
+    width: 1em;
+    height: 1em;
+}
+
+.premium-gradient-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 40%, transparent 100%);
+    pointer-events: none;
+    z-index: 15;
+    transform: translateZ(5px);
+    will-change: transform;
+}
+
+.premium-text-block {
+    position: relative;
+    z-index: 20;
+    color: #f8fafc;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transform: translateZ(25px);
+    will-change: transform;
+    padding: 0 1rem;
+}
+
+.premium-text-block h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+}
+
+.premium-text-block .location {
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    font-weight: 400;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.premium-text-block .features {
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.premium-price-tag {
+    position: relative;
+    z-index: 20;
+    background: linear-gradient(135deg, #FFD93D 0%, #FFC107 100%);
+    color: #2C3E50;
+    font-weight: 800;
+    font-size: 1.15rem;
+    padding: 0.65rem 1.75rem;
+    border-radius: 9999px;
+    text-align: center;
+    width: auto;
+    max-width: 85%;
+    margin: 0 auto 0.75rem;
+    box-shadow:
+        inset 2px 2px 4px rgba(255, 255, 255, 0.5),
+        inset -2px -2px 4px rgba(180, 140, 0, 0.3),
+        0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateZ(40px);
+    will-change: transform;
+    letter-spacing: 0.03em;
+}
+
+.premium-tour-button {
+    position: relative;
+    z-index: 20;
+    background: linear-gradient(135deg, #FF6B35 0%, #E85A2A 100%);
+    color: #fff;
+    font-weight: 700;
+    padding: 0.85rem 2rem;
+    border-radius: 9999px;
+    text-align: center;
+    width: auto;
+    min-width: 190px;
+    max-width: 85%;
+    margin: 0 auto;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    box-shadow:
+        inset 2px 2px 4px rgba(255, 140, 100, 0.4),
+        inset -2px -2px 4px rgba(200, 60, 30, 0.4),
+        0 4px 15px rgba(255, 107, 53, 0.4);
+    transform: translateZ(40px);
+    will-change: transform, box-shadow, background;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.premium-tour-button:hover {
+    background: linear-gradient(135deg, #FF8C61 0%, #FF6B35 100%);
+    box-shadow:
+        inset 2px 2px 5px rgba(255, 160, 120, 0.5),
+        inset -2px -2px 5px rgba(220, 80, 50, 0.4),
+        0 6px 20px rgba(255, 107, 53, 0.5);
+    transform: translateZ(40px) translateY(-3px);
+    color: #fff;
+}
+
+.premium-tour-button:active {
+    background: linear-gradient(135deg, #E85A2A 0%, #D04A1F 100%);
+    box-shadow:
+        inset -2px -2px 4px rgba(255, 140, 100, 0.4),
+        inset 2px 2px 4px rgba(180, 50, 20, 0.5),
+        0 2px 8px rgba(255, 107, 53, 0.3);
+    transform: translateZ(40px) translateY(0px);
+}
+
+.location-icon,
+.arrow-icon {
+    width: 1.2em;
+    height: 1.2em;
+    fill: currentColor;
+    stroke: currentColor;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .premium-tour-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .premium-card-container {
+        max-height: 580px;
+    }
+
+    .premium-text-block h3 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .premium-tour-grid {
+        grid-template-columns: 1fr;
+    }
+}

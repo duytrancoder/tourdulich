@@ -1,0 +1,172 @@
+/* Custom Dropdown Menu Styles - Inspired by Premium Design */
+
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.custom-select-wrapper select {
+    display: none;
+    /* Hide native select */
+}
+
+.custom-select-button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    padding-right: 3rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background: white;
+    color: var(--text);
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow:
+        0 1px 2px rgba(44, 62, 80, 0.05),
+        0 2px 4px rgba(44, 62, 80, 0.05);
+}
+
+.custom-select-button::after {
+    content: '';
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.5em;
+    height: 1.5em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23FF6B35' fill-rule='evenodd' d='M7 9a1 1 0 0 0-.707 1.707l5 5a1 1 0 0 0 1.414 0l5-5A1 1 0 0 0 17 9z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-select-button:hover {
+    border-color: var(--brand);
+    box-shadow:
+        0 2px 4px rgba(255, 107, 53, 0.1),
+        0 4px 8px rgba(255, 107, 53, 0.1);
+}
+
+.custom-select-button.active {
+    border-color: var(--brand);
+    box-shadow:
+        0 0 0 3px var(--brand-soft),
+        0 2px 8px rgba(255, 107, 53, 0.15);
+}
+
+.custom-select-button.active::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.custom-select-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 1rem;
+    padding: 0.5rem;
+    box-shadow:
+        0 1px 2px rgba(44, 62, 80, 0.05),
+        0 4px 8px rgba(44, 62, 80, 0.08),
+        0 8px 16px rgba(44, 62, 80, 0.08),
+        0 16px 32px rgba(44, 62, 80, 0.08);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+
+    /* Animation properties */
+    opacity: 0;
+    transform: scaleY(0.25) translateY(-1rem);
+    transform-origin: top center;
+    pointer-events: none;
+    transition:
+        opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+        transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.custom-select-dropdown.active {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+    pointer-events: all;
+}
+
+.custom-select-option {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text);
+    font-size: 0.95rem;
+
+    /* Stagger animation */
+    opacity: 0;
+    transform: translateY(20%);
+    transition:
+        opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+        transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+        background-color 0.2s ease;
+}
+
+.custom-select-dropdown.active .custom-select-option {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.custom-select-dropdown.active .custom-select-option:nth-child(1) {
+    transition-delay: 0.05s;
+}
+
+.custom-select-dropdown.active .custom-select-option:nth-child(2) {
+    transition-delay: 0.1s;
+}
+
+.custom-select-dropdown.active .custom-select-option:nth-child(3) {
+    transition-delay: 0.15s;
+}
+
+.custom-select-dropdown.active .custom-select-option:nth-child(4) {
+    transition-delay: 0.2s;
+}
+
+.custom-select-dropdown.active .custom-select-option:nth-child(5) {
+    transition-delay: 0.25s;
+}
+
+.custom-select-option:hover {
+    background: linear-gradient(135deg, var(--brand-soft), #FFE8DC);
+    color: var(--brand-dark);
+}
+
+.custom-select-option.selected {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 107, 53, 0.05));
+    color: var(--brand);
+    font-weight: 600;
+}
+
+.custom-select-option.selected::before {
+    content: '✓ ';
+    color: var(--brand);
+    font-weight: 700;
+    margin-right: 0.5rem;
+}
+
+/* Scrollbar styling */
+.custom-select-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.custom-select-dropdown::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-light);
+}

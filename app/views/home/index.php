@@ -6,7 +6,11 @@
 	<title>GoTravel | Trang chủ</title>
 	<meta name="description" content="Đặt tour du lịch nhanh chóng, quản lý lịch trình và nhận hỗ trợ 24/7 cùng GoTravel.">
 
-	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css">
+	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css?v=5.0">
+	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/modern-tour-cards.css?v=1.0">
+	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/enhanced-forms.css?v=5.0">
+	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/custom-dropdown.css?v=5.0">
+	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/theme-colors.css?v=5.0">
 </head>
 <body>
 <?php include ROOT . "/includes/header.php"; ?>
@@ -93,24 +97,87 @@
 			<?php if (count($data["packages"])): ?>
 				<div class="tour-grid">
 					<?php foreach ($data["packages"] as $package): ?>
-						<article class="tour-card">
-							<img src="<?php echo BASE_URL; ?>admin/pacakgeimages/<?php echo htmlentities(
-    $package->PackageImage,
-); ?>" alt="<?php echo htmlentities($package->PackageName); ?>">
-							<h4><?php echo htmlentities($package->PackageName); ?></h4>
-							<div class="tour-card__meta">
-								<span><?php echo htmlentities($package->PackageLocation); ?></span>
-								<span>|</span>
-								<span><?php echo htmlentities($package->PackageType); ?></span>
+						<div class="tour-card">
+							<!-- Tour Type Badge -->
+							<div class="badge"><?php echo htmlentities($package->PackageType); ?></div>
+							
+							<!-- Image -->
+							<div class="tilt">
+								<div class="img">
+									<img src="<?php echo BASE_URL; ?>admin/packageimages/<?php echo htmlentities($package->PackageImage); ?>" 
+									     alt="<?php echo htmlentities($package->PackageName); ?>">
+								</div>
 							</div>
-							<p><?php echo htmlentities($package->PackageFetures); ?></p>
-							<div class="tour-card__footer">
-								<span class="price"><?php echo Controller::formatVND($package->PackagePrice); ?></span>
-								<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities(
-    $package->PackageId,
-); ?>">Chi tiết</a>
+							
+							<!-- Info Section -->
+							<div class="info">
+								<!-- Location Category -->
+								<div class="cat">
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+										<circle cx="12" cy="10" r="3"></circle>
+									</svg>
+									<?php echo htmlentities($package->PackageLocation); ?>
+								</div>
+								
+								<!-- Tour Name -->
+								<h2 class="title"><?php echo htmlentities($package->PackageName); ?></h2>
+								
+								<!-- Description -->
+								<p class="desc"><?php echo htmlentities($package->PackageFetures); ?></p>
+								
+								<!-- Features (extract from PackageFetures if available) -->
+								<div class="feats">
+									<span class="feat">Tour trọn gói</span>
+									<span class="feat">Hướng dẫn viên</span>
+									<span class="feat">Bảo hiểm</span>
+								</div>
+								
+								<!-- Price & Button -->
+								<div class="bottom">
+									<div class="price">
+										<span class="price-label">Chỉ từ</span>
+										<span class="price-value"><?php echo Controller::formatVND($package->PackagePrice); ?></span>
+									</div>
+									<a href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities($package->PackageId); ?>" class="btn">
+										<span>Xem chi tiết</span>
+										<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+											<path d="M5 12h14"></path>
+											<path d="M12 5l7 7-7 7"></path>
+										</svg>
+									</a>
+								</div>
+								
+								<!-- Meta: Rating & Duration -->
+								<div class="meta">
+									<div class="rating">
+										<svg viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="0.5">
+											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+										</svg>
+										<svg viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="0.5">
+											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+										</svg>
+										<svg viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="0.5">
+											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+										</svg>
+										<svg viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="0.5">
+											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+										</svg>
+										<svg viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="0.5">
+											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+										</svg>
+										<span class="rcount">4.8/5</span>
+									</div>
+									<div class="duration">
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+											<circle cx="12" cy="12" r="10"></circle>
+											<polyline points="12 6 12 12 16 14"></polyline>
+										</svg>
+										<span>3-5 ngày</span>
+									</div>
+								</div>
 							</div>
-						</article>
+						</div>
 					<?php endforeach; ?>
 				</div>
 			<?php else: ?>
@@ -154,5 +221,6 @@
 <?php include ROOT . "/includes/signup.php"; ?>
 <?php include ROOT . "/includes/signin.php"; ?>
 <?php include ROOT . "/includes/write-us.php"; ?>
+<script src="<?php echo BASE_URL; ?>public/js/custom-dropdown.js?v=1.0"></script>
 </body>
 </html>
