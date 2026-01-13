@@ -6,6 +6,7 @@
 	<title>GoTravel | Chi tiết gói tour</title>
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css">
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/itinerary-carousel.css?v=11.0">
+	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/wishlist-button.css?v=1.0">
 </head>
 <body>
 <?php include ROOT . "/includes/header.php"; ?>
@@ -27,12 +28,7 @@
 
 		<?php if ($data["package"]): ?>
 				<div class="grid-two">
-					<section class="card" style="position: relative;">
-						<!-- Wishlist Heart -->
-						<button class="wishlist-heart" data-package-id="<?php echo htmlentities($data["package"]->PackageId); ?>" title="Thêm vào yêu thích" style="position: absolute; top: 1rem; right: 1rem;">
-							<i class="fas fa-heart"></i>
-						</button>
-						
+					<section class="card">
 						<img src="<?php echo BASE_URL; ?>admin/packageimages/<?php echo htmlentities(
     $data["package"]->PackageImage,
 ); ?>" alt="<?php echo htmlentities($data["package"]->PackageName); ?>">
@@ -40,6 +36,12 @@
 						<p class="badge">#PKG-<?php echo htmlentities(
           $data["package"]->PackageId,
       ); ?></p>
+						
+						<!-- Wishlist Button - Đẹp mắt và rõ ràng -->
+						<button class="wishlist-btn" data-package-id="<?php echo htmlentities($data["package"]->PackageId); ?>" id="wishlistBtn">
+							<i class="fas fa-heart"></i>
+							<span class="wishlist-text">Lưu tour yêu thích</span>
+						</button>
 						<ul class="summary-list">
 							<li><span>Loại gói</span><strong><?php echo htmlentities(
            $data["package"]->PackageType,
@@ -116,6 +118,6 @@
 <?php include ROOT . "/includes/signin.php"; ?>
 <?php include ROOT . "/includes/write-us.php"; ?>
 <script src="<?php echo BASE_URL; ?>public/js/itinerary-carousel.js?v=8.0"></script>
-<script src="<?php echo BASE_URL; ?>public/js/wishlist.js?v=1.0"></script>
+<script src="<?php echo BASE_URL; ?>public/js/wishlist-button.js?v=1.0"></script>
 </body>
 </html>

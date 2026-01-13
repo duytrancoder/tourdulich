@@ -1,0 +1,129 @@
+/* ============================================
+   WISHLIST BUTTON - Beautiful Design
+   ============================================ */
+
+.wishlist-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    border: 2px solid var(--border);
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.wishlist-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.wishlist-btn:hover::before {
+    left: 100%;
+}
+
+.wishlist-btn i {
+    font-size: 1.5rem;
+    color: #e74c3c;
+    transition: all 0.3s ease;
+    filter: grayscale(100%);
+}
+
+.wishlist-btn .wishlist-text {
+    transition: all 0.3s ease;
+}
+
+/* Hover State */
+.wishlist-btn:hover {
+    border-color: #e74c3c;
+    box-shadow: 0 4px 16px rgba(231, 76, 60, 0.2);
+    transform: translateY(-2px);
+}
+
+.wishlist-btn:hover i {
+    filter: grayscale(0%);
+    transform: scale(1.1);
+}
+
+/* Active State - Đã lưu */
+.wishlist-btn.saved {
+    background: linear-gradient(135deg, #ffe5e5 0%, #ffcccc 100%);
+    border-color: #e74c3c;
+    color: #c0392b;
+}
+
+.wishlist-btn.saved i {
+    filter: grayscale(0%);
+    animation: heartPulse 0.5s ease;
+}
+
+.wishlist-btn.saved .wishlist-text::before {
+    content: '✓ ';
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* Click Animation */
+.wishlist-btn:active {
+    transform: scale(0.98);
+}
+
+@keyframes heartPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.3);
+    }
+}
+
+/* Loading State */
+.wishlist-btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.wishlist-btn.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .wishlist-btn {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .wishlist-btn i {
+        font-size: 1.3rem;
+    }
+}

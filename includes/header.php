@@ -1,5 +1,6 @@
 <?php
 $isLoggedIn = !empty($_SESSION["login"]); ?>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <header class="site-header">
 	<div class="top-bar">
 		<div class="container top-bar__content">
