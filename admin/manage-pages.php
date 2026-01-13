@@ -60,10 +60,7 @@ include('includes/layout-start.php');
 				</select>
 			</div>
 			<?php if($selectedType && isset($pageMap[$selectedType])): ?>
-			<div class="form-group">
-				<label>Trang đã chọn</label>
-				<input type="text" value="<?php echo $pageMap[$selectedType];?>" disabled>
-			</div>
+
 			<div class="form-group">
 				<label for="pgedetails">Nội dung trang</label>
 				<textarea name="pgedetails" id="pgedetails" rows="12" required><?php echo htmlentities($pageContent);?></textarea>

@@ -8,6 +8,99 @@ class UserController extends Controller {
         exit;
     }
 
+    public function account() {
+        if (strlen($_SESSION['login']) == 0) {
+            header('location:' . BASE_URL);
+            exit;
+        }
+
+        $userModel = $this->model('UserModel');
+        $bookingModel = $this->model('BookingModel');
+        $wishlistModel = $this->model('WishlistModel');
+        
+        $userEmail = $_SESSION['login'];
+        $user = $userModel->getUserByEmail($userEmail);
+        $bookings = $bookingModel->getBookingsByUserEmail($userEmail);
+        $wishlistItems = $wishlistModel->getWishlistByUser($userEmail);
+
+        $data = [
+            'user' => $user,
+            'bookings' => $bookings,
+            'wishlistItems' => $wishlistItems,
+            'error' => $_SESSION['error'] ?? null,
+            'msg' => $_SESSION['msg'] ?? null
+        ];
+        unset($_SESSION['error'], $_SESSION['msg']);
+
+        $this->view('account/index', $data);
+    }
+
+    public function updateProfileExtended() {
+        if (strlen($_SESSION['login']) == 0) {
+            header('location:' . BASE_URL);
+            exit;
+        }
+
+        if (isset($_POST['submit'])) {
+            $name = trim($_POST['name'] ?? '');
+            $mobileno = trim($_POST['mobileno'] ?? '');
+            $address = trim($_POST['address'] ?? '');
+            $dateOfBirth = trim($_POST['dateofbirth'] ?? '');
+            $gender = trim($_POST['gender'] ?? '');
+            $email = $_SESSION['login'];
+
+            // Validate inputs
+            if (empty($name) || empty($mobileno)) {
+                $_SESSION['error'] = "Vui lòng nhập đầy đủ họ tên và số điện thoại";
+                header('location:' . BASE_URL . 'user/account');
+                exit;
+            }
+
+            if (!preg_match('/^[0-9]{10}$/', $mobileno)) {
+                $_SESSION['error'] = "Số điện thoại phải có 10 chữ số";
+                header('location:' . BASE_URL . 'user/account');
+                exit;
+            }
+
+            // Handle avatar upload
+            $userModel = $this->model('UserModel');
+            if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
+                $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+                $filename = $_FILES['avatar']['name'];
+                $filetype = pathinfo($filename, PATHINFO_EXTENSION);
+                
+                if (!in_array(strtolower($filetype), $allowed)) {
+                    $_SESSION['error'] = "Chỉ chấp nhận file ảnh (jpg, jpeg, png, gif)";
+                    header('location:' . BASE_URL . 'user/account');
+                    exit;
+                }
+
+                // Create upload directory if it doesn't exist
+                $uploadDir = ROOT . '/public/uploads/avatars/';
+                if (!file_exists($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                // Generate unique filename
+                $newFilename = uniqid() . '_' . time() . '.' . $filetype;
+                $uploadPath = $uploadDir . $newFilename;
+
+                if (move_uploaded_file($_FILES['avatar']['tmp_name'], $uploadPath)) {
+                    $avatarPath = 'public/uploads/avatars/' . $newFilename;
+                    $userModel->updateAvatar($email, $avatarPath);
+                }
+            }
+
+            if ($userModel->updateUserProfileExtended($email, $name, $mobileno, $address, $dateOfBirth, $gender)) {
+                $_SESSION['msg'] = "Hồ sơ đã được cập nhật";
+            } else {
+                $_SESSION['error'] = "Có lỗi xảy ra. Vui lòng thử lại";
+            }
+        }
+        header('location:' . BASE_URL . 'user/account');
+        exit;
+    }
+
     public function profile() {
         if (strlen($_SESSION['login']) == 0) {
             header('location:' . BASE_URL);

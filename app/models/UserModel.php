@@ -24,6 +24,28 @@ class UserModel extends Model
         return $query->execute();
     }
 
+    public function updateUserProfileExtended($email, $name, $mobile, $address, $dateOfBirth, $gender)
+    {
+        $sql = "UPDATE tblusers SET FullName=:name, MobileNumber=:mobile, Address=:address, DateOfBirth=:dob, Gender=:gender WHERE EmailId=:email";
+        $query = $this->db->prepare($sql);
+        $query->bindParam(":name", $name, PDO::PARAM_STR);
+        $query->bindParam(":mobile", $mobile, PDO::PARAM_STR);
+        $query->bindParam(":address", $address, PDO::PARAM_STR);
+        $query->bindParam(":dob", $dateOfBirth, PDO::PARAM_STR);
+        $query->bindParam(":gender", $gender, PDO::PARAM_STR);
+        $query->bindParam(":email", $email, PDO::PARAM_STR);
+        return $query->execute();
+    }
+
+    public function updateAvatar($email, $avatarPath)
+    {
+        $sql = "UPDATE tblusers SET Avatar=:avatar WHERE EmailId=:email";
+        $query = $this->db->prepare($sql);
+        $query->bindParam(":avatar", $avatarPath, PDO::PARAM_STR);
+        $query->bindParam(":email", $email, PDO::PARAM_STR);
+        return $query->execute();
+    }
+
     public function checkPassword($email, $password)
     {
         $sql = "SELECT Password FROM tblusers WHERE EmailId=:email";

@@ -68,6 +68,11 @@
 							<!-- Tour Type Badge -->
 							<div class="badge"><?php echo htmlentities($package->PackageType); ?></div>
 							
+							<!-- Wishlist Heart -->
+							<button class="wishlist-heart" data-package-id="<?php echo htmlentities($package->PackageId); ?>" title="Thêm vào yêu thích">
+								<i class="fas fa-heart"></i>
+							</button>
+							
 							<!-- Image -->
 							<div class="tilt">
 								<div class="img">
@@ -157,6 +162,6 @@
 <?php include ROOT . "/includes/signup.php"; ?>
 <?php include ROOT . "/includes/signin.php"; ?>
 <?php include ROOT . "/includes/write-us.php"; ?>
-
+<script src="<?php echo BASE_URL; ?>public/js/wishlist.js?v=1.0"></script>
 </body>
 </html>

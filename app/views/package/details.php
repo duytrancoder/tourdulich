@@ -27,7 +27,12 @@
 
 		<?php if ($data["package"]): ?>
 				<div class="grid-two">
-					<section class="card">
+					<section class="card" style="position: relative;">
+						<!-- Wishlist Heart -->
+						<button class="wishlist-heart" data-package-id="<?php echo htmlentities($data["package"]->PackageId); ?>" title="Thêm vào yêu thích" style="position: absolute; top: 1rem; right: 1rem;">
+							<i class="fas fa-heart"></i>
+						</button>
+						
 						<img src="<?php echo BASE_URL; ?>admin/packageimages/<?php echo htmlentities(
     $data["package"]->PackageImage,
 ); ?>" alt="<?php echo htmlentities($data["package"]->PackageName); ?>">
@@ -111,5 +116,6 @@
 <?php include ROOT . "/includes/signin.php"; ?>
 <?php include ROOT . "/includes/write-us.php"; ?>
 <script src="<?php echo BASE_URL; ?>public/js/itinerary-carousel.js?v=8.0"></script>
+<script src="<?php echo BASE_URL; ?>public/js/wishlist.js?v=1.0"></script>
 </body>
 </html>

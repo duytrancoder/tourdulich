@@ -69,7 +69,7 @@ include('includes/layout-start.php');
 							<td><?php echo htmlentities($result->PackageType);?></td>
 							<td><?php echo htmlentities($result->PackageLocation);?></td>
 							<td><?php echo number_format($result->PackagePrice, 0, ',', '.') . ' đ';?></td>
-							<td><?php echo htmlentities($result->Creationdate);?></td>
+							<td><?php echo date('d/m/Y', strtotime($result->Creationdate));?></td>
 							<td>
 								<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/update-package.php?pid=<?php echo htmlentities($result->PackageId);?>">Xem chi tiết</a>
 								<a class="btn" href="<?php echo BASE_URL; ?>admin/manage-itinerary.php?pid=<?php echo htmlentities($result->PackageId);?>" style="background: var(--brand); color: white;">Quản lý lộ trình</a>

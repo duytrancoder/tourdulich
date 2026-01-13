@@ -41,8 +41,10 @@ $isLoggedIn = !empty($_SESSION["login"]); ?>
 				<a href="<?php echo BASE_URL; ?>page/terms">Điều khoản</a>
 				<a href="<?php echo BASE_URL; ?>page/contact">Liên hệ</a>
 				<?php if ($isLoggedIn): ?>
+					<a href="<?php echo BASE_URL; ?>user/account" class="account-link"><i class="fas fa-user-circle"></i> Tài khoản</a>
 					<a href="#" data-modal-target="support-modal">Yêu cầu hỗ trợ</a>
 				<?php else: ?>
+					<a href="#" data-modal-target="signin-modal" class="account-link"><i class="fas fa-user-circle"></i> Tài khoản</a>
 					<a href="<?php echo BASE_URL; ?>enquiry">Gửi hỏi đáp</a>
 				<?php endif; ?>
 			</nav>
