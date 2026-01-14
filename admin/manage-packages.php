@@ -71,9 +71,10 @@ include('includes/layout-start.php');
 							<td><?php echo number_format($result->PackagePrice, 0, ',', '.') . ' đ';?></td>
 							<td><?php echo date('d/m/Y', strtotime($result->Creationdate));?></td>
 							<td>
-								<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/update-package.php?pid=<?php echo htmlentities($result->PackageId);?>">Xem chi tiết</a>
-								<a class="btn" href="<?php echo BASE_URL; ?>admin/manage-itinerary.php?pid=<?php echo htmlentities($result->PackageId);?>" style="background: var(--brand); color: white;">Quản lý lộ trình</a>
-								<a class="btn btn-danger" href="<?php echo BASE_URL; ?>admin/manage-packages.php?del=<?php echo htmlentities($result->PackageId);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa gói tour này không?');">Xóa</a>
+								<div style="display: flex; gap: 0.5rem; align-items: center;">
+									<a class="btn btn-primary" href="<?php echo BASE_URL; ?>admin/update-package.php?pid=<?php echo htmlentities($result->PackageId);?>">Sửa</a>
+									<a class="btn btn-danger" href="<?php echo BASE_URL; ?>admin/manage-packages.php?del=<?php echo htmlentities($result->PackageId);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa gói tour này không?');">Xóa</a>
+								</div>
 							</td>
 						</tr>
 					<?php $cnt++; }} else { ?>
