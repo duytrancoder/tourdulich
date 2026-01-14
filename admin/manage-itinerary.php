@@ -155,6 +155,11 @@ if(strlen($_SESSION['alogin']) == 0) {
 			padding: 0.5rem 1rem;
 			font-size: 0.875rem;
 		}
+		.action-buttons {
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+		}
 		.alert {
 			padding: 1rem;
 			border-radius: 8px;
@@ -204,15 +209,21 @@ if(strlen($_SESSION['alogin']) == 0) {
 					<?php 
 					$cnt = 1;
 					foreach($itineraries as $item) { ?>
-						<tr onclick="editItem(<?php echo $item->ItineraryId; ?>, '<?php echo htmlspecialchars($item->TimeLabel, ENT_QUOTES); ?>', '<?php echo htmlspecialchars($item->Activity, ENT_QUOTES); ?>', <?php echo $item->SortOrder; ?>)">
+						<tr data-id="<?php echo $item->ItineraryId; ?>" 
+						    data-time="<?php echo htmlspecialchars($item->TimeLabel, ENT_QUOTES); ?>" 
+						    data-activity="<?php echo htmlspecialchars($item->Activity, ENT_QUOTES); ?>" 
+						    data-sort="<?php echo $item->SortOrder; ?>">
 							<td><?php echo $cnt++; ?></td>
 							<td><?php echo htmlentities($item->TimeLabel); ?></td>
 							<td><?php echo htmlentities($item->Activity); ?></td>
 							<td><?php echo $item->SortOrder; ?></td>
 							<td>
-								<a href="?pid=<?php echo $pid; ?>&del=<?php echo $item->ItineraryId; ?>" 
-								   class="btn btn-danger btn-small" 
-								   onclick="event.stopPropagation(); return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
+								<div class="action-buttons">
+									<button type="button" class="btn btn-primary btn-small btn-edit" onclick="event.stopPropagation();">Sửa</button>
+									<a href="?pid=<?php echo $pid; ?>&del=<?php echo $item->ItineraryId; ?>" 
+									   class="btn btn-danger btn-small" 
+									   onclick="event.stopPropagation(); return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
+								</div>
 							</td>
 						</tr>
 					<?php } ?>
@@ -251,7 +262,23 @@ if(strlen($_SESSION['alogin']) == 0) {
 	</div>
 	
 	<script>
-		function editItem(id, timeLabel, activity, sortOrder) {
+		// Add click event to edit buttons
+		document.addEventListener('DOMContentLoaded', function() {
+			document.querySelectorAll('.btn-edit').forEach(btn => {
+				btn.addEventListener('click', function(e) {
+					e.stopPropagation();
+					const row = this.closest('tr');
+					const id = row.dataset.id;
+					const timeLabel = row.dataset.time;
+					const activity = row.dataset.activity;
+					const sortOrder = row.dataset.sort;
+					
+					editItem(id, timeLabel, activity, sortOrder, row);
+				});
+			});
+		});
+		
+		function editItem(id, timeLabel, activity, sortOrder, row) {
 			document.getElementById('formTitle').textContent = 'Chỉnh sửa lộ trình';
 			document.getElementById('itemId').value = id;
 			document.getElementById('timeLabel').value = timeLabel;
@@ -262,11 +289,12 @@ if(strlen($_SESSION['alogin']) == 0) {
 			
 			// Highlight selected row
 			document.querySelectorAll('.itinerary-table tr').forEach(tr => tr.classList.remove('selected'));
-			event.currentTarget.classList.add('selected');
+			if (row) row.classList.add('selected');
 			
 			// Scroll to form
 			document.getElementById('itineraryForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
 		}
+		
 		
 		function resetForm() {
 			document.getElementById('formTitle').textContent = 'Thêm lộ trình mới';

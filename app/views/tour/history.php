@@ -31,8 +31,7 @@
 							<th>#</th>
 							<th>Mã đặt tour</th>
 							<th>Tên gói</th>
-							<th>Từ ngày</th>
-							<th>Đến ngày</th>
+							<th>Ngày khởi hành</th>
 							<th>Ghi chú</th>
 							<th>Trạng thái</th>
 							<th>Ngày đặt</th>
@@ -67,7 +66,6 @@
     $result->pkgid,
 ); ?>"><?php echo htmlentities($result->packagename); ?></a></td>
 							<td><?php echo htmlentities($result->fromdate); ?></td>
-							<td><?php echo htmlentities($result->todate); ?></td>
 							<td><?php echo htmlentities($result->comment); ?></td>
 							<td><span class="status-chip <?php echo $statusClass; ?>"><?php echo htmlentities(
     $statusText,
@@ -87,7 +85,7 @@
          }
      } else {
           ?>
-						<tr><td colspan="9"><div class="empty-state">Bạn chưa có đặt tour nào.</div></td></tr>
+						<tr><td colspan="8"><div class="empty-state">Bạn chưa có đặt tour nào.</div></td></tr>
 						<?php
      }
      ?>

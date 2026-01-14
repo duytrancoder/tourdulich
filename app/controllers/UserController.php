@@ -1,9 +1,12 @@
 <?php
 class UserController extends Controller {
     public function logout() {
+        $userName = $_SESSION['login'] ?? 'Người dùng';
         $_SESSION['login'] = '';
         session_unset();
         session_destroy();
+        session_start(); // Restart session để lưu message
+        $_SESSION['msg'] = 'Đăng xuất thành công. Hẹn gặp lại!';
         header('location:' . BASE_URL);
         exit;
     }
@@ -358,10 +361,11 @@ class UserController extends Controller {
             $userModel = $this->model('UserModel');
             if ($userModel->checkPassword($email, $password)) {
                 $_SESSION['login'] = $email;
-                header('location:' . BASE_URL . 'package');
+                $_SESSION['msg'] = "Đăng nhập thành công! Chào mừng bạn trở lại.";
+                header('location:' . BASE_URL);
                 exit;
             } else {
-                $_SESSION['error'] = "Thông tin không hợp lệ";
+                $_SESSION['error'] = "Email hoặc mật khẩu không chính xác";
                 header('location:' . BASE_URL);
                 exit;
             }

@@ -71,7 +71,7 @@ include('includes/layout-start.php');
 						<th>Khách hàng</th>
 						<th>Liên hệ</th>
 						<th>Gói tour</th>
-						<th>Thời gian đặt</th>
+						<th>Ngày khởi hành</th>
 						<th>Ghi chú</th>
 						<th>Trạng thái</th>
 						<th>Thao tác</th>
@@ -95,7 +95,7 @@ include('includes/layout-start.php');
 						<div class="helper-text"><?php echo htmlentities($result->email);?></div>
 					</td>
 					<td><a href="<?php echo BASE_URL; ?>admin/update-package.php?pid=<?php echo htmlentities($result->pid);?>"><?php echo htmlentities($result->pckname);?></a></td>
-					<td><?php echo date('d/m/Y H:i', strtotime($result->regdate));?></td>
+					<td><?php echo date('d/m/Y', strtotime($result->fdate));?></td>
 					<td><?php echo htmlentities($result->comment);?></td>
 					<td><span class="status-chip <?php echo $statusClass;?>"><?php echo htmlentities($statusText);?></span></td>
 					<td>

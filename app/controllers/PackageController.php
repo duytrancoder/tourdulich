@@ -50,36 +50,28 @@ class PackageController extends Controller {
         if (isset($_POST['submit2'])) {
             $pid = intval($id);
             $useremail = $_SESSION['login'];
-            $fromdate = trim($_POST['fromdate'] ?? '');
-            $todate = trim($_POST['todate'] ?? '');
+            $departureDate = trim($_POST['departuredate'] ?? '');
             $comment = trim($_POST['comment'] ?? '');
 
             // Validate inputs
-            if (empty($fromdate) || empty($todate)) {
-                $_SESSION['error'] = "Vui lòng chọn ngày đi và ngày về";
+            if (empty($departureDate)) {
+                $_SESSION['error'] = "Vui lòng chọn ngày khởi hành";
                 header('Location: ' . BASE_URL . 'package/details/' . $pid);
                 exit;
             }
 
-            // Validate dates
-            $fromTimestamp = strtotime($fromdate);
-            $toTimestamp = strtotime($todate);
+            // Validate date
+            $departureTimestamp = strtotime($departureDate);
             $todayTimestamp = strtotime('today');
 
-            if ($fromTimestamp === false || $toTimestamp === false) {
+            if ($departureTimestamp === false) {
                 $_SESSION['error'] = "Ngày không hợp lệ";
                 header('Location: ' . BASE_URL . 'package/details/' . $pid);
                 exit;
             }
 
-            if ($fromTimestamp < $todayTimestamp) {
-                $_SESSION['error'] = "Ngày đi không thể là ngày trong quá khứ";
-                header('Location: ' . BASE_URL . 'package/details/' . $pid);
-                exit;
-            }
-
-            if ($toTimestamp < $fromTimestamp) {
-                $_SESSION['error'] = "Ngày về phải sau ngày đi";
+            if ($departureTimestamp < $todayTimestamp) {
+                $_SESSION['error'] = "Ngày khởi hành không thể là ngày trong quá khứ";
                 header('Location: ' . BASE_URL . 'package/details/' . $pid);
                 exit;
             }
@@ -90,8 +82,9 @@ class PackageController extends Controller {
                 exit;
             }
 
+            // Use same date for both fromdate and todate for database compatibility
             $bookingModel = $this->model('BookingModel');
-            $lastInsertId = $bookingModel->createBooking($pid, $useremail, $fromdate, $todate, $comment);
+            $lastInsertId = $bookingModel->createBooking($pid, $useremail, $departureDate, $departureDate, $comment);
 
             if ($lastInsertId) {
                 $_SESSION['msg'] = "Đặt tour thành công.";

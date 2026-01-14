@@ -12,7 +12,7 @@ $isLoggedIn = !empty($_SESSION["login"]); ?>
 					<a class="link-muted" href="<?php echo BASE_URL; ?>user/profile">Hồ sơ</a>
 					<a class="link-muted" href="<?php echo BASE_URL; ?>user/change-password">Đổi mật khẩu</a>
 					<a class="link-muted" href="<?php echo BASE_URL; ?>tour/history">Lịch sử tour</a>
-					<a class="btn btn-ghost btn-compact" href="<?php echo BASE_URL; ?>admin/logout.php">Đăng xuất</a>
+					<a class="btn btn-ghost btn-compact" href="<?php echo BASE_URL; ?>user/logout">Đăng xuất</a>
 				<?php else: ?>
 					<a class="link-muted" href="<?php echo BASE_URL; ?>admin/index.php">Quản trị</a>
 					<a class="link-muted" href="#" data-modal-target="signup-modal">Đăng ký</a>
@@ -52,3 +52,5 @@ $isLoggedIn = !empty($_SESSION["login"]); ?>
 		</div>
 	</div>
 </header>
+<?php include ROOT . "/includes/toast-notifications.php"; ?>
+<script src="<?php echo BASE_URL; ?>public/js/toast-notifications.js?v=1.0"></script>

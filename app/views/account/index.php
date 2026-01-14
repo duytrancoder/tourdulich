@@ -156,7 +156,7 @@
 										<div class="booking-details">
 											<div class="booking-detail-item">
 												<i class="fas fa-calendar"></i>
-												<span><?php echo htmlentities($booking->fromdate); ?> - <?php echo htmlentities($booking->todate); ?></span>
+												<span>Ngày khởi hành: <?php echo htmlentities($booking->fromdate); ?></span>
 											</div>
 											<div class="booking-detail-item">
 												<i class="fas fa-money-bill-wave"></i>

@@ -29,4 +29,5 @@
 	<div class="site-footer__bottom">
 	</div>
 </footer>
+<script src="<?php echo BASE_URL; ?>public/js/toast-notifications.js?v=1.1"></script>
 <script src="<?php echo BASE_URL; ?>js/app.js"></script>

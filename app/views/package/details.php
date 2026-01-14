@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>GoTravel | Chi tiết gói tour</title>
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css">
-	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/itinerary-carousel.css?v=11.0">
+	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/itinerary-carousel.css?v=14.0">
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/wishlist-button.css?v=1.0">
 </head>
 <body>
@@ -58,15 +58,9 @@
 						<form name="book" method="post" class="form-stack" action="<?php echo BASE_URL; ?>package/book/<?php echo htmlentities(
     $data["package"]->PackageId,
 ); ?>">
-							<div class="form-grid">
-								<div class="form-group">
-									<label for="fromdate">Từ ngày</label>
-									<input type="date" id="fromdate" name="fromdate" required>
-								</div>
-								<div class="form-group">
-									<label for="todate">Đến ngày</label>
-									<input type="date" id="todate" name="todate" required>
-								</div>
+							<div class="form-group">
+								<label for="departuredate">Ngày khởi hành</label>
+								<input type="date" id="departuredate" name="departuredate" required>
 							</div>
 							<div class="form-group">
 								<label for="comment">Ghi chú</label>
@@ -81,28 +75,20 @@
 					</section>
 				</div>
 				
-			<!-- Itinerary Carousel -->
-			<?php if (isset($data["itineraries"]) && count($data["itineraries"]) > 0): ?>
-				<section class="itinerary-section">
-					<div class="itinerary-wrapper">
-						<header class="itinerary-header">
-							<h2 class="itinerary-headline">Lộ trình chi tiết</h2>
-						</header>
-						<ul class="itinerary-cards">
-							<?php foreach ($data["itineraries"] as $item): ?>
-								<li class="itinerary-card">
-									<article class="itinerary-article">
-										<div class="itinerary-content">
-											<p class="itinerary-time"><?php echo htmlentities($item->TimeLabel); ?></p>
-											<h3 class="itinerary-activity"><?php echo htmlentities($item->Activity); ?></h3>
-										</div>
-									</article>
-								</li>
-							<?php endforeach; ?>
-						</ul>
-					</div>
-				</section>
-			<?php endif; ?>
+			<!-- Itinerary Section - Simple Layout -->
+		<?php if (isset($data["itineraries"]) && count($data["itineraries"]) > 0): ?>
+			<section class="card">
+				<h3>Lộ trình chi tiết</h3>
+				<div class="itinerary-list">
+					<?php foreach ($data["itineraries"] as $item): ?>
+						<div class="itinerary-item">
+							<strong><?php echo htmlentities($item->TimeLabel); ?>:</strong>
+							<span><?php echo htmlentities($item->Activity); ?></span>
+						</div>
+					<?php endforeach; ?>
+				</div>
+			</section>
+		<?php endif; ?>
 				
 				<section class="card">
 					<h3>Thông tin chi tiết</h3>
@@ -117,7 +103,6 @@
 <?php include ROOT . "/includes/signup.php"; ?>
 <?php include ROOT . "/includes/signin.php"; ?>
 <?php include ROOT . "/includes/write-us.php"; ?>
-<script src="<?php echo BASE_URL; ?>public/js/itinerary-carousel.js?v=8.0"></script>
 <script src="<?php echo BASE_URL; ?>public/js/wishlist-button.js?v=1.0"></script>
 </body>
 </html>

@@ -1,69 +1,79 @@
-// Simple Itinerary Carousel Navigation
+// Itinerary Section - Vertical Layout (No carousel needed)
 document.addEventListener('DOMContentLoaded', function () {
     const carousel = document.querySelector('.itinerary-cards');
     const wrapper = document.querySelector('.itinerary-wrapper');
 
     if (!carousel || !wrapper) return;
 
-    // Create navigation buttons
-    const nav = document.createElement('div');
-    nav.className = 'carousel-nav';
+    // For vertical layout, we don't need carousel navigation
+    // All cards are displayed in a vertical stack
+    // Navigation buttons are hidden by default in CSS
 
-    // Previous button
-    const prevBtn = document.createElement('button');
-    prevBtn.className = 'carousel-btn carousel-prev';
-    prevBtn.setAttribute('aria-label', 'Lộ trình trước');
-    prevBtn.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-        </svg>
-    `;
+    // Optional: Add smooth scroll to top/bottom if there are many items
+    const cards = carousel.querySelectorAll('.itinerary-card');
 
-    // Next button
-    const nextBtn = document.createElement('button');
-    nextBtn.className = 'carousel-btn carousel-next';
-    nextBtn.setAttribute('aria-label', 'Lộ trình tiếp theo');
-    nextBtn.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-        </svg>
-    `;
+    // Only show navigation if there are more than 5 items
+    if (cards.length > 5) {
+        // Create navigation buttons for scrolling
+        const nav = document.createElement('div');
+        nav.className = 'carousel-nav';
 
-    nav.appendChild(prevBtn);
-    nav.appendChild(nextBtn);
-    wrapper.appendChild(nav);
+        // Scroll Up button
+        const upBtn = document.createElement('button');
+        upBtn.className = 'carousel-btn carousel-up';
+        upBtn.setAttribute('aria-label', 'Cuộn lên');
+        upBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+            </svg>
+        `;
 
-    // Scroll amount
-    function getScrollAmount() {
-        const card = carousel.querySelector('.itinerary-card');
-        return card ? card.offsetWidth + 20 : 380;
-    }
+        // Scroll Down button
+        const downBtn = document.createElement('button');
+        downBtn.className = 'carousel-btn carousel-down';
+        downBtn.setAttribute('aria-label', 'Cuộn xuống');
+        downBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+            </svg>
+        `;
 
-    // Navigation handlers
-    prevBtn.addEventListener('click', function () {
-        carousel.scrollBy({
-            left: -getScrollAmount(),
-            behavior: 'smooth'
+        nav.appendChild(upBtn);
+        nav.appendChild(downBtn);
+        wrapper.appendChild(nav);
+
+        // Scroll amount - one card height plus gap
+        function getScrollAmount() {
+            const card = carousel.querySelector('.itinerary-card');
+            return card ? card.offsetHeight + 20 : 200;
+        }
+
+        // Navigation handlers - scroll vertically
+        upBtn.addEventListener('click', function () {
+            carousel.scrollBy({
+                top: -getScrollAmount(),
+                behavior: 'smooth'
+            });
         });
-    });
 
-    nextBtn.addEventListener('click', function () {
-        carousel.scrollBy({
-            left: getScrollAmount(),
-            behavior: 'smooth'
+        downBtn.addEventListener('click', function () {
+            carousel.scrollBy({
+                top: getScrollAmount(),
+                behavior: 'smooth'
+            });
         });
-    });
 
-    // Update button states
-    function updateButtons() {
-        const atStart = carousel.scrollLeft <= 1;
-        const atEnd = carousel.scrollLeft >= carousel.scrollWidth - carousel.clientWidth - 1;
+        // Update button states
+        function updateButtons() {
+            const atStart = carousel.scrollTop <= 1;
+            const atEnd = carousel.scrollTop >= carousel.scrollHeight - carousel.clientHeight - 1;
 
-        prevBtn.disabled = atStart;
-        nextBtn.disabled = atEnd;
+            upBtn.disabled = atStart;
+            downBtn.disabled = atEnd;
+        }
+
+        carousel.addEventListener('scroll', updateButtons);
+        window.addEventListener('resize', updateButtons);
+        updateButtons();
     }
-
-    carousel.addEventListener('scroll', updateButtons);
-    window.addEventListener('resize', updateButtons);
-    updateButtons();
 });
