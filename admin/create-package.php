@@ -5,6 +5,67 @@ include('includes/config.php');
 require_once dirname(__DIR__) . '/core/Helper.php';
 Helper::requireAdminLogin();
 
+$packageCreated = false;
+$newPackageId = null;
+
+// Handle Itinerary Add (only if package exists)
+if(isset($_POST['addItinerary']) && isset($_GET['pid'])) {
+	$pid = intval($_GET['pid']);
+	$timeLabel = $_POST['timeLabel'];
+	$activity = $_POST['activity'];
+	
+	$sql = "SELECT COALESCE(MAX(SortOrder), 0) + 1 as NextOrder FROM tblitinerary WHERE PackageId = :pid";
+	$query = $dbh->prepare($sql);
+	$query->bindParam(':pid', $pid, PDO::PARAM_INT);
+	$query->execute();
+	$result = $query->fetch(PDO::FETCH_OBJ);
+	$sortOrder = $result->NextOrder;
+	
+	$sql = "INSERT INTO tblitinerary (PackageId, TimeLabel, Activity, SortOrder) VALUES (:pid, :timeLabel, :activity, :sortOrder)";
+	$query = $dbh->prepare($sql);
+	$query->bindParam(':pid', $pid, PDO::PARAM_INT);
+	$query->bindParam(':timeLabel', $timeLabel, PDO::PARAM_STR);
+	$query->bindParam(':activity', $activity, PDO::PARAM_STR);
+	$query->bindParam(':sortOrder', $sortOrder, PDO::PARAM_INT);
+	$query->execute();
+	
+	$itineraryMsg = "Đã thêm lộ trình thành công";
+}
+
+// Handle Itinerary Update
+if(isset($_POST['updateItinerary']) && isset($_GET['pid'])) {
+	$pid = intval($_GET['pid']);
+	$id = intval($_POST['itineraryId']);
+	$timeLabel = $_POST['timeLabel'];
+	$activity = $_POST['activity'];
+	$sortOrder = intval($_POST['sortOrder']);
+	
+	$sql = "UPDATE tblitinerary SET TimeLabel = :timeLabel, Activity = :activity, SortOrder = :sortOrder WHERE ItineraryId = :id";
+	$query = $dbh->prepare($sql);
+	$query->bindParam(':id', $id, PDO::PARAM_INT);
+	$query->bindParam(':timeLabel', $timeLabel, PDO::PARAM_STR);
+	$query->bindParam(':activity', $activity, PDO::PARAM_STR);
+	$query->bindParam(':sortOrder', $sortOrder, PDO::PARAM_INT);
+	$query->execute();
+	
+	$itineraryMsg = "Đã cập nhật lộ trình thành công";
+}
+
+// Handle Itinerary Delete
+if(isset($_GET['delItinerary']) && isset($_GET['pid'])) {
+	$pid = intval($_GET['pid']);
+	$id = intval($_GET['delItinerary']);
+	$sql = "DELETE FROM tblitinerary WHERE ItineraryId = :id";
+	$query = $dbh->prepare($sql);
+	$query->bindParam(':id', $id, PDO::PARAM_INT);
+	$query->execute();
+	
+	$itineraryMsg = "Đã xóa lộ trình thành công";
+	header('Location: ' . BASE_URL . 'admin/create-package.php?pid=' . $pid);
+	exit;
+}
+
+// Handle Package Creation
 if(isset($_POST['submit']))
 {
 $pname = trim($_POST['packagename'] ?? '');
@@ -52,7 +113,12 @@ $query->bindParam(':pimage',$pimage,PDO::PARAM_STR);
 	$lastInsertId = $dbh->lastInsertId();
 	if($lastInsertId)
 	{
-		$msg="Tạo gói tour thành công";
+		$packageCreated = true;
+		$newPackageId = $lastInsertId;
+		$msg = "Tạo gói tour thành công! Bây giờ bạn có thể thêm lộ trình chi tiết bên dưới.";
+		// Redirect to same page with package ID to enable itinerary management
+		header('Location: ' . BASE_URL . 'admin/create-package.php?pid=' . $lastInsertId . '&created=1');
+		exit;
 	}
 	else 
 	{
@@ -61,19 +127,52 @@ $query->bindParam(':pimage',$pimage,PDO::PARAM_STR);
 }
 }
 
+// Check if we're viewing a created package
+if(isset($_GET['pid'])) {
+	$pid = intval($_GET['pid']);
+	$packageCreated = true;
+	$newPackageId = $pid;
+	
+	// Get package info
+	$sql = "SELECT * FROM tbltourpackages WHERE PackageId = :pid";
+	$query = $dbh->prepare($sql);
+	$query->bindParam(':pid', $pid, PDO::PARAM_INT);
+	$query->execute();
+	$package = $query->fetch(PDO::FETCH_OBJ);
+	
+	// Get itineraries
+	$sql = "SELECT * FROM tblitinerary WHERE PackageId = :pid ORDER BY SortOrder ASC, ItineraryId ASC";
+	$query = $dbh->prepare($sql);
+	$query->bindParam(':pid', $pid, PDO::PARAM_INT);
+	$query->execute();
+	$itineraries = $query->fetchAll(PDO::FETCH_OBJ);
+	
+	if(isset($_GET['created'])) {
+		$msg = "Tạo gói tour thành công! Bây giờ bạn có thể thêm lộ trình chi tiết bên dưới.";
+	}
+}
+
 	$pageTitle = "GoTravel Admin | Tạo gói tour";
 	$currentPage = 'create-package';
 	include('includes/layout-start.php');
 	?>
 		<section class="admin-page-head">
 			<div>
-				<h1>Tạo gói tour</h1>
-				<p>Thêm nhanh gói tour mới với đầy đủ thông tin và hình ảnh.</p>
+				<h1><?php echo $packageCreated ? 'Hoàn thiện gói tour' : 'Tạo gói tour'; ?></h1>
+				<p><?php echo $packageCreated ? 'Gói tour đã được tạo. Thêm lộ trình chi tiết để hoàn thiện.' : 'Thêm nhanh gói tour mới với đầy đủ thông tin và hình ảnh.'; ?></p>
 			</div>
+			<?php if($packageCreated) { ?>
+				<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/manage-packages.php">← Quay lại danh sách</a>
+			<?php } ?>
 		</section>
 		<?php if($error){?><div class="alert error"><?php echo htmlentities($error); ?> </div><?php } ?>
 		<?php if($msg){?><div class="alert success"><?php echo htmlentities($msg); ?> </div><?php } ?>
+		<?php if(isset($itineraryMsg)){?><div class="alert success"><?php echo htmlentities($itineraryMsg); ?></div><?php } ?>
+		
+		<?php if(!$packageCreated) { ?>
+		<!-- Package Creation Form -->
 		<section class="card">
+			<h3>Thông tin gói tour</h3>
 			<form name="package" method="post" enctype="multipart/form-data" class="form-stack">
 				<div class="form-grid">
 					<div class="form-group">
@@ -112,4 +211,138 @@ $query->bindParam(':pimage',$pimage,PDO::PARAM_STR);
 				</div>
 			</form>
 		</section>
+		<?php } else { ?>
+		
+		<!-- Package Created - Show Summary -->
+		<section class="card">
+			<h3>✅ Gói tour đã tạo</h3>
+			<div class="form-grid">
+				<div><strong>Tên gói:</strong> <?php echo htmlentities($package->PackageName); ?></div>
+				<div><strong>Loại:</strong> <?php echo htmlentities($package->PackageType); ?></div>
+				<div><strong>Địa điểm:</strong> <?php echo htmlentities($package->PackageLocation); ?></div>
+				<div><strong>Giá:</strong> <?php echo number_format($package->PackagePrice, 0, ',', '.') . ' đ'; ?></div>
+			</div>
+			<div style="margin-top: 1rem;">
+				<a href="<?php echo BASE_URL; ?>admin/update-package.php?pid=<?php echo $newPackageId; ?>" class="btn btn-ghost">Chỉnh sửa thông tin gói</a>
+			</div>
+		</section>
+		
+		<!-- Itinerary Management Section -->
+		<section class="card" style="margin-top: 2rem;">
+			<h3>Quản lý lộ trình chi tiết</h3>
+			<p style="color: var(--muted); margin-bottom: 1.5rem;">Thêm các điểm trong lộ trình tour của bạn.</p>
+			
+			<?php if(count($itineraries) > 0) { ?>
+				<div style="overflow-x: auto; margin-bottom: 2rem;">
+					<table class="table">
+						<thead>
+							<tr>
+								<th style="width: 50px;">STT</th>
+								<th style="width: 200px;">Thời gian</th>
+								<th>Hoạt động</th>
+								<th style="width: 80px;">Thứ tự</th>
+								<th style="width: 150px;">Thao tác</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php 
+							$cnt = 1;
+							foreach($itineraries as $item) { ?>
+								<tr data-id="<?php echo $item->ItineraryId; ?>" 
+								    data-time="<?php echo htmlspecialchars($item->TimeLabel, ENT_QUOTES); ?>" 
+								    data-activity="<?php echo htmlspecialchars($item->Activity, ENT_QUOTES); ?>" 
+								    data-sort="<?php echo $item->SortOrder; ?>">
+									<td><?php echo $cnt++; ?></td>
+									<td><?php echo htmlentities($item->TimeLabel); ?></td>
+									<td><?php echo htmlentities($item->Activity); ?></td>
+									<td><?php echo $item->SortOrder; ?></td>
+									<td>
+										<div style="display: flex; gap: 0.5rem;">
+											<button type="button" class="btn btn-primary btn-small btn-edit-itinerary">Sửa</button>
+											<a href="?pid=<?php echo $newPackageId; ?>&delItinerary=<?php echo $item->ItineraryId; ?>" 
+											   class="btn btn-danger btn-small" 
+											   onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
+										</div>
+									</td>
+								</tr>
+							<?php } ?>
+						</tbody>
+					</table>
+				</div>
+			<?php } else { ?>
+				<p style="text-align: center; padding: 2rem; color: var(--muted);">Chưa có lộ trình nào. Hãy thêm lộ trình bên dưới.</p>
+			<?php } ?>
+			
+			<!-- Add/Edit Itinerary Form -->
+			<div style="background: var(--bg); padding: 1.5rem; border-radius: 8px;">
+				<h4 style="margin-bottom: 1rem;" id="itineraryFormTitle">Thêm lộ trình mới</h4>
+				<form method="post" id="itineraryForm" class="form-stack">
+					<input type="hidden" name="itineraryId" id="itineraryId" value="">
+					<input type="hidden" name="sortOrder" id="sortOrder" value="0">
+					
+					<div class="form-grid">
+						<div class="form-group">
+							<label for="timeLabel">Thời gian *</label>
+							<input type="text" name="timeLabel" id="timeLabel" required 
+							       placeholder="VD: Ngày 1 - Sáng, 08:00 - 10:00">
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label for="activity">Hoạt động *</label>
+						<textarea name="activity" id="activity" required 
+						          placeholder="Mô tả chi tiết hoạt động trong thời gian này..."></textarea>
+					</div>
+					
+					<div style="display: flex; gap: 1rem;">
+						<button type="submit" name="addItinerary" id="btnAddItinerary" class="btn">Thêm lộ trình</button>
+						<button type="submit" name="updateItinerary" id="btnUpdateItinerary" class="btn" style="display: none; background: var(--accent);">Cập nhật</button>
+						<button type="button" onclick="resetItineraryForm()" class="btn btn-ghost">Hủy / Làm mới</button>
+						<a href="<?php echo BASE_URL; ?>admin/manage-packages.php" class="btn btn-ghost">Hoàn tất & Quay lại</a>
+					</div>
+				</form>
+			</div>
+		</section>
+		
+		<script>
+		// Itinerary management
+		document.addEventListener('DOMContentLoaded', function() {
+			document.querySelectorAll('.btn-edit-itinerary').forEach(btn => {
+				btn.addEventListener('click', function(e) {
+					e.stopPropagation();
+					const row = this.closest('tr');
+					const id = row.dataset.id;
+					const timeLabel = row.dataset.time;
+					const activity = row.dataset.activity;
+					const sortOrder = row.dataset.sort;
+					
+					editItinerary(id, timeLabel, activity, sortOrder);
+				});
+			});
+		});
+		
+		function editItinerary(id, timeLabel, activity, sortOrder) {
+			document.getElementById('itineraryFormTitle').textContent = 'Chỉnh sửa lộ trình';
+			document.getElementById('itineraryId').value = id;
+			document.getElementById('timeLabel').value = timeLabel;
+			document.getElementById('activity').value = activity;
+			document.getElementById('sortOrder').value = sortOrder;
+			document.getElementById('btnAddItinerary').style.display = 'none';
+			document.getElementById('btnUpdateItinerary').style.display = 'inline-block';
+			
+			// Scroll to form
+			document.getElementById('itineraryForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}
+		
+		function resetItineraryForm() {
+			document.getElementById('itineraryFormTitle').textContent = 'Thêm lộ trình mới';
+			document.getElementById('itineraryId').value = '';
+			document.getElementById('timeLabel').value = '';
+			document.getElementById('activity').value = '';
+			document.getElementById('sortOrder').value = '0';
+			document.getElementById('btnAddItinerary').style.display = 'inline-block';
+			document.getElementById('btnUpdateItinerary').style.display = 'none';
+		}
+		</script>
+		<?php } ?>
 	<?php include('includes/layout-end.php'); ?>

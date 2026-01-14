@@ -26,8 +26,35 @@ if(isset($_GET['del']))
 $pageTitle = "GoTravel Admin | Quản lý gói tour";
 $currentPage = 'manage-packages';
 
-$sql = "SELECT * from tbltourpackages";
-$query = $dbh -> prepare($sql);
+// Search functionality
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$searchType = isset($_GET['type']) ? trim($_GET['type']) : '';
+$searchLocation = isset($_GET['location']) ? trim($_GET['location']) : '';
+
+$sql = "SELECT * FROM tbltourpackages WHERE 1=1";
+$params = [];
+
+if (!empty($search)) {
+	$sql .= " AND PackageName LIKE :search";
+	$params[':search'] = '%' . $search . '%';
+}
+
+if (!empty($searchType)) {
+	$sql .= " AND PackageType LIKE :type";
+	$params[':type'] = '%' . $searchType . '%';
+}
+
+if (!empty($searchLocation)) {
+	$sql .= " AND PackageLocation LIKE :location";
+	$params[':location'] = '%' . $searchLocation . '%';
+}
+
+$sql .= " ORDER BY PackageId DESC";
+
+$query = $dbh->prepare($sql);
+foreach ($params as $key => $value) {
+	$query->bindValue($key, $value, PDO::PARAM_STR);
+}
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
 
@@ -42,6 +69,31 @@ include('includes/layout-start.php');
 		</section>
 		<?php if($error){?><div class="alert error"><?php echo htmlentities($error); ?></div><?php } ?>
 		<?php if($msg){?><div class="alert success"><?php echo htmlentities($msg); ?></div><?php } ?>
+		
+		<!-- Search Form -->
+		<section class="card" style="margin-bottom: 1.5rem;">
+			<form method="get" action="" class="form-stack">
+				<div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+					<div class="form-group">
+						<label for="search">Tìm theo tên</label>
+						<input type="text" name="search" id="search" placeholder="Nhập tên gói tour..." value="<?php echo htmlentities($search); ?>">
+					</div>
+					<div class="form-group">
+						<label for="type">Loại gói</label>
+						<input type="text" name="type" id="type" placeholder="VD: Gia đình, Cặp đôi..." value="<?php echo htmlentities($searchType); ?>">
+					</div>
+					<div class="form-group">
+						<label for="location">Địa điểm</label>
+						<input type="text" name="location" id="location" placeholder="VD: Hà Nội, Đà Nẵng..." value="<?php echo htmlentities($searchLocation); ?>">
+					</div>
+				</div>
+				<div style="display: flex; gap: 0.5rem;">
+					<button type="submit" class="btn btn-primary">🔍 Tìm kiếm</button>
+					<a href="<?php echo BASE_URL; ?>admin/manage-packages.php" class="btn btn-ghost">Xóa bộ lọc</a>
+				</div>
+			</form>
+		</section>
+		
 		<section class="card">
 			<div class="table-responsive">
 				<table class="table">
@@ -78,7 +130,13 @@ include('includes/layout-start.php');
 							</td>
 						</tr>
 					<?php $cnt++; }} else { ?>
-						<tr><td colspan="7"><div class="empty-state">Chưa có gói tour nào.</div></td></tr>
+						<tr><td colspan="7"><div class="empty-state">
+							<?php if(!empty($search) || !empty($searchType) || !empty($searchLocation)) { ?>
+								Không tìm thấy gói tour phù hợp. <a href="<?php echo BASE_URL; ?>admin/manage-packages.php">Xóa bộ lọc</a>
+							<?php } else { ?>
+								Chưa có gói tour nào.
+							<?php } ?>
+						</div></td></tr>
 					<?php } ?>
 					</tbody>
 				</table>

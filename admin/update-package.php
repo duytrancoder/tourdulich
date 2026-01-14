@@ -119,6 +119,12 @@ $query->bindParam(':pdetails',$pdetails,PDO::PARAM_STR);
 		<?php if($msg){?><div class="alert success"><?php echo htmlentities($msg);?></div><?php } ?>
 		<?php if($error){?><div class="alert error"><?php echo htmlentities($error);?></div><?php } ?>
 		<?php if(isset($itineraryMsg)){?><div class="alert success"><?php echo htmlentities($itineraryMsg);?></div><?php } ?>
+		<?php 
+		if(isset($_SESSION['package_msg'])) {
+			echo '<div class="alert success">' . htmlentities($_SESSION['package_msg']) . '</div>';
+			unset($_SESSION['package_msg']);
+		}
+		?>
 		
 		<?php if($package): ?>
 		<!-- Package Information Form -->

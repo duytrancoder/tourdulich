@@ -24,8 +24,36 @@ if($query -> execute()){
 
 $pageTitle = "GoTravel Admin | Quản lý người dùng";
 $currentPage = 'manage-users';
-$sql = "SELECT * from tblusers";
-$query = $dbh -> prepare($sql);
+
+// Search functionality
+$searchName = isset($_GET['name']) ? trim($_GET['name']) : '';
+$searchPhone = isset($_GET['phone']) ? trim($_GET['phone']) : '';
+$searchEmail = isset($_GET['email']) ? trim($_GET['email']) : '';
+
+$sql = "SELECT * FROM tblusers WHERE 1=1";
+$params = [];
+
+if (!empty($searchName)) {
+	$sql .= " AND FullName LIKE :name";
+	$params[':name'] = '%' . $searchName . '%';
+}
+
+if (!empty($searchPhone)) {
+	$sql .= " AND MobileNumber LIKE :phone";
+	$params[':phone'] = '%' . $searchPhone . '%';
+}
+
+if (!empty($searchEmail)) {
+	$sql .= " AND EmailId LIKE :email";
+	$params[':email'] = '%' . $searchEmail . '%';
+}
+
+$sql .= " ORDER BY id DESC";
+
+$query = $dbh->prepare($sql);
+foreach ($params as $key => $value) {
+	$query->bindValue($key, $value, PDO::PARAM_STR);
+}
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
 
@@ -39,6 +67,31 @@ include('includes/layout-start.php');
 		</section>
 		<?php if($error){?><div class="alert error"><?php echo htmlentities($error);?></div><?php } ?>
 		<?php if($msg){?><div class="alert success"><?php echo htmlentities($msg);?></div><?php } ?>
+		
+		<!-- Search Form -->
+		<section class="card" style="margin-bottom: 1.5rem;">
+			<form method="get" action="" class="form-stack">
+				<div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+					<div class="form-group">
+						<label for="name">Họ tên</label>
+						<input type="text" name="name" id="name" placeholder="Nhập họ tên..." value="<?php echo htmlentities($searchName); ?>">
+					</div>
+					<div class="form-group">
+						<label for="phone">Số điện thoại</label>
+						<input type="text" name="phone" id="phone" placeholder="Nhập số điện thoại..." value="<?php echo htmlentities($searchPhone); ?>">
+					</div>
+					<div class="form-group">
+						<label for="email">Email</label>
+						<input type="text" name="email" id="email" placeholder="Nhập email..." value="<?php echo htmlentities($searchEmail); ?>">
+					</div>
+				</div>
+				<div style="display: flex; gap: 0.5rem;">
+					<button type="submit" class="btn btn-primary">🔍 Tìm kiếm</button>
+					<a href="<?php echo BASE_URL; ?>admin/manage-users.php" class="btn btn-ghost">Xóa bộ lọc</a>
+				</div>
+			</form>
+		</section>
+		
 		<section class="card">
 			<div class="table-responsive">
 				<table class="table">
@@ -77,7 +130,13 @@ include('includes/layout-start.php');
 							<td><a class="btn btn-danger" href="<?php echo BASE_URL; ?>admin/manage-users.php?del=<?php echo htmlentities($result->id);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này không?');">Xóa</a></td>
 						</tr>
 						<?php $cnt++; }} else { ?>
-						<tr><td colspan="7"><div class="empty-state">Chưa có người dùng nào.</div></td></tr>
+						<tr><td colspan="7"><div class="empty-state">
+							<?php if(!empty($searchName) || !empty($searchPhone) || !empty($searchEmail)) { ?>
+								Không tìm thấy người dùng phù hợp. <a href="<?php echo BASE_URL; ?>admin/manage-users.php">Xóa bộ lọc</a>
+							<?php } else { ?>
+								Chưa có người dùng nào.
+							<?php } ?>
+						</div></td></tr>
 						<?php } ?>
 					</tbody>
 				</table>
