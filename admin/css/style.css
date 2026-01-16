@@ -399,20 +399,19 @@ button, input, select, textarea {
   border-radius: 999px;
   font-size: 0.8rem;
   font-weight: 600;
+  background: transparent;
+  border: none;
 }
 
 .status-chip.is-pending {
-  background: #fff7ed;
-  color: #c2410c;
+  color: var(--text-primary);
 }
 
 .status-chip.is-approved {
-  background: #ecfdf5;
   color: var(--success);
 }
 
 .status-chip.is-cancelled {
-  background: #fee2e2;
   color: var(--danger);
 }
 

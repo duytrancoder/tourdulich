@@ -12,39 +12,75 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+-- ============================================
+-- DATABASE WEBDULICH - FULL SCHEMA (MySQL/XAMPP)
+-- Run this script directly in phpMyAdmin or mysql CLI
+-- ============================================
 
--- --------------------------------------------------------
+-- 1) CREATE DATABASE & USE
+CREATE DATABASE IF NOT EXISTS `webdulich` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `webdulich`;
 
---
--- Cấu trúc bảng cho bảng `tbladmin`
---
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+SET NAMES utf8mb4;
+
+-- 2) DROP TABLES (clean import)
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `tblitinerary`;
+DROP TABLE IF EXISTS `tblwishlist`;
+DROP TABLE IF EXISTS `tblbooking`;
+DROP TABLE IF EXISTS `tblissues`;
+DROP TABLE IF EXISTS `tblenquiry`;
+DROP TABLE IF EXISTS `tblpages`;
+DROP TABLE IF EXISTS `tbltourpackages`;
+DROP TABLE IF EXISTS `tblusers`;
+DROP TABLE IF EXISTS `tbladmin`;
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- 3) TABLE DEFINITIONS
 
 CREATE TABLE `tbladmin` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `UserName` varchar(100) NOT NULL,
   `Password` varchar(100) NOT NULL,
-  `updationDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE current_timestamp()
+  `updationDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Đang đổ dữ liệu cho bảng `tbladmin`
---
+CREATE TABLE `tblusers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `FullName` varchar(100) NOT NULL,
+  `MobileNumber` char(10) NOT NULL,
+  `EmailId` varchar(70) NOT NULL,
+  `Password` varchar(100) NOT NULL,
+  `RegDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `Avatar` varchar(255) DEFAULT NULL,
+  `Address` varchar(255) DEFAULT NULL,
+  `DateOfBirth` date DEFAULT NULL,
+  `Gender` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email_unique` (`EmailId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `tbladmin` (`id`, `UserName`, `Password`, `updationDate`) VALUES
-(1, 'admin', 'f925916e2754e5e03f75dd58a5733251', '2017-05-13 11:18:49');
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `tblbooking`
---
+CREATE TABLE `tbltourpackages` (
+  `PackageId` int(11) NOT NULL AUTO_INCREMENT,
+  `PackageName` varchar(200) NOT NULL,
+  `PackageType` varchar(150) NOT NULL,
+  `TourDuration` varchar(100) NOT NULL,
+  `PackageLocation` varchar(100) NOT NULL,
+  `PackagePrice` int(11) NOT NULL,
+  `PackageFetures` varchar(255) NOT NULL,
+  `PackageDetails` mediumtext NOT NULL,
+  `PackageImage` varchar(100) NOT NULL,
+  `Creationdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UpdationDate` timestamp NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`PackageId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `tblbooking` (
-  `BookingId` int(11) NOT NULL,
+  `BookingId` int(11) NOT NULL AUTO_INCREMENT,
   `PackageId` int(11) NOT NULL,
   `UserEmail` varchar(100) NOT NULL,
   `FromDate` varchar(100) NOT NULL,
@@ -54,151 +90,118 @@ CREATE TABLE `tblbooking` (
   `TotalPrice` decimal(10,2) NOT NULL,
   `AdminNotes` mediumtext DEFAULT NULL,
   `CancelReason` mediumtext DEFAULT NULL,
-  `RegDate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `RegDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `status` int(11) NOT NULL,
   `CancelledBy` varchar(5) DEFAULT NULL,
-  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
-  `CustomerMessage` mediumtext DEFAULT NULL
+  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `CustomerMessage` mediumtext DEFAULT NULL,
+  PRIMARY KEY (`BookingId`),
+  KEY `idx_user_email` (`UserEmail`),
+  KEY `idx_package` (`PackageId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Đang đổ dữ liệu cho bảng `tblbooking`
---
+CREATE TABLE `tblenquiry` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `FullName` varchar(100) NOT NULL,
+  `EmailId` varchar(100) NOT NULL,
+  `MobileNumber` char(10) NOT NULL,
+  `Subject` varchar(100) NOT NULL,
+  `Description` mediumtext NOT NULL,
+  `PostingDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `Status` int(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `tblissues` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `UserEmail` varchar(100) NOT NULL,
+  `Issue` varchar(100) NOT NULL,
+  `Description` mediumtext NOT NULL,
+  `PostingDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `AdminRemark` mediumtext DEFAULT NULL,
+  `AdminremarkDate` timestamp NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `tblpages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(255) NOT NULL DEFAULT '',
+  `detail` longtext NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `tblwishlist` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `UserEmail` varchar(70) NOT NULL,
+  `PackageId` int(11) NOT NULL,
+  `CreatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_package` (`UserEmail`,`PackageId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `tblitinerary` (
+  `ItineraryId` int(11) NOT NULL AUTO_INCREMENT,
+  `PackageId` int(11) NOT NULL,
+  `TimeLabel` varchar(255) NOT NULL COMMENT 'Time period (e.g., "Ngày 1 - Sáng", "08:00 - 10:00")',
+  `Activity` text NOT NULL COMMENT 'Activity description for this time period',
+  `SortOrder` int(11) DEFAULT 0 COMMENT 'Display order (lower numbers first)',
+  `CreatedAt` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ItineraryId`),
+  KEY `PackageId` (`PackageId`),
+  KEY `SortOrder` (`SortOrder`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 4) FOREIGN KEYS
+ALTER TABLE `tblbooking`
+  ADD CONSTRAINT `fk_booking_package` FOREIGN KEY (`PackageId`) REFERENCES `tbltourpackages` (`PackageId`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_booking_user` FOREIGN KEY (`UserEmail`) REFERENCES `tblusers` (`EmailId`) ON DELETE CASCADE;
+
+ALTER TABLE `tblwishlist`
+  ADD CONSTRAINT `fk_wishlist_package` FOREIGN KEY (`PackageId`) REFERENCES `tbltourpackages` (`PackageId`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_wishlist_user` FOREIGN KEY (`UserEmail`) REFERENCES `tblusers` (`EmailId`) ON DELETE CASCADE;
+
+ALTER TABLE `tblitinerary`
+  ADD CONSTRAINT `fk_itinerary_package` FOREIGN KEY (`PackageId`) REFERENCES `tbltourpackages` (`PackageId`) ON DELETE CASCADE;
+
+-- 5) SEED DATA
+INSERT INTO `tbladmin` (`id`, `UserName`, `Password`, `updationDate`) VALUES
+(1, 'admin', 'f925916e2754e5e03f75dd58a5733251', '2017-05-13 11:18:49');
+
+INSERT INTO `tblusers` (`id`, `FullName`, `MobileNumber`, `EmailId`, `Password`, `Avatar`, `Address`, `DateOfBirth`, `Gender`, `RegDate`, `UpdationDate`) VALUES
+(12, 'Le Van Uy', '0763165881', 'leuy26011@gmail.com', '17b9cdbb06619ebae36bfeb59dd89449', NULL, NULL, NULL, NULL, '2025-11-20 04:20:33', NULL),
+(13, 'Le Van Uy', '0389378485', 'leuy260105@gmail.com', '258d88e5ebfa52d32ad49bf932146263', NULL, NULL, NULL, NULL, '2025-11-21 03:14:09', NULL);
+
+INSERT INTO `tbltourpackages` (`PackageId`, `PackageName`, `PackageType`, `TourDuration`, `PackageLocation`, `PackagePrice`, `PackageFetures`, `PackageDetails`, `PackageImage`, `Creationdate`, `UpdationDate`) VALUES
+(7, 'TOUR VIP 2N1Đ KHÁM PHÁ CHỢ NỔI CÁI RĂNG - TRẢI NGHIỆM TÂY ĐÔ ĐẬM ĐÀ BẢN SẮC', 'Gia Đình', '2 ngày 1 đêm', 'Miền Tây', 100, 'Đưa đón tận tình', 'Nếu bạn chỉ có 2 ngày nhưng vẫn muốn cảm nhận trọn vẹn nét đẹp sông nước miền Tây, Tour Miền Tây 2N1Đ sẽ là lựa chọn phù hợp nhất. Chuyến đi đưa bạn từ khung cảnh miệt vườn xanh mát đến trải nghiệm bữa tối trên du thuyền, ngắm thành phố Cần Thơ lung linh về đêm.', 'tour_mientay.webp', '2025-11-20 04:12:40', '0000-00-00 00:00:00'),
+(8, 'Ha Long Bay Instagram Tour: Most Famous Spots', 'Cặp Đôi', '1 ngày', 'Hạ Long', 270, 'Đưa đón tận tình', 'Our Ha Long Bay Tour will take you to the most Instagrammable and adventurous spots in Ha Long Bay all in one day.', 'tour_halong.webp', '2025-11-21 04:00:59', '0000-00-00 00:00:00'),
+(9, 'Tour Du Lịch Khám Phá Cao Nguyên Mộc Châu 2N1Đ', 'Gia Đình', '2 ngày 1 đêm', 'Hà Nội - Thác Chiềng Khoa - Đồi Chè - Vườn Hồng Chín - Mộc Châu', 70, 'Phục vụ nhiệt tình', 'Chương trình du lịch cao nguyên Mộc Châu.', 'mocchau.jpg', '2025-11-21 06:59:45', '0000-00-00 00:00:00');
 
 INSERT INTO `tblbooking` (`BookingId`, `PackageId`, `UserEmail`, `FromDate`, `ToDate`, `Comment`, `NumberOfPeople`, `TotalPrice`, `AdminNotes`, `CancelReason`, `RegDate`, `status`, `CancelledBy`, `UpdationDate`, `CustomerMessage`) VALUES
 (11, 7, 'leuy26011@gmail.com', '2025-11-02', '2025-11-04', 'Mong sẽ được tận hưởng một chuyến đi trọn vẹn', 2, 200.00, NULL, NULL, '2025-11-20 04:21:14', 1, NULL, '2025-11-21 06:31:48', NULL),
 (12, 7, 'leuy26011@gmail.com', '2025-11-30', '2025-12-01', 'Hãy hoàn thiện các dịch vụ giúp tôi', 1, 100.00, NULL, 'Khách hàng có việc đột xuất', '2025-11-21 03:32:39', 2, 'u', '2025-11-21 03:36:53', NULL),
 (13, 8, 'leuy26011@gmail.com', '2025-11-28', '2025-11-30', 'Hãy đón tôi đúng giờ', 1, 270.00, NULL, NULL, '2025-11-21 06:47:30', 1, NULL, '2025-11-21 06:48:29', NULL);
 
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `tblenquiry`
---
-
-CREATE TABLE `tblenquiry` (
-  `id` int(11) NOT NULL,
-  `FullName` varchar(100) NOT NULL,
-  `EmailId` varchar(100) NOT NULL,
-  `MobileNumber` char(10) NOT NULL,
-  `Subject` varchar(100) NOT NULL,
-  `Description` mediumtext NOT NULL,
-  `PostingDate` timestamp NOT NULL DEFAULT current_timestamp(),
-  `Status` int(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `tblissues`
---
-
-CREATE TABLE `tblissues` (
-  `id` int(11) NOT NULL,
-  `UserEmail` varchar(100) NOT NULL,
-  `Issue` varchar(100) NOT NULL,
-  `Description` mediumtext NOT NULL,
-  `PostingDate` timestamp NOT NULL DEFAULT current_timestamp(),
-  `AdminRemark` mediumtext DEFAULT NULL,
-  `AdminremarkDate` timestamp NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `tblissues`
---
-
 INSERT INTO `tblissues` (`id`, `UserEmail`, `Issue`, `Description`, `PostingDate`, `AdminRemark`, `AdminremarkDate`) VALUES
 (8, 'leuy26011@gmail.com', 'Tôi gặp sự cố ở tour', 'Hãy cho người tới giúp tôi', '2025-11-21 06:35:01', 'Tôi đồng ý', '2025-11-21 06:48:49');
 
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `tblpages`
---
-
-CREATE TABLE `tblpages` (
-  `id` int(11) NOT NULL,
-  `type` varchar(255) NOT NULL DEFAULT '',
-  `detail` longtext NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `tblpages`
---
-
 INSERT INTO `tblpages` (`id`, `type`, `detail`) VALUES
-(1, 'terms', 'Chưa có gì \r\n'),
-(2, 'privacy', '<span style=\"color: rgb(0, 0, 0); font-family: &quot;Open Sans&quot;, Arial, sans-serif; font-size: 14px; text-align: justify;\">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat</span>'),
-(3, 'aboutus', '<h1 style=\"font-size: 40px; font-weight: 600; line-height: 1.2; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif; text-align: justify;\">Giới thiệu về iVIVU.com</h1><p style=\"margin-bottom: 8px; font-size: 14px; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif;\">&nbsp;</p><p style=\"margin-bottom: 8px; font-size: 14px; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif; text-align: justify;\">Thành lập năm 2010,&nbsp;<span style=\"font-weight: bolder;\">iVIVU.com</span>&nbsp;là thành viên của&nbsp;<span style=\"font-weight: bolder;\">Tập đoàn TMG Việt Nam</span>&nbsp;với hơn 20 năm kinh nghiệm trong lĩnh vực Du lịch – Khách sạn.&nbsp;<span style=\"font-weight: bolder;\">iVIVU.com</span>&nbsp;tiên phong trong việc sáng tạo các sản phẩm du lịch tiện ích dành cho khách hàng nội địa. Liên tục tăng trưởng mạnh qua nhiều năm, iVIVU.com hiện là OTA hàng đầu Việt Nam trong phân khúc cao cấp với hệ thống khoảng 2,500 khách sạn tại Việt Nam &amp; hơn 30,000 khách sạn quốc tế.</p><p style=\"margin-bottom: 8px; font-size: 14px; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif; text-align: justify;\"><br>Với mục tiêu mang đến cho khách hàng một&nbsp;<span style=\"font-weight: bolder;\">"Trải nghiệm kỳ nghỉ tuyệt vời"</span>,&nbsp;<span style=\"font-weight: bolder;\">iVIVU.com</span>&nbsp;kỳ vọng trở thành nền tảng du lịch nghỉ dưỡng số 1 cho khách hàng Đông Nam Á trong 5 năm tới.</p><p style=\"margin-bottom: 8px; font-size: 14px; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif; text-align: justify;\"><br>Dòng sản phẩm chính của iVIVU là&nbsp;<span style=\"font-weight: bolder;\">Combo du lịch</span>&nbsp;- sản phẩm cung cấp đầy đủ cho một kỳ nghỉ bao gồm phòng khách sạn, vé máy bay, đưa đón, ăn uống, khám phá,… chỉ trong 1 lần đặt. Với combo du lịch khách hàng không cần băn khoăn chọn lựa hoặc mất thời gian đặt từng dịch vụ riêng lẻ, lại còn hưởng được mức giá vô cùng tốt với những dòng combo iVIVU.com mang lại:&nbsp;<span style=\"font-weight: bolder;\">combo tiết kiệm, voucher độc quyền, ưu đãi đặt sớm và flash sales</span>.</p><p style=\"margin-bottom: 8px; font-size: 14px; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif; text-align: justify;\"><br>Để đảm bảo cho khách hàng một&nbsp;<span style=\"font-weight: bolder;\">"Trải nghiệm kỳ nghỉ tuyệt vời"</span>, chúng tôi áp dụng công nghệ vào việc đọc hiểu nhu cầu của thị trường, nghiên cứu phát triển sản phẩm và gợi ý những sản phẩm và dịch vụ tốt nhất, phù hợp với từng khách hàng.</p><p style=\"margin-bottom: 8px; font-size: 14px; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif; text-align: justify;\"><br>Khách hàng chọn đặt dịch vụ với iVIVU.com có thể đặt qua rất nhiều kênh:&nbsp;<span style=\"font-weight: bolder;\">Đặt trực tiếp tại website, gọi điện thoại Hotline, đặt qua chat bot, app, đặt qua Facebook và các mạng xã hội khác</span>. Với iVIVU.com mỗi kỳ nghỉ là một trải nghiệm tuyệt vời!</p><p style=\"margin-bottom: 8px; font-size: 14px; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif; text-align: justify;\"><span style=\"font-weight: bolder;\">Vui lòng liên hệ:</span></p><p style=\"margin-bottom: 8px; font-size: 14px; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif; text-align: justify;\">1. Dịch vụ khách hàng, đặt phòng khách sạn: Hotline&nbsp;<span style=\"font-weight: bolder;\">1900 1870</span>&nbsp;– Email:&nbsp;<a href=\"mailto:TC@iVIVU.com\" style=\"color: rgb(47, 128, 237); cursor: pointer;\">TC@iVIVU.com</a></p><p style=\"margin-bottom: 8px; font-size: 14px; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif; text-align: justify;\">2. Nhà cung cấp liên hệ – Email:&nbsp;<a href=\"mailto:Market@ivivu.com\" style=\"color: rgb(47, 128, 237); cursor: pointer;\">Market@ivivu.com</a></p><p style=\"margin-bottom: 8px; font-size: 14px; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif; text-align: justify;\">3. Liên hệ Marketing – Email:&nbsp;<a href=\"mailto:thanhlong.nguyen@ivivu.com\" style=\"color: rgb(47, 128, 237); cursor: pointer;\">marketing@ivivu.com</a></p><p style=\"margin-bottom: 8px; font-size: 14px; color: rgb(27, 31, 59); font-family: Roboto, Arial, sans-serif; text-align: justify;\">4. Các liên hệ khác:&nbsp;<span style=\"font-weight: bolder;\">1900 1870</span></p>'),
-(11, 'contact', '<div style=\"text-align: justify;\"><span style=\"color: rgb(0, 0, 0); font-family: &quot;Open Sans&quot;, Arial, sans-serif; font-size: 14px;\">0763165881&nbsp;</span></div>');
+(1, 'terms', 'Chưa có gì'),
+(2, 'privacy', 'Nội dung chính sách bảo mật'),
+(3, 'aboutus', 'Giới thiệu về công ty'),
+(11, 'contact', '0763165881');
 
--- --------------------------------------------------------
+-- 6) AUTO INCREMENT FIXES (align with seed IDs)
+ALTER TABLE `tbladmin` AUTO_INCREMENT = 2;
+ALTER TABLE `tblusers` AUTO_INCREMENT = 14;
+ALTER TABLE `tbltourpackages` AUTO_INCREMENT = 10;
+ALTER TABLE `tblbooking` AUTO_INCREMENT = 14;
+ALTER TABLE `tblenquiry` AUTO_INCREMENT = 8;
+ALTER TABLE `tblissues` AUTO_INCREMENT = 9;
+ALTER TABLE `tblpages` AUTO_INCREMENT = 22;
+ALTER TABLE `tblwishlist` AUTO_INCREMENT = 1;
+ALTER TABLE `tblitinerary` AUTO_INCREMENT = 1;
 
---
--- Cấu trúc bảng cho bảng `tbltourpackages`
---
-
-CREATE TABLE `tbltourpackages` (
-  `PackageId` int(11) NOT NULL,
-  `PackageName` varchar(200) NOT NULL,
-  `PackageType` varchar(150) NOT NULL,
-  `TourDuration` varchar(100) NOT NULL,
-  `PackageLocation` varchar(100) NOT NULL,
-  `PackagePrice` int(11) NOT NULL,
-  `PackageFetures` varchar(255) NOT NULL,
-  `PackageDetails` mediumtext NOT NULL,
-  `PackageImage` varchar(100) NOT NULL,
-  `Creationdate` timestamp NOT NULL DEFAULT current_timestamp(),
-  `UpdationDate` timestamp NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `tbltourpackages`
---
-
-INSERT INTO `tbltourpackages` (`PackageId`, `PackageName`, `PackageType`, `TourDuration`, `PackageLocation`, `PackagePrice`, `PackageFetures`, `PackageDetails`, `PackageImage`, `Creationdate`, `UpdationDate`) VALUES
-(7, 'TOUR VIP 2N1Đ KHÁM PHÁ CHỢ NỔI CÁI RĂNG - TRẢI NGHIỆM TÂY ĐÔ ĐẬM ĐÀ BẢN SẮC', 'Gia Đình', '2 ngày 1 đêm', 'Miền Tây ', 100, 'Đưa đón tận tình ', 'Nếu bạn chỉ có 2 ngày nhưng vẫn muốn cảm nhận trọn vẹn nét đẹp sông nước miền Tây, Tour Miền Tây 2N1Đ sẽ là lựa chọn phù hợp nhất. Chuyến đi đưa bạn từ khung cảnh miệt vườn xanh mát đến trải nghiệm bữa tối trên du thuyền, ngắm thành phố Cần Thơ lung linh về đêm.\r\n\r\nTour Miền Tây 2 ngày 1 đêm là một trong những hành trình ngắn nhưng mang lại nhiều trải nghiệm nhất. Chỉ trong hai ngày, bạn sẽ đi qua Mỹ Tho – Bến Tre – Cần Thơ, cảm nhận trọn vẹn vẻ đẹp sông Tiền, sông Hậu, làng nghề xứ Dừa, chợ nổi Cái Răng, cùng những điểm check-in độc đáo như Khu du lịch Mỹ Khánh hay Căn Nhà Màu Tím.\r\n\r\nĐây là hành trình lý tưởng cho gia đình, nhóm bạn hoặc du khách muốn tìm sự bình yên, nhẹ nhàng và trọn vẹn của miền sông nước.', 'tour_mientay.webp', '2025-11-20 04:12:40', '0000-00-00 00:00:00'),
-(8, 'Ha Long Bay Instagram Tour: Most Famous Spots', 'Cặp Đôi ', '1 ngày', 'Hạ Long ', 270, 'Đưa đón tận tình ', 'Our Ha Long Bay Tour will take you to the most Instagrammable and adventurous spots in Ha Long Bay all in one day. If you are looking for a little bit of a culture, delicious food, and a ton of adventure paired with great photos then this is the tour for you.\r\n\r\nThis tour will depart from Hanoi. The morning will start with a private pickup directly from your hotel or villa by one of our friendly, English speaking guides. From there your tour will begin as you start your drive in one of our comfortable, spacious and air-conditioned vehicles.\r\n\r\nThis private, full-day tour will be fully packed with famous landmarks, secretly located spots, relaxing on the water, Vietnamese coffee and much much more!\r\n\r\nOn this tour you will be able to visit:\r\n\r\nPoem Mountain\r\nVisit the Bay on a private boat\r\nExplore Sung Sot Caves\r\nDiscover Luon Cave on a kayak\r\nHike or swimming at Titop Island\r\n\r\nNo need to worry about planning where to go, waiting for other people, paying for entrance fees or buying lunch. We got you covered as this tour is private and all-inclusive. Our guides will also help you to take some beautiful photos that will look amazing on Instagram.\r\n\r\nIf you\'re looking for an exciting and stress-free day in Ha Long Bay (departing from Hanoi) then this is the tour for you. It's the perfect tour to make memories with loved ones, friends or family.\r\n\r\n', 'tour_halong.webp', '2025-11-21 04:00:59', '0000-00-00 00:00:00'),
-(9, 'Tour Du Lịch Khám Phá Cao Nguyên Mộc Châu 2N1Đ', 'Gia Đình ', '2 ngày 1 đêm', 'Hà Nội - Thác Chiềng Khoa - Đồi Chè - Vườn Hồng Chín - Mộc Châu Hoa Trái Bốn Mùa - Làng Nguyên Thủy ', 70, 'Phục vụ nhiệt tình ', 'Chương trình du lịch\r\n\r\nCAO NGUYÊN MỘC CHÂU\r\n\r\nHÀ NỘI - THÁC CHIỀNG KHOA - ĐỒI CHÈ - VƯỜN HỒNG CHÍN - HOA TRÁI 4 MÙA - LÀNG NGUYÊN THỦY HANG TÁU -\r\n\r\nCẦU KÍNH BẠCH LONG/ HAPPY LAND\r\n\r\nThời gian: 2 ngày 1 đêm\r\n\r\nKhởi hành: Thứ 7 hàng tuần\r\n\r\nLà điểm đến nổi tiếng trên cung đường Tây Bắc và chỉ cách Hà Nội 180km, cao nguyên Mộc Châu ẩn chứa vẻ đẹp của những đồi chè xanh mướt trải dài, những thung lũng được phủ sắc trắng của hoa cải, hoa mận, sắc hồng của hoa anh đào và rất nhiều các loại hoa trái bốn mùa; kết hợp với những con thác lớn đổ xuống vô cùng hùng vĩ và thơ mộng… đã tạo nên một Mộc Châu đầy cuốn hút mà bất cứ ai một lần đặt chân đến đây đều cảm thấy lưu luyến khó rời.', 'mocchau.jpg', '2025-11-21 06:59:45', '0000-00-00 00:00:00');
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `tblusers`
---
-
-CREATE TABLE `tblusers` (
-  `id` int(11) NOT NULL,
-  `FullName` varchar(100) NOT NULL,
-  `MobileNumber` char(10) NOT NULL,
-  `EmailId` varchar(70) NOT NULL,
-  `Password` varchar(100) NOT NULL,
-  `RegDate` timestamp NOT NULL DEFAULT current_timestamp(),
-  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
-  `Avatar` varchar(255) DEFAULT NULL,
-  `Address` varchar(255) DEFAULT NULL,
-  `DateOfBirth` date DEFAULT NULL,
-  `Gender` varchar(10) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `tblusers`
---
-
-INSERT INTO `tblusers` (`id`, `FullName`, `MobileNumber`, `EmailId`, `Password`, `Avatar`, `Address`, `DateOfBirth`, `Gender`, `RegDate`, `UpdationDate`) VALUES
-(12, 'Lê Văn Uy ', '0763165881', 'leuy26011@gmail.com ', '17b9cdbb06619ebae36bfeb59dd89449', NULL, NULL, NULL, NULL, '2025-11-20 04:20:33', NULL),
-(13, 'Lê Văn Uy ', '0389378485', 'leuy260105@gmail.com', '258d88e5ebfa52d32ad49bf932146263', NULL, NULL, NULL, NULL, '2025-11-21 03:14:09', NULL);
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `tblwishlist`
---
-
-CREATE TABLE `tblwishlist` (
-  `id` int(11) NOT NULL,
-  `UserEmail` varchar(70) NOT NULL,
-  `PackageId` int(11) NOT NULL,
+COMMIT;
   `CreatedAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

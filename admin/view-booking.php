@@ -226,29 +226,31 @@ include('includes/layout-start.php');
 		<!-- Thao tác -->
 		<section class="card">
 			<h3>Thao tác</h3>
-			<div style="display: grid; gap: 0.75rem;">
+			<div class="action-stack">
 				<?php if($booking->status != 1) { ?>
-					<form method="post">
+					<form method="post" class="action-row">
 						<input type="hidden" name="status" value="1">
 						<input type="hidden" name="admin_notes" value="<?php echo htmlentities($booking->AdminNotes ?? ''); ?>">
-						<button type="submit" name="update_status" class="btn btn-primary">
-							<i class="fas fa-check"></i> Xác nhận đơn
+						<button type="submit" name="update_status" class="btn btn-primary btn-full">
+							Xác nhận đơn
 						</button>
 					</form>
 				<?php } else { ?>
-					<button class="btn" style="background: #28a745; cursor: default;" disabled>
-						<i class="fas fa-check-circle"></i> Đã xác nhận
-					</button>
+					<div class="action-row">
+						<button class="btn btn-muted btn-full" disabled>Đã xác nhận</button>
+					</div>
 				<?php } ?>
 
 				<?php if($booking->status != 2) { ?>
-					<button class="btn btn-danger" onclick="document.getElementById('cancelModal').style.display='block';">
-						<i class="fas fa-times"></i> Hủy đơn
-					</button>
+					<div class="action-row">
+						<button class="btn btn-danger btn-full" type="button" onclick="document.getElementById('cancelModal').style.display='block';">
+							Hủy đơn
+						</button>
+					</div>
 				<?php } else { ?>
-					<button class="btn" style="background: #dc3545; cursor: default;" disabled>
-						<i class="fas fa-times-circle"></i> Đã hủy
-					</button>
+					<div class="action-row">
+						<button class="btn btn-muted btn-full" disabled>Đã hủy</button>
+					</div>
 				<?php } ?>
 			</div>
 		</section>
@@ -316,6 +318,26 @@ include('includes/layout-start.php');
 	padding: 0.75rem;
 	background: #f5f5f5;
 	border-radius: 4px;
+}
+
+.action-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.action-row {
+	display: flex;
+}
+
+.btn-full {
+	width: 100%;
+}
+
+.btn-muted {
+	background: #f0f0f0;
+	color: #666;
+	cursor: not-allowed;
 }
 
 .info-item h4 {
