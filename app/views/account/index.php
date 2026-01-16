@@ -166,11 +166,29 @@
 												<i class="fas fa-clock"></i>
 												<span>Đặt ngày <?php echo date('d/m/Y', strtotime($booking->regdate)); ?></span>
 											</div>
+											<?php if ($booking->status == 2 && !empty($booking->cancelby)): ?>
+											<div class="booking-detail-item">
+												<i class="fas fa-times-circle" style="color: var(--danger);"></i>
+												<span>Đã hủy - 
+													<a href="#" onclick="showCancelReason(event, '<?php echo htmlentities($booking->cancelreason ?? 'Không có thông tin'); ?>')" style="text-decoration: underline; cursor: pointer; color: var(--primary);">Xem lý do</a>
+												</span>
+											</div>
+											<?php endif; ?>
 										</div>
 										<?php if (!empty($booking->comment)): ?>
 										<div class="booking-comment">
 											<i class="fas fa-comment"></i>
 											<span><?php echo htmlentities($booking->comment); ?></span>
+										</div>
+										<?php endif; ?>
+										
+										<?php if (!empty($booking->customermessage)): ?>
+										<div class="admin-message">
+											<div class="admin-message-header">
+												<span class="admin-message-icon">📨</span>
+												<span class="admin-message-title">Lời nhắn từ Admin</span>
+											</div>
+											<div class="admin-message-content"><?php echo nl2br(htmlentities($booking->customermessage)); ?></div>
 										</div>
 										<?php endif; ?>
 									</div>
@@ -305,7 +323,7 @@
 													<circle cx="12" cy="12" r="10"></circle>
 													<polyline points="12 6 12 12 16 14"></polyline>
 												</svg>
-												<span>3-5 ngày</span>
+												<span><?php echo htmlentities($package->TourDuration); ?></span>
 											</div>
 										</div>
 									</div>
@@ -333,5 +351,11 @@
 <?php include ROOT . "/includes/write-us.php"; ?>
 <script src="<?php echo BASE_URL; ?>public/js/account.js?v=1.0"></script>
 <script src="<?php echo BASE_URL; ?>public/js/wishlist.js?v=1.0"></script>
+<script>
+	function showCancelReason(event, reason) {
+		event.preventDefault();
+		alert('Lý do hủy đơn:\n\n' + reason);
+	}
+</script>
 </body>
 </html>

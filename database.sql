@@ -20,21 +20,21 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `admin`
+-- Cấu trúc bảng cho bảng `tbladmin`
 --
 
-CREATE TABLE `admin` (
+CREATE TABLE `tbladmin` (
   `id` int(11) NOT NULL,
-  `UserName` nvarchar(100) NOT NULL,
-  `Password` nvarchar(100) NOT NULL,
+  `UserName` varchar(100) NOT NULL,
+  `Password` varchar(100) NOT NULL,
   `updationDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `admin`
+-- Đang đổ dữ liệu cho bảng `tbladmin`
 --
 
-INSERT INTO `admin` (`id`, `UserName`, `Password`, `updationDate`) VALUES
+INSERT INTO `tbladmin` (`id`, `UserName`, `Password`, `updationDate`) VALUES
 (1, 'admin', 'f925916e2754e5e03f75dd58a5733251', '2017-05-13 11:18:49');
 
 -- --------------------------------------------------------
@@ -46,24 +46,29 @@ INSERT INTO `admin` (`id`, `UserName`, `Password`, `updationDate`) VALUES
 CREATE TABLE `tblbooking` (
   `BookingId` int(11) NOT NULL,
   `PackageId` int(11) NOT NULL,
-  `UserEmail` nvarchar(100) NOT NULL,
-  `FromDate` nvarchar(100) NOT NULL,
-  `ToDate` nvarchar(100) NOT NULL,
+  `UserEmail` varchar(100) NOT NULL,
+  `FromDate` varchar(100) NOT NULL,
+  `ToDate` varchar(100) NOT NULL,
   `Comment` mediumtext NOT NULL,
+  `NumberOfPeople` int(11) NOT NULL,
+  `TotalPrice` decimal(10,2) NOT NULL,
+  `AdminNotes` mediumtext DEFAULT NULL,
+  `CancelReason` mediumtext DEFAULT NULL,
   `RegDate` timestamp NOT NULL DEFAULT current_timestamp(),
   `status` int(11) NOT NULL,
-  `CancelledBy` nvarchar(5) DEFAULT NULL,
-  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
+  `CancelledBy` varchar(5) DEFAULT NULL,
+  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `CustomerMessage` mediumtext DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `tblbooking`
 --
 
-INSERT INTO `tblbooking` (`BookingId`, `PackageId`, `UserEmail`, `FromDate`, `ToDate`, `Comment`, `RegDate`, `status`, `CancelledBy`, `UpdationDate`) VALUES
-(11, 7, 'leuy26011@gmail.com', '2025-11-02', '2025-11-04', 'Mong sẽ được tận hưởng một chuyến đi trọn vẹn', '2025-11-20 04:21:14', 1, NULL, '2025-11-21 06:31:48'),
-(12, 7, 'leuy26011@gmail.com', '2025-11-30', '2025-12-01', 'Hãy hoàn thiện các dịch vụ giúp tôi', '2025-11-21 03:32:39', 2, 'u', '2025-11-21 03:36:53'),
-(13, 8, 'leuy26011@gmail.com', '2025-11-28', '2025-11-30', 'Hãy đón tôi đúng giờ', '2025-11-21 06:47:30', 1, NULL, '2025-11-21 06:48:29');
+INSERT INTO `tblbooking` (`BookingId`, `PackageId`, `UserEmail`, `FromDate`, `ToDate`, `Comment`, `NumberOfPeople`, `TotalPrice`, `AdminNotes`, `CancelReason`, `RegDate`, `status`, `CancelledBy`, `UpdationDate`, `CustomerMessage`) VALUES
+(11, 7, 'leuy26011@gmail.com', '2025-11-02', '2025-11-04', 'Mong sẽ được tận hưởng một chuyến đi trọn vẹn', 2, 200.00, NULL, NULL, '2025-11-20 04:21:14', 1, NULL, '2025-11-21 06:31:48', NULL),
+(12, 7, 'leuy26011@gmail.com', '2025-11-30', '2025-12-01', 'Hãy hoàn thiện các dịch vụ giúp tôi', 1, 100.00, NULL, 'Khách hàng có việc đột xuất', '2025-11-21 03:32:39', 2, 'u', '2025-11-21 03:36:53', NULL),
+(13, 8, 'leuy26011@gmail.com', '2025-11-28', '2025-11-30', 'Hãy đón tôi đúng giờ', 1, 270.00, NULL, NULL, '2025-11-21 06:47:30', 1, NULL, '2025-11-21 06:48:29', NULL);
 
 -- --------------------------------------------------------
 
@@ -73,10 +78,10 @@ INSERT INTO `tblbooking` (`BookingId`, `PackageId`, `UserEmail`, `FromDate`, `To
 
 CREATE TABLE `tblenquiry` (
   `id` int(11) NOT NULL,
-  `FullName` nvarchar(100) NOT NULL,
-  `EmailId` nvarchar(100) NOT NULL,
+  `FullName` varchar(100) NOT NULL,
+  `EmailId` varchar(100) NOT NULL,
   `MobileNumber` char(10) NOT NULL,
-  `Subject` nvarchar(100) NOT NULL,
+  `Subject` varchar(100) NOT NULL,
   `Description` mediumtext NOT NULL,
   `PostingDate` timestamp NOT NULL DEFAULT current_timestamp(),
   `Status` int(1) DEFAULT NULL
@@ -90,8 +95,8 @@ CREATE TABLE `tblenquiry` (
 
 CREATE TABLE `tblissues` (
   `id` int(11) NOT NULL,
-  `UserEmail` nvarchar(100) NOT NULL,
-  `Issue` nvarchar(100) NOT NULL,
+  `UserEmail` varchar(100) NOT NULL,
+  `Issue` varchar(100) NOT NULL,
   `Description` mediumtext NOT NULL,
   `PostingDate` timestamp NOT NULL DEFAULT current_timestamp(),
   `AdminRemark` mediumtext DEFAULT NULL,
@@ -113,7 +118,7 @@ INSERT INTO `tblissues` (`id`, `UserEmail`, `Issue`, `Description`, `PostingDate
 
 CREATE TABLE `tblpages` (
   `id` int(11) NOT NULL,
-  `type` nvarchar(255) NOT NULL DEFAULT '',
+  `type` varchar(255) NOT NULL DEFAULT '',
   `detail` longtext NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -135,13 +140,14 @@ INSERT INTO `tblpages` (`id`, `type`, `detail`) VALUES
 
 CREATE TABLE `tbltourpackages` (
   `PackageId` int(11) NOT NULL,
-  `PackageName` nvarchar(200) NOT NULL,
-  `PackageType` nvarchar(150) NOT NULL,
-  `PackageLocation` nvarchar(100) NOT NULL,
+  `PackageName` varchar(200) NOT NULL,
+  `PackageType` varchar(150) NOT NULL,
+  `TourDuration` varchar(100) NOT NULL,
+  `PackageLocation` varchar(100) NOT NULL,
   `PackagePrice` int(11) NOT NULL,
-  `PackageFetures` nvarchar(255) NOT NULL,
+  `PackageFetures` varchar(255) NOT NULL,
   `PackageDetails` mediumtext NOT NULL,
-  `PackageImage` nvarchar(100) NOT NULL,
+  `PackageImage` varchar(100) NOT NULL,
   `Creationdate` timestamp NOT NULL DEFAULT current_timestamp(),
   `UpdationDate` timestamp NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -150,10 +156,10 @@ CREATE TABLE `tbltourpackages` (
 -- Đang đổ dữ liệu cho bảng `tbltourpackages`
 --
 
-INSERT INTO `tbltourpackages` (`PackageId`, `PackageName`, `PackageType`, `PackageLocation`, `PackagePrice`, `PackageFetures`, `PackageDetails`, `PackageImage`, `Creationdate`, `UpdationDate`) VALUES
-(7, 'TOUR VIP 2N1Đ KHÁM PHÁ CHỢ NỔI CÁI RĂNG - TRẢI NGHIỆM TÂY ĐÔ ĐẬM ĐÀ BẢN SẮC', 'Gia Đình', 'Miền Tây ', 100, 'Đưa đón tận tình ', 'Nếu bạn chỉ có 2 ngày nhưng vẫn muốn cảm nhận trọn vẹn nét đẹp sông nước miền Tây, Tour Miền Tây 2N1Đ sẽ là lựa chọn phù hợp nhất. Chuyến đi đưa bạn từ khung cảnh miệt vườn xanh mát đến trải nghiệm bữa tối trên du thuyền, ngắm thành phố Cần Thơ lung linh về đêm.\r\n\r\nTour Miền Tây 2 ngày 1 đêm là một trong những hành trình ngắn nhưng mang lại nhiều trải nghiệm nhất. Chỉ trong hai ngày, bạn sẽ đi qua Mỹ Tho – Bến Tre – Cần Thơ, cảm nhận trọn vẹn vẻ đẹp sông Tiền, sông Hậu, làng nghề xứ Dừa, chợ nổi Cái Răng, cùng những điểm check-in độc đáo như Khu du lịch Mỹ Khánh hay Căn Nhà Màu Tím.\r\n\r\nĐây là hành trình lý tưởng cho gia đình, nhóm bạn hoặc du khách muốn tìm sự bình yên, nhẹ nhàng và trọn vẹn của miền sông nước.', 'tour_mientay.webp', '2025-11-20 04:12:40', '0000-00-00 00:00:00'),
-(8, 'Ha Long Bay Instagram Tour: Most Famous Spots', 'Cặp Đôi ', 'Hạ Long ', 270, 'Đưa đón tận tình ', 'Our Ha Long Bay Tour will take you to the most Instagrammable and adventurous spots in Ha Long Bay all in one day. If you are looking for a little bit of a culture, delicious food, and a ton of adventure paired with great photos then this is the tour for you.\r\n\r\nThis tour will depart from Hanoi. The morning will start with a private pickup directly from your hotel or villa by one of our friendly, English speaking guides. From there your tour will begin as you start your drive in one of our comfortable, spacious and air-conditioned vehicles.\r\n\r\nThis private, full-day tour will be fully packed with famous landmarks, secretly located spots, relaxing on the water, Vietnamese coffee and much much more!\r\n\r\nOn this tour you will be able to visit:\r\n\r\nPoem Mountain\r\nVisit the Bay on a private boat\r\nExplore Sung Sot Caves\r\nDiscover Luon Cave on a kayak\r\nHike or swimming at Titop Island\r\n\r\nNo need to worry about planning where to go, waiting for other people, paying for entrance fees or buying lunch. We got you covered as this tour is private and all-inclusive. Our guides will also help you to take some beautiful photos that will look amazing on Instagram.\r\n\r\nIf you\'re looking for an exciting and stress-free day in Ha Long Bay (departing from Hanoi) then this is the tour for you. It's the perfect tour to make memories with loved ones, friends or family.\r\n\r\n', 'tour_halong.webp', '2025-11-21 04:00:59', '0000-00-00 00:00:00'),
-(9, 'Tour Du Lịch Khám Phá Cao Nguyên Mộc Châu 2N1Đ', 'Gia Đình ', 'Hà Nội - Thác Chiềng Khoa - Đồi Chè - Vườn Hồng Chín - Mộc Châu Hoa Trái Bốn Mùa - Làng Nguyên Thủy ', 70, 'Phục vụ nhiệt tình ', 'Chương trình du lịch\r\n\r\nCAO NGUYÊN MỘC CHÂU\r\n\r\nHÀ NỘI - THÁC CHIỀNG KHOA - ĐỒI CHÈ - VƯỜN HỒNG CHÍN - HOA TRÁI 4 MÙA - LÀNG NGUYÊN THỦY HANG TÁU -\r\n\r\nCẦU KÍNH BẠCH LONG/ HAPPY LAND\r\n\r\nThời gian: 2 ngày 1 đêm\r\n\r\nKhởi hành: Thứ 7 hàng tuần\r\n\r\nLà điểm đến nổi tiếng trên cung đường Tây Bắc và chỉ cách Hà Nội 180km, cao nguyên Mộc Châu ẩn chứa vẻ đẹp của những đồi chè xanh mướt trải dài, những thung lũng được phủ sắc trắng của hoa cải, hoa mận, sắc hồng của hoa anh đào và rất nhiều các loại hoa trái bốn mùa; kết hợp với những con thác lớn đổ xuống vô cùng hùng vĩ và thơ mộng… đã tạo nên một Mộc Châu đầy cuốn hút mà bất cứ ai một lần đặt chân đến đây đều cảm thấy lưu luyến khó rời.', 'mocchau.jpg', '2025-11-21 06:59:45', '0000-00-00 00:00:00');
+INSERT INTO `tbltourpackages` (`PackageId`, `PackageName`, `PackageType`, `TourDuration`, `PackageLocation`, `PackagePrice`, `PackageFetures`, `PackageDetails`, `PackageImage`, `Creationdate`, `UpdationDate`) VALUES
+(7, 'TOUR VIP 2N1Đ KHÁM PHÁ CHỢ NỔI CÁI RĂNG - TRẢI NGHIỆM TÂY ĐÔ ĐẬM ĐÀ BẢN SẮC', 'Gia Đình', '2 ngày 1 đêm', 'Miền Tây ', 100, 'Đưa đón tận tình ', 'Nếu bạn chỉ có 2 ngày nhưng vẫn muốn cảm nhận trọn vẹn nét đẹp sông nước miền Tây, Tour Miền Tây 2N1Đ sẽ là lựa chọn phù hợp nhất. Chuyến đi đưa bạn từ khung cảnh miệt vườn xanh mát đến trải nghiệm bữa tối trên du thuyền, ngắm thành phố Cần Thơ lung linh về đêm.\r\n\r\nTour Miền Tây 2 ngày 1 đêm là một trong những hành trình ngắn nhưng mang lại nhiều trải nghiệm nhất. Chỉ trong hai ngày, bạn sẽ đi qua Mỹ Tho – Bến Tre – Cần Thơ, cảm nhận trọn vẹn vẻ đẹp sông Tiền, sông Hậu, làng nghề xứ Dừa, chợ nổi Cái Răng, cùng những điểm check-in độc đáo như Khu du lịch Mỹ Khánh hay Căn Nhà Màu Tím.\r\n\r\nĐây là hành trình lý tưởng cho gia đình, nhóm bạn hoặc du khách muốn tìm sự bình yên, nhẹ nhàng và trọn vẹn của miền sông nước.', 'tour_mientay.webp', '2025-11-20 04:12:40', '0000-00-00 00:00:00'),
+(8, 'Ha Long Bay Instagram Tour: Most Famous Spots', 'Cặp Đôi ', '1 ngày', 'Hạ Long ', 270, 'Đưa đón tận tình ', 'Our Ha Long Bay Tour will take you to the most Instagrammable and adventurous spots in Ha Long Bay all in one day. If you are looking for a little bit of a culture, delicious food, and a ton of adventure paired with great photos then this is the tour for you.\r\n\r\nThis tour will depart from Hanoi. The morning will start with a private pickup directly from your hotel or villa by one of our friendly, English speaking guides. From there your tour will begin as you start your drive in one of our comfortable, spacious and air-conditioned vehicles.\r\n\r\nThis private, full-day tour will be fully packed with famous landmarks, secretly located spots, relaxing on the water, Vietnamese coffee and much much more!\r\n\r\nOn this tour you will be able to visit:\r\n\r\nPoem Mountain\r\nVisit the Bay on a private boat\r\nExplore Sung Sot Caves\r\nDiscover Luon Cave on a kayak\r\nHike or swimming at Titop Island\r\n\r\nNo need to worry about planning where to go, waiting for other people, paying for entrance fees or buying lunch. We got you covered as this tour is private and all-inclusive. Our guides will also help you to take some beautiful photos that will look amazing on Instagram.\r\n\r\nIf you\'re looking for an exciting and stress-free day in Ha Long Bay (departing from Hanoi) then this is the tour for you. It's the perfect tour to make memories with loved ones, friends or family.\r\n\r\n', 'tour_halong.webp', '2025-11-21 04:00:59', '0000-00-00 00:00:00'),
+(9, 'Tour Du Lịch Khám Phá Cao Nguyên Mộc Châu 2N1Đ', 'Gia Đình ', '2 ngày 1 đêm', 'Hà Nội - Thác Chiềng Khoa - Đồi Chè - Vườn Hồng Chín - Mộc Châu Hoa Trái Bốn Mùa - Làng Nguyên Thủy ', 70, 'Phục vụ nhiệt tình ', 'Chương trình du lịch\r\n\r\nCAO NGUYÊN MỘC CHÂU\r\n\r\nHÀ NỘI - THÁC CHIỀNG KHOA - ĐỒI CHÈ - VƯỜN HỒNG CHÍN - HOA TRÁI 4 MÙA - LÀNG NGUYÊN THỦY HANG TÁU -\r\n\r\nCẦU KÍNH BẠCH LONG/ HAPPY LAND\r\n\r\nThời gian: 2 ngày 1 đêm\r\n\r\nKhởi hành: Thứ 7 hàng tuần\r\n\r\nLà điểm đến nổi tiếng trên cung đường Tây Bắc và chỉ cách Hà Nội 180km, cao nguyên Mộc Châu ẩn chứa vẻ đẹp của những đồi chè xanh mướt trải dài, những thung lũng được phủ sắc trắng của hoa cải, hoa mận, sắc hồng của hoa anh đào và rất nhiều các loại hoa trái bốn mùa; kết hợp với những con thác lớn đổ xuống vô cùng hùng vĩ và thơ mộng… đã tạo nên một Mộc Châu đầy cuốn hút mà bất cứ ai một lần đặt chân đến đây đều cảm thấy lưu luyến khó rời.', 'mocchau.jpg', '2025-11-21 06:59:45', '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -163,16 +169,16 @@ INSERT INTO `tbltourpackages` (`PackageId`, `PackageName`, `PackageType`, `Packa
 
 CREATE TABLE `tblusers` (
   `id` int(11) NOT NULL,
-  `FullName` nvarchar(100) NOT NULL,
+  `FullName` varchar(100) NOT NULL,
   `MobileNumber` char(10) NOT NULL,
-  `EmailId` nvarchar(70) NOT NULL,
-  `Password` nvarchar(100) NOT NULL,
-  `Avatar` nvarchar(255) DEFAULT NULL,
-  `Address` nvarchar(255) DEFAULT NULL,
-  `DateOfBirth` date DEFAULT NULL,
-  `Gender` nvarchar(10) DEFAULT NULL,
+  `EmailId` varchar(70) NOT NULL,
+  `Password` varchar(100) NOT NULL,
   `RegDate` timestamp NOT NULL DEFAULT current_timestamp(),
-  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
+  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `Avatar` varchar(255) DEFAULT NULL,
+  `Address` varchar(255) DEFAULT NULL,
+  `DateOfBirth` date DEFAULT NULL,
+  `Gender` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -191,7 +197,7 @@ INSERT INTO `tblusers` (`id`, `FullName`, `MobileNumber`, `EmailId`, `Password`,
 
 CREATE TABLE `tblwishlist` (
   `id` int(11) NOT NULL,
-  `UserEmail` nvarchar(70) NOT NULL,
+  `UserEmail` varchar(70) NOT NULL,
   `PackageId` int(11) NOT NULL,
   `CreatedAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -218,9 +224,9 @@ CREATE TABLE `tblitinerary` (
 --
 
 --
--- Chỉ mục cho bảng `admin`
+-- Chỉ mục cho bảng `tbladmin`
 --
-ALTER TABLE `admin`
+ALTER TABLE `tbladmin`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -281,9 +287,9 @@ ALTER TABLE `tblitinerary`
 --
 
 --
--- AUTO_INCREMENT cho bảng `admin`
+-- AUTO_INCREMENT cho bảng `tbladmin`
 --
-ALTER TABLE `admin`
+ALTER TABLE `tbladmin`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --

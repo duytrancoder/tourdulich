@@ -81,6 +81,18 @@
 								<?php } ?>
 							</td>
 						</tr>
+						<?php if (!empty($result->customermessage)): ?>
+						<tr style="background-color: #FFF4F0; border-top: 1px solid #FFE0CC;">
+							<td colspan="8">
+								<div style="padding: 1rem 1rem 1rem 2rem;">
+									<strong style="color: #FF7F50; font-size: 1rem;">📨 Lời nhắn từ GoTravel</strong>
+									<p style="margin: 0.75rem 0 0 0; color: #333; line-height: 1.5;">
+										<?php echo nl2br(htmlentities($result->customermessage)); ?>
+									</p>
+								</div>
+							</td>
+						</tr>
+						<?php endif; ?>
 						<?php $cnt++;
          }
      } else {

@@ -67,7 +67,6 @@
 						<div class="tour-card">
 							<!-- Tour Type Badge -->
 							<div class="badge"><?php echo htmlentities($package->PackageType); ?></div>
-							
 							<!-- Image -->
 							<div class="tilt">
 								<div class="img">
@@ -75,81 +74,56 @@
 									     alt="<?php echo htmlentities($package->PackageName); ?>">
 								</div>
 							</div>
-							
+
 							<!-- Info Section -->
 							<div class="info">
-								<!-- Location Category -->
-								<div class="cat">
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-										<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-										<circle cx="12" cy="10" r="3"></circle>
-									</svg>
-									<?php echo htmlentities($package->PackageLocation); ?>
+								<!-- Location -->
+								<div class="meta-top">
+									<div class="cat">
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+											<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+											<circle cx="12" cy="10" r="3"></circle>
+										</svg>
+										<?php echo htmlentities($package->PackageLocation); ?>
+									</div>
 								</div>
-								
+
 								<!-- Tour Name -->
 								<h2 class="title"><?php echo htmlentities($package->PackageName); ?></h2>
-								
+
 								<!-- Description -->
 								<p class="desc"><?php echo htmlentities($package->PackageFetures); ?></p>
-								
-								<!-- Features -->
-								<div class="feats">
-									<span class="feat">Tour trọn gói</span>
-									<span class="feat">Hướng dẫn viên</span>
-									<span class="feat">Bảo hiểm</span>
+
+								<!-- Duration -->
+								<div class="duration-row">
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<circle cx="12" cy="12" r="10"></circle>
+										<polyline points="12 6 12 12 16 14"></polyline>
+									</svg>
+									<span><?php echo htmlentities($package->TourDuration); ?></span>
 								</div>
-								
-								<!-- Price & Button -->
-								<div class="bottom">
-									<div class="price">
-										<span class="price-label">Chỉ từ</span>
-										<span class="price-value"><?php echo Controller::formatVND($package->PackagePrice); ?></span>
-									</div>
-									<a href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities($package->PackageId); ?>" class="btn">
-										<span>Xem chi tiết</span>
-										<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-											<path d="M5 12h14"></path>
-											<path d="M12 5l7 7-7 7"></path>
-										</svg>
-									</a>
+
+								<!-- Price -->
+								<div class="price-row">
+									<span class="price-label">Chỉ từ</span>
+									<span class="price-value"><?php echo Controller::formatVND($package->PackagePrice); ?></span>
 								</div>
-								
-								<!-- Meta: Rating & Duration -->
-								<div class="meta">
-									<div class="rating">
-										<svg viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="0.5">
-											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-										</svg>
-										<svg viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="0.5">
-											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-										</svg>
-										<svg viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="0.5">
-											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-										</svg>
-										<svg viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="0.5">
-											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-										</svg>
-										<svg viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="0.5">
-											<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-										</svg>
-										<span class="rcount">4.8/5</span>
-									</div>
-									<div class="duration">
-										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-											<circle cx="12" cy="12" r="10"></circle>
-											<polyline points="12 6 12 12 16 14"></polyline>
-										</svg>
-										<span>3-5 ngày</span>
-									</div>
+
+								<!-- Button -->
+								<a href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities($package->PackageId); ?>" class="btn-detail">
+									<span>Xem chi tiết</span>
+									<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M5 12h14"></path>
+										<path d="M12 5l7 7-7 7"></path>
+									</svg>
+								</a>
 								</div>
 							</div>
-						</div>
-					<?php endforeach; ?>
-				</div>
-			<?php else: ?>
-				<div class="empty-state">Không tìm thấy tour phù hợp. Hãy thử thay đổi bộ lọc.</div>
-			<?php endif; ?>
+						<?php endforeach; ?>
+					</div>
+				<?php else: ?>
+					<div class="empty-state">Không tìm thấy tour phù hợp. Hãy thử thay đổi bộ lọc.</div>
+				<?php endif; ?>
 		</section>
 	</div>
 </main>

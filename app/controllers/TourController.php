@@ -54,7 +54,13 @@ class TourController extends Controller {
             $_SESSION['error'] = "Không tìm thấy đặt tour";
         }
 
-        header('location:' . BASE_URL . 'tour/history');
+        // Redirect back to referring page
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        if (strpos($referer, 'user/account') !== false) {
+            header('location:' . BASE_URL . 'user/account');
+        } else {
+            header('location:' . BASE_URL . 'tour/history');
+        }
         exit;
     }
 }

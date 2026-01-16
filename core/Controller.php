@@ -37,6 +37,6 @@ class Controller {
      * @return string Giá đã định dạng kèm đơn vị
      */
     public static function formatVND($vndPrice) {
-        return number_format($vndPrice, 0, ',', '.') . ' đ';
+        return number_format($vndPrice, 0, ',', '.') . ' vnđ';
     }
 }

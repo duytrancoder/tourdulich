@@ -51,11 +51,18 @@ class PackageController extends Controller {
             $pid = intval($id);
             $useremail = $_SESSION['login'];
             $departureDate = trim($_POST['departuredate'] ?? '');
+            $numberofpeople = intval($_POST['numberofpeople'] ?? 1);
             $comment = trim($_POST['comment'] ?? '');
 
             // Validate inputs
             if (empty($departureDate)) {
                 $_SESSION['error'] = "Vui lòng chọn ngày khởi hành";
+                header('Location: ' . BASE_URL . 'package/details/' . $pid);
+                exit;
+            }
+
+            if ($numberofpeople < 1 || $numberofpeople > 100) {
+                $_SESSION['error'] = "Số người phải từ 1 đến 100";
                 header('Location: ' . BASE_URL . 'package/details/' . $pid);
                 exit;
             }
@@ -82,9 +89,14 @@ class PackageController extends Controller {
                 exit;
             }
 
+            // Get package price and calculate total
+            $packageModel = $this->model('PackageModel');
+            $package = $packageModel->getPackageById($pid);
+            $totalprice = $package->PackagePrice * $numberofpeople;
+
             // Use same date for both fromdate and todate for database compatibility
             $bookingModel = $this->model('BookingModel');
-            $lastInsertId = $bookingModel->createBooking($pid, $useremail, $departureDate, $departureDate, $comment);
+            $lastInsertId = $bookingModel->createBooking($pid, $useremail, $departureDate, $departureDate, $comment, $numberofpeople, $totalprice);
 
             if ($lastInsertId) {
                 $_SESSION['msg'] = "Đặt tour thành công.";

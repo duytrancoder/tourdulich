@@ -69,19 +69,21 @@ if(isset($_POST['submit']))
 $pname = trim($_POST['packagename'] ?? '');
 $ptype = trim($_POST['packagetype'] ?? '');	
 $plocation = trim($_POST['packagelocation'] ?? '');
+$tourduration = trim($_POST['tourduration'] ?? '');
 $pprice = intval($_POST['packageprice'] ?? 0);	
 $pfeatures = trim($_POST['packagefeatures'] ?? '');
 $pdetails = trim($_POST['packagedetails'] ?? '');	
 
 // Validate inputs
-if (empty($pname) || empty($ptype) || empty($plocation) || $pprice <= 0 || empty($pfeatures) || empty($pdetails)) {
+if (empty($pname) || empty($ptype) || empty($plocation) || empty($tourduration) || $pprice <= 0 || empty($pfeatures) || empty($pdetails)) {
 	$error = "Vui lòng điền đầy đủ thông tin";
 } else {
-	$sql="update tbltourpackages set PackageName=:pname,PackageType=:ptype,PackageLocation=:plocation,PackagePrice=:pprice,PackageFetures=:pfeatures,PackageDetails=:pdetails where PackageId=:pid";
+	$sql="update tbltourpackages set PackageName=:pname,PackageType=:ptype,PackageLocation=:plocation,TourDuration=:tourduration,PackagePrice=:pprice,PackageFetures=:pfeatures,PackageDetails=:pdetails where PackageId=:pid";
 $query = $dbh->prepare($sql);
 $query->bindParam(':pname',$pname,PDO::PARAM_STR);
 $query->bindParam(':ptype',$ptype,PDO::PARAM_STR);
 $query->bindParam(':plocation',$plocation,PDO::PARAM_STR);
+$query->bindParam(':tourduration',$tourduration,PDO::PARAM_STR);
 $query->bindParam(':pprice',$pprice,PDO::PARAM_INT);
 $query->bindParam(':pfeatures',$pfeatures,PDO::PARAM_STR);
 $query->bindParam(':pdetails',$pdetails,PDO::PARAM_STR);
@@ -143,6 +145,10 @@ $query->bindParam(':pdetails',$pdetails,PDO::PARAM_STR);
 					<div class="form-group">
 						<label for="packagelocation">Địa điểm</label>
 						<input type="text" name="packagelocation" id="packagelocation" value="<?php echo htmlentities($package->PackageLocation);?>" required>
+					</div>
+					<div class="form-group">
+						<label for="tourduration">Thời gian tour</label>
+						<input type="text" name="tourduration" id="tourduration" value="<?php echo htmlentities($package->TourDuration);?>" placeholder="VD: 2 Ngày 1 Đêm" required>
 					</div>
 					<div class="form-group">
 						<label for="packageprice">Giá gói (VNĐ)</label>

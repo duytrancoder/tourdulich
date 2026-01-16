@@ -1,0 +1,75 @@
+i/* Pagination Styles */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  padding: 1.5rem 0;
+  flex-wrap: nowrap;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--brand);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.pagination-btn:hover:not(.disabled) {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 90, 156, 0.2);
+}
+
+.pagination-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.pagination-btn svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.pagination-info {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  padding: 0 1.5rem;
+  min-width: 150px;
+  text-align: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+  
+  .pagination-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .pagination-info {
+    font-size: 0.9rem;
+    min-width: 120px;
+  }
+}

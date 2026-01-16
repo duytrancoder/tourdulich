@@ -103,6 +103,7 @@ include('includes/layout-start.php');
 							<th>Tên gói</th>
 							<th>Loại gói</th>
 							<th>Địa điểm</th>
+							<th>Thời gian tour</th>
 							<th>Giá (VNĐ)</th>
 							<th>Ngày tạo</th>
 							<th>Thao tác</th>
@@ -120,6 +121,7 @@ include('includes/layout-start.php');
 							<td><?php echo htmlentities($result->PackageName);?></td>
 							<td><?php echo htmlentities($result->PackageType);?></td>
 							<td><?php echo htmlentities($result->PackageLocation);?></td>
+							<td><?php echo htmlentities($result->TourDuration);?></td>
 							<td><?php echo number_format($result->PackagePrice, 0, ',', '.') . ' đ';?></td>
 							<td><?php echo date('d/m/Y', strtotime($result->Creationdate));?></td>
 							<td>
@@ -130,7 +132,7 @@ include('includes/layout-start.php');
 							</td>
 						</tr>
 					<?php $cnt++; }} else { ?>
-						<tr><td colspan="7"><div class="empty-state">
+						<tr><td colspan="8"><div class="empty-state">
 							<?php if(!empty($search) || !empty($searchType) || !empty($searchLocation)) { ?>
 								Không tìm thấy gói tour phù hợp. <a href="<?php echo BASE_URL; ?>admin/manage-packages.php">Xóa bộ lọc</a>
 							<?php } else { ?>

@@ -48,8 +48,9 @@
        ); ?></strong></li>
 							<li><span>Địa điểm</span><strong><?php echo htmlentities(
            $data["package"]->PackageLocation,
-       ); ?></strong></li>
-							<li><span>Giá</span><strong><?php echo Controller::formatVND($data["package"]->PackagePrice); ?></strong></li>
+       ); ?></strong></li>					<li><span>Thời gian tour</span><strong><?php echo htmlentities(
+           $data["package"]->TourDuration,
+       ); ?></strong></li>							<li><span>Giá</span><strong><?php echo Controller::formatVND($data["package"]->PackagePrice); ?></strong></li>
 						</ul>
 						<p><?php echo htmlentities($data["package"]->PackageFetures); ?></p>
 					</section>
@@ -61,6 +62,10 @@
 							<div class="form-group">
 								<label for="departuredate">Ngày khởi hành</label>
 								<input type="date" id="departuredate" name="departuredate" required>
+							</div>
+							<div class="form-group">
+								<label for="numberofpeople">Số người</label>
+								<input type="number" id="numberofpeople" name="numberofpeople" min="1" max="100" value="1" required>
 							</div>
 							<div class="form-group">
 								<label for="comment">Ghi chú</label>

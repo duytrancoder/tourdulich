@@ -11,6 +11,25 @@ class PackageModel extends Model {
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
+    public function getFeaturedPackagesPaginated($limit, $offset) {
+        $limit = (int)$limit;
+        $offset = (int)$offset;
+        $sql = "SELECT * FROM tbltourpackages ORDER BY Creationdate DESC LIMIT :limit OFFSET :offset";
+        $query = $this->db->prepare($sql);
+        $query->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $query->bindParam(':offset', $offset, PDO::PARAM_INT);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
+    public function getTotalToursCount() {
+        $sql = "SELECT COUNT(*) as total FROM tbltourpackages";
+        $query = $this->db->prepare($sql);
+        $query->execute();
+        $result = $query->fetch(PDO::FETCH_OBJ);
+        return $result->total;
+    }
+
     public function getDistinctLocations() {
         $sql = "SELECT DISTINCT PackageLocation FROM tbltourpackages WHERE PackageLocation <> '' ORDER BY PackageLocation";
         $query = $this->db->prepare($sql);

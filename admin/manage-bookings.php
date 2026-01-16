@@ -15,10 +15,11 @@ if(isset($_REQUEST['bkid']) && isset($_POST['cancel_reason']))
 	$cancelby='a';
 	$cancelReason = $_POST['cancel_reason'];
 	// TODO: Send cancellation reason to user (will be implemented later)
-	$sql = "UPDATE tblbooking SET status=:status,CancelledBy=:cancelby WHERE  BookingId=:bid";
+	$sql = "UPDATE tblbooking SET status=:status,CancelledBy=:cancelby,CancelReason=:cancelReason WHERE BookingId=:bid";
 	$query = $dbh->prepare($sql);
 	$query -> bindParam(':status',$status, PDO::PARAM_STR);
 	$query -> bindParam(':cancelby',$cancelby , PDO::PARAM_STR);
+	$query -> bindParam(':cancelReason',$cancelReason , PDO::PARAM_STR);
 	$query-> bindParam(':bid',$bid, PDO::PARAM_STR);
 	$query -> execute();
 	$msg="Hủy đặt tour thành công. Lý do: " . htmlentities($cancelReason);
@@ -48,7 +49,7 @@ if(isset($_GET['del']))
 
 $pageTitle = "GoTravel Admin | Quản lý đặt tour";
 $currentPage = 'manage-bookings';
-$sql = "SELECT tblbooking.BookingId as bookid,tblusers.FullName as fname,tblusers.MobileNumber as mnumber,tblusers.EmailId as email,tbltourpackages.PackageName as pckname,tblbooking.PackageId as pid,tblbooking.FromDate as fdate,tblbooking.ToDate as tdate,tblbooking.Comment as comment,tblbooking.status as status,tblbooking.CancelledBy as cancelby,tblbooking.UpdationDate as upddate,tblbooking.RegDate as regdate from tblusers join  tblbooking on  tblbooking.UserEmail=tblusers.EmailId join tbltourpackages on tbltourpackages.PackageId=tblbooking.PackageId";
+$sql = "SELECT tblbooking.BookingId as bookid,tblusers.FullName as fname,tblusers.MobileNumber as mnumber,tblusers.EmailId as email,tbltourpackages.PackageName as pckname,tbltourpackages.TourDuration as tourduration,tblbooking.PackageId as pid,tblbooking.FromDate as fdate,tblbooking.ToDate as tdate,tblbooking.Comment as comment,tblbooking.NumberOfPeople as numppl,tblbooking.TotalPrice as totalprice,tblbooking.status as status,tblbooking.CancelledBy as cancelby,tblbooking.UpdationDate as upddate,tblbooking.RegDate as regdate from tblusers join  tblbooking on  tblbooking.UserEmail=tblusers.EmailId join tbltourpackages on tbltourpackages.PackageId=tblbooking.PackageId ORDER BY tblbooking.RegDate DESC";
 $query = $dbh -> prepare($sql);
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
@@ -67,51 +68,41 @@ include('includes/layout-start.php');
 			<table class="table">
 				<thead>
 					<tr>
-						<th>Mã đặt tour</th>
+						<th>Mã (#ID)</th>
 						<th>Khách hàng</th>
-						<th>Liên hệ</th>
-						<th>Gói tour</th>
+						<th>Thông tin Tour</th>
+						<th>Thời gian tour</th>
 						<th>Ngày khởi hành</th>
-						<th>Ghi chú</th>
+						<th>Số lượng khách</th>
+						<th>Tổng tiền</th>
 						<th>Trạng thái</th>
 						<th>Thao tác</th>
-						<th>Xóa</th>
 					</tr>
 				</thead>
 				<tbody>
 				<?php if($query->rowCount() > 0) {
 					foreach($results as $result) {
 						$statusClass = 'is-pending';
-						$statusText = 'Đang chờ xử lý';
+						$statusText = 'Chờ xử lý';
 						if($result->status==1){ $statusClass='is-approved'; $statusText='Đã xác nhận'; }
 						if($result->status==2 && $result->cancelby=='a'){ $statusClass='is-cancelled'; $statusText='Quản trị viên hủy'; }
 						if($result->status==2 && $result->cancelby=='u'){ $statusClass='is-cancelled'; $statusText='Người dùng hủy'; }
 				?>
 				<tr>
-					<td>#BK-<?php echo htmlentities($result->bookid);?></td>
+					<td><strong>#<?php echo htmlentities($result->bookid);?></strong></td>
 					<td><?php echo htmlentities($result->fname);?></td>
-					<td>
-						<div><?php echo htmlentities($result->mnumber);?></div>
-						<div class="helper-text"><?php echo htmlentities($result->email);?></div>
-					</td>
-					<td><a href="<?php echo BASE_URL; ?>admin/update-package.php?pid=<?php echo htmlentities($result->pid);?>"><?php echo htmlentities($result->pckname);?></a></td>
+					<td><?php echo htmlentities($result->pckname);?></td>
+					<td><?php echo htmlentities($result->tourduration);?></td>
 					<td><?php echo date('d/m/Y', strtotime($result->fdate));?></td>
-					<td><?php echo htmlentities($result->comment);?></td>
+					<td><?php echo htmlentities($result->numppl);?> người</td>
+					<td><?php echo number_format($result->totalprice, 0, ',', '.') . ' VND';?></td>
 					<td><span class="status-chip <?php echo $statusClass;?>"><?php echo htmlentities($statusText);?></span></td>
 					<td>
-						<?php if($result->status==2){ ?>
-							<span class="link-muted">Đã hủy</span>
-						<?php } elseif($result->status==1){ ?>
-							<a class="btn btn-ghost" href="#" onclick="alert('Chức năng chi tiết sẽ được triển khai sau'); return false;">Chi tiết</a>
-						<?php } else { ?>
-							<form method="post" action="<?php echo BASE_URL; ?>admin/manage-bookings.php?bkid=<?php echo htmlentities($result->bookid);?>" style="display:inline;" onsubmit="return promptCancelReason(this);">
-								<input type="hidden" name="cancel_reason" id="cancel_reason_<?php echo $result->bookid;?>">
-								<button type="submit" class="btn btn-danger">Hủy</button>
-							</form>
-							<a class="btn btn-primary" href="<?php echo BASE_URL; ?>admin/manage-bookings.php?bckid=<?php echo htmlentities($result->bookid);?>" onclick="return confirm('Bạn có chắc chắn muốn xác nhận đặt tour này không?')">Xác nhận</a>
-						<?php } ?>
+						<div style="display:flex; gap:.5rem;">
+							<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/view-booking.php?bid=<?php echo htmlentities($result->bookid);?>">Chi tiết</a>
+							<a class="btn btn-danger" href="<?php echo BASE_URL; ?>admin/manage-bookings.php?del=<?php echo htmlentities($result->bookid);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa đặt tour #<?php echo htmlentities($result->bookid);?>?');">Xóa</a>
+						</div>
 					</td>
-					<td><a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/manage-bookings.php?del=<?php echo htmlentities($result->bookid);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa bản ghi này không?');">Xóa</a></td>
 				</tr>
 				<?php }
 				} else { ?>
