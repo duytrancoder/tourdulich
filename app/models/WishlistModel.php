@@ -30,8 +30,8 @@ class WishlistModel extends Model {
      */
     public function getWishlistByUser($userEmail) {
         $sql = "SELECT w.id, w.PackageId, w.CreatedAt, 
-                       p.PackageName, p.PackageType, p.PackageLocation, 
-                       p.PackagePrice, p.PackageFetures, p.PackageImage
+                   p.PackageName, p.PackageType, p.PackageLocation, 
+                   p.PackagePrice, p.PackageFetures, p.PackageImage, p.TourDuration
                 FROM tblwishlist w
                 INNER JOIN tbltourpackages p ON w.PackageId = p.PackageId
                 WHERE w.UserEmail = :email
