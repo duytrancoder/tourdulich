@@ -3,7 +3,8 @@
  * Handles adding/removing tours from wishlist with AJAX
  */
 
-const BASE_URL = window.location.origin + '/tour1/';
+// Use BASE_URL from PHP if available, otherwise fallback to default
+const BASE_URL = window.BASE_URL_FROM_PHP || (window.location.origin + '/tour1/');
 
 document.addEventListener('DOMContentLoaded', function () {
     // Initialize wishlist hearts on page load

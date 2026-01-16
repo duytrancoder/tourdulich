@@ -34,13 +34,24 @@ class WishlistController extends Controller {
             exit;
         }
 
+        // Validate package ID
+        if ($packageId <= 0) {
+            echo json_encode(['success' => false, 'message' => 'ID tour không hợp lệ']);
+            exit;
+        }
+
         $wishlistModel = $this->model('WishlistModel');
         $userEmail = $_SESSION['login'];
         
-        if ($wishlistModel->addToWishlist($userEmail, $packageId)) {
-            echo json_encode(['success' => true, 'message' => 'Đã thêm vào danh sách yêu thích']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Có lỗi xảy ra']);
+        try {
+            if ($wishlistModel->addToWishlist($userEmail, $packageId)) {
+                echo json_encode(['success' => true, 'message' => 'Đã thêm vào danh sách yêu thích']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Không thể thêm vào danh sách yêu thích. Vui lòng thử lại']);
+            }
+        } catch (Exception $e) {
+            error_log("WishlistController::add Error: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Có lỗi xảy ra. Vui lòng thử lại']);
         }
         exit;
     }
@@ -78,20 +89,31 @@ class WishlistController extends Controller {
             exit;
         }
 
+        // Validate package ID
+        if ($packageId <= 0) {
+            echo json_encode(['success' => false, 'message' => 'ID tour không hợp lệ']);
+            exit;
+        }
+
         $wishlistModel = $this->model('WishlistModel');
         $userEmail = $_SESSION['login'];
         
-        $isInWishlist = $wishlistModel->isInWishlist($userEmail, $packageId);
-        
-        if ($wishlistModel->toggleWishlist($userEmail, $packageId)) {
-            $newStatus = !$isInWishlist;
-            echo json_encode([
-                'success' => true, 
-                'inWishlist' => $newStatus,
-                'message' => $newStatus ? 'Đã thêm vào danh sách yêu thích' : 'Đã xóa khỏi danh sách yêu thích'
-            ]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Có lỗi xảy ra']);
+        try {
+            $isInWishlist = $wishlistModel->isInWishlist($userEmail, $packageId);
+            
+            if ($wishlistModel->toggleWishlist($userEmail, $packageId)) {
+                $newStatus = !$isInWishlist;
+                echo json_encode([
+                    'success' => true, 
+                    'inWishlist' => $newStatus,
+                    'message' => $newStatus ? 'Đã thêm vào danh sách yêu thích' : 'Đã xóa khỏi danh sách yêu thích'
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Không thể cập nhật danh sách yêu thích. Vui lòng thử lại']);
+            }
+        } catch (Exception $e) {
+            error_log("WishlistController::toggle Error: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Có lỗi xảy ra. Vui lòng thử lại']);
         }
         exit;
     }

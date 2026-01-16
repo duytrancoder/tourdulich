@@ -3,7 +3,8 @@
  * Handles beautiful wishlist button with clear saved/unsaved states
  */
 
-const BASE_URL = window.location.origin + '/tour1/';
+// Use BASE_URL from PHP if available, otherwise fallback to default
+const BASE_URL = window.BASE_URL_FROM_PHP || (window.location.origin + '/tour1/');
 
 document.addEventListener('DOMContentLoaded', function () {
     const wishlistBtn = document.getElementById('wishlistBtn');

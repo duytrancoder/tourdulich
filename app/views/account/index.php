@@ -318,8 +318,12 @@
 <?php include ROOT . "/includes/signup.php"; ?>
 <?php include ROOT . "/includes/signin.php"; ?>
 <?php include ROOT . "/includes/write-us.php"; ?>
+<script>
+    // Pass BASE_URL from PHP to JavaScript
+    window.BASE_URL_FROM_PHP = '<?php echo BASE_URL; ?>';
+</script>
 <script src="<?php echo BASE_URL; ?>public/js/account.js?v=1.0"></script>
-<script src="<?php echo BASE_URL; ?>public/js/wishlist.js?v=1.0"></script>
+<script src="<?php echo BASE_URL; ?>public/js/wishlist.js?v=1.1"></script>
 <script>
 	function showCancelReason(event, reason) {
 		event.preventDefault();
