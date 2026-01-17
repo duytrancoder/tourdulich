@@ -77,7 +77,9 @@ class UserModel extends Model
     public function updatePassword($email, $newpassword)
     {
         // Ensure password is hashed if it's not already
-        if (strlen($newpassword) !== 60 || !str_starts_with($newpassword, '$2y$')) {
+        $isAlreadyHashed = (strlen($newpassword) >= 60 && (strpos($newpassword, '$2y$') === 0 || strpos($newpassword, '$2a$') === 0 || strpos($newpassword, '$2x$') === 0));
+        
+        if (!$isAlreadyHashed) {
             $newpassword = password_hash($newpassword, PASSWORD_DEFAULT);
         }
         

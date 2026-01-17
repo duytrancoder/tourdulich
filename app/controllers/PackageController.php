@@ -54,7 +54,7 @@ class PackageController extends Controller {
             $numberofpeople = intval($_POST['numberofpeople'] ?? 1);
             $comment = trim($_POST['comment'] ?? '');
 
-            // Validate inputs
+            // Loc
             if (empty($departureDate)) {
                 $_SESSION['error'] = "Vui lòng chọn ngày khởi hành";
                 header('Location: ' . BASE_URL . 'package/details/' . $pid);
