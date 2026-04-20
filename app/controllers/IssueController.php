@@ -6,17 +6,8 @@ class IssueController extends Controller {
             exit;
         }
 
-        $issueModel = $this->model('IssueModel');
-        $issues = $issueModel->getIssuesByUserEmail($_SESSION['login']);
-
-        $data = [
-            'issues' => $issues,
-            'error' => $_SESSION['error'] ?? null,
-            'msg' => $_SESSION['msg'] ?? null
-        ];
-        unset($_SESSION['error'], $_SESSION['msg']);
-
-        $this->view('issue/index', $data);
+        header('location:' . BASE_URL);
+        exit;
     }
 
     public function submit() {

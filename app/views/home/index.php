@@ -232,6 +232,7 @@
 		</div>
 	</section>
 </main>
+<?php include ROOT . "/app/views/partials/user_chat_widget.php"; ?>
 <?php include ROOT . "/includes/footer.php"; ?>
 <?php include ROOT . "/includes/signup.php"; ?>
 <?php include ROOT . "/includes/signin.php"; ?>
