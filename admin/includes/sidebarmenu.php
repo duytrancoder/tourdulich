@@ -8,7 +8,6 @@
 		<a href="<?php echo BASE_URL; ?>admin/manage-users.php" class="<?php echo $activePage==='manage-users' ? 'is-active' : ''; ?>"><i class="fa fa-users"></i> Quản lý người dùng</a>
 		<a href="<?php echo BASE_URL; ?>admin/manage-bookings.php" class="<?php echo $activePage==='manage-bookings' ? 'is-active' : ''; ?>"><i class="fa fa-book"></i> Quản lý đặt tour</a>
 		<a href="<?php echo BASE_URL; ?>admin/manageissues.php" class="<?php echo $activePage==='chat' ? 'is-active' : ''; ?>"><i class="fa fa-comments"></i> Chat trực tuyến</a>
-		<a href="<?php echo BASE_URL; ?>admin/manage-enquires.php" class="<?php echo $activePage==='manage-enquiries' ? 'is-active' : ''; ?>"><i class="fa fa-envelope"></i> Liên hệ khách hàng</a>
 		<a href="<?php echo BASE_URL; ?>admin/manage-pages.php" class="<?php echo $activePage==='manage-pages' ? 'is-active' : ''; ?>"><i class="fa fa-file"></i> Trang nội dung</a>
 	</nav>
 </aside>

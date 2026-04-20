@@ -102,7 +102,6 @@ include('includes/layout-start.php');
 							<th>Số điện thoại</th>
 							<th>Email</th>
 							<th>Ngày đăng ký</th>
-							<th>Ngày cập nhật</th>
 							<th>Thao tác</th>
 						</tr>
 					</thead>
@@ -119,15 +118,10 @@ include('includes/layout-start.php');
 							<td><?php echo htmlentities($result->MobileNumber);?></td>
 							<td><?php echo htmlentities($result->EmailId);?></td>
 							<td><?php echo htmlentities($result->RegDate);?></td>
-							<td>
-								<?php
-								$lastUpdate = ($result->UpdationDate && $result->UpdationDate !== '0000-00-00 00:00:00')
-									? $result->UpdationDate
-									: 'Chưa cập nhật';
-								echo htmlentities($lastUpdate);
-								?>
+							<td style="white-space:nowrap;">
+								<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/user-details.php?id=<?php echo htmlentities($result->id);?>">Xem chi tiết</a>
+								<a class="btn btn-danger" href="<?php echo BASE_URL; ?>admin/manage-users.php?del=<?php echo htmlentities($result->id);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này không?');">Xóa</a>
 							</td>
-							<td><a class="btn btn-danger" href="<?php echo BASE_URL; ?>admin/manage-users.php?del=<?php echo htmlentities($result->id);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này không?');">Xóa</a></td>
 						</tr>
 						<?php $cnt++; }} else { ?>
 						<tr><td colspan="7"><div class="empty-state">

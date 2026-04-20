@@ -97,7 +97,6 @@ include('includes/layout-start.php');
 				<a class="btn btn-primary" href="<?php echo BASE_URL; ?>admin/create-package.php">Tạo gói tour</a>
 				<a class="btn btn-secondary" href="<?php echo BASE_URL; ?>admin/manage-packages.php">Quản lý gói tour</a>
 				<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/manageissues.php">Chat trực tuyến</a>
-				<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/manage-enquires.php">Hộp thư liên hệ</a>
 			</div>
 		</section>
 	</main>

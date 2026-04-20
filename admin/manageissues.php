@@ -11,7 +11,7 @@ $pageTitle = "GoTravel Admin | Chat trực tuyến";
 $currentPage = 'chat';
 include('includes/layout-start.php');
 ?>
-<!-- Ensure Tailwind CSS is loaded for this specific page -->
+<!-- Tailwind CSS for chat UI -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <div class="h-[calc(100vh-80px)] flex flex-col p-4 bg-gray-50 font-sans">
@@ -19,8 +19,23 @@ include('includes/layout-start.php');
         
         <!-- Left Column: User List -->
         <div class="w-1/3 border-r border-gray-100 flex flex-col">
-            <div class="p-4 border-b border-gray-100 bg-gray-50">
-                <h2 class="font-bold text-gray-800 text-lg">Danh sách hội thoại</h2>
+            <div class="p-4 border-b border-gray-100 bg-gray-50 space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                    <h2 class="font-bold text-gray-800 text-lg">Danh sách hội thoại</h2>
+                    <span id="user-count" class="text-xs text-gray-500"></span>
+                </div>
+                <div class="relative">
+                    <input
+                        id="chat-user-search"
+                        type="text"
+                        class="w-full rounded-full bg-white border border-gray-200 px-4 py-2.5 text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-400"
+                        placeholder="Tìm theo tên người dùng..."
+                        autocomplete="off"
+                    >
+                    <svg class="w-4 h-4 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10 18a8 8 0 100-16 8 8 0 000 16z"></path>
+                    </svg>
+                </div>
             </div>
             <div id="user-list" class="flex-1 overflow-y-auto">
                 <!-- User items will be injected here -->
@@ -73,10 +88,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatInput = document.getElementById('admin-chat-input');
     const chatUserName = document.getElementById('chat-user-name');
     const chatUserEmail = document.getElementById('chat-user-email');
+    const searchInput = document.getElementById('chat-user-search');
+    const userCountEl = document.getElementById('user-count');
 
     let currentEmail = null;
     let lastMessageId = 0;
     let userList = [];
+    let filteredUserList = [];
 
     // Format time helper
     function formatTime(dateStr) {
@@ -91,19 +109,33 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => {
                 if (res.status === 'success') {
                     userList = res.data;
+                    filteredUserList = applyUserFilter(userList, searchInput ? searchInput.value : '');
                     renderUserList();
                 }
             })
             .catch(err => console.error(err));
     }
 
+    function applyUserFilter(list, keyword) {
+        const q = (keyword || '').trim().toLowerCase();
+        if (!q) return list.slice();
+        return list.filter(u => {
+            const name = (u.FullName || '').toLowerCase();
+            const email = (u.EmailId || '').toLowerCase();
+            return name.includes(q) || email.includes(q);
+        });
+    }
+
     function renderUserList() {
-        if (userList.length === 0) {
+        const list = filteredUserList || [];
+        if (userCountEl) userCountEl.textContent = list.length ? `${list.length} cuộc trò chuyện` : '';
+
+        if (list.length === 0) {
             userListEl.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Chưa có cuộc trò chuyện nào.</div>';
             return;
         }
 
-        userListEl.innerHTML = userList.map(u => `
+        userListEl.innerHTML = list.map(u => `
             <div class="user-item cursor-pointer p-4 border-b border-gray-50 hover:bg-teal-50 transition-colors ${currentEmail === u.EmailId ? 'bg-teal-50 border-l-4 border-l-teal-600' : 'border-l-4 border-l-transparent'}" data-email="${u.EmailId}" data-name="${u.FullName}">
                 <div class="flex justify-between items-start mb-1">
                     <h4 class="font-semibold text-gray-800 truncate pr-2 text-sm">${u.FullName}</h4>
@@ -215,6 +247,18 @@ document.addEventListener('DOMContentLoaded', function() {
         fetchUsers();
         if (currentEmail) fetchMessages();
     }, 3000);
+
+    // Search filtering (client-side)
+    if (searchInput) {
+        let searchTimer = null;
+        searchInput.addEventListener('input', function() {
+            window.clearTimeout(searchTimer);
+            searchTimer = window.setTimeout(() => {
+                filteredUserList = applyUserFilter(userList, searchInput.value);
+                renderUserList();
+            }, 120);
+        });
+    }
 
     // Initial load
     fetchUsers();
