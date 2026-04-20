@@ -52,8 +52,9 @@ if(isset($_POST['update_status'])) {
 		if($newStatus == 2) {
 			$sql_update = "UPDATE tblbooking SET status=:status, CancelledBy=:cancelby, CancelReason=:cancelreason WHERE BookingId=:bid";
 			$query_update = $dbh->prepare($sql_update);
+			$cancelBy = 'a';
 			$query_update->bindParam(':status', $newStatus, PDO::PARAM_INT);
-			$query_update->bindParam(':cancelby', $cancelby = 'a', PDO::PARAM_STR);
+			$query_update->bindParam(':cancelby', $cancelBy, PDO::PARAM_STR);
 			$query_update->bindParam(':cancelreason', $cancelReason, PDO::PARAM_STR);
 		} else {
 			$sql_update = "UPDATE tblbooking SET status=:status WHERE BookingId=:bid";
@@ -63,6 +64,10 @@ if(isset($_POST['update_status'])) {
 		$query_update->bindParam(':bid', $bid, PDO::PARAM_INT);
 		
 		if($query_update->execute()) {
+			if($newStatus == 2) {
+				header('location:manage-bookings.php');
+				exit;
+			}
 			$msg = "Cập nhật trạng thái thành công";
 			// Refresh booking data
 			$query_refresh = $dbh->prepare($sql);
@@ -223,11 +228,12 @@ include('includes/layout-start.php');
 			</form>
 		</section>
 
+		<?php if ((int)$booking->status !== 2): ?>
 		<!-- Thao tác -->
 		<section class="card">
 			<h3>Thao tác</h3>
 			<div class="action-stack">
-				<?php if($booking->status != 1) { ?>
+				<?php if((int)$booking->status === 0) { ?>
 					<form method="post" class="action-row">
 						<input type="hidden" name="status" value="1">
 						<input type="hidden" name="admin_notes" value="<?php echo htmlentities($booking->AdminNotes ?? ''); ?>">
@@ -237,23 +243,20 @@ include('includes/layout-start.php');
 					</form>
 				<?php } else { ?>
 					<div class="action-row">
-						<button class="btn btn-muted btn-full" disabled>Đã xác nhận</button>
+						<button class="btn btn-muted btn-full" disabled>Không thể cập nhật trạng thái</button>
 					</div>
 				<?php } ?>
 
-				<?php if($booking->status != 2) { ?>
+				<?php if((int)$booking->status === 0 || (int)$booking->status === 1) { ?>
 					<div class="action-row">
 						<button class="btn btn-danger btn-full" type="button" onclick="document.getElementById('cancelModal').style.display='block';">
 							Hủy đơn
 						</button>
 					</div>
-				<?php } else { ?>
-					<div class="action-row">
-						<button class="btn btn-muted btn-full" disabled>Đã hủy</button>
-					</div>
 				<?php } ?>
 			</div>
 		</section>
+		<?php endif; ?>
 	</div>
 </div>
 
@@ -261,7 +264,7 @@ include('includes/layout-start.php');
 
 <!-- Modal Hủy đơn -->
 <div id="cancelModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-	<div style="background: white; padding: 2rem; border-radius: 8px; max-width: 400px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+	<div style="background: white; padding: 2rem; border-radius: 8px; width: min(560px, 92%); box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
 		<h3>Hủy đơn hàng</h3>
 		<form method="post" style="margin-top: 1rem;">
 			<div class="form-group">

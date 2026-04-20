@@ -153,6 +153,10 @@
     font-family: 'Playfair Display', Georgia, serif;
 }
 
+.status-chip i {
+    margin-right: 0.4rem;
+}
+
 .booking-body {
     margin-bottom: 1rem;
 }

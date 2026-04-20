@@ -902,6 +902,12 @@ section+section {
   border: 1px solid rgba(231, 76, 60, 0.2);
 }
 
+.status-chip.is-completed {
+  background: linear-gradient(135deg, #E3F2FD, #D6EEFF);
+  color: #1565C0;
+  border: 1px solid rgba(21, 101, 192, 0.2);
+}
+
 .cta {
   background: linear-gradient(135deg, #013a3b 0%, #014d4e 100%);
   color: #fff;
@@ -1029,6 +1035,32 @@ section+section {
   font-size: 0.85rem;
   color: var(--muted);
   margin-top: 0.3rem;
+}
+
+.rating-stars {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.rating-star {
+  font-size: 1.9rem;
+  line-height: 1;
+  border: none;
+  background: transparent;
+  color: #d1d5db;
+  cursor: pointer;
+  padding: 0.1rem;
+  transition: transform 0.15s ease, color 0.2s ease;
+}
+
+.rating-star:hover {
+  transform: scale(1.1);
+}
+
+.rating-star.is-active {
+  color: #f59e0b;
 }
 
 .empty-state {
