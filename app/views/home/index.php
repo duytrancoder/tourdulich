@@ -195,20 +195,6 @@
 			</div>
 		</div>
 	</section>
-
-	<section class="section cta">
-		<div class="container cta__content">
-			<div>
-				<h2>Sẵn sàng lên đường?</h2>
-				<p>Hãy gửi yêu cầu hoặc liên hệ đội hỗ trợ để được tư vấn hành trình phù hợp nhất.</p>
-			</div>
-			<?php if (empty($_SESSION["login"])): ?>
-				<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>enquiry">Gửi hỏi đáp</a>
-			<?php else: ?>
-				<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>issue">Gửi yêu cầu</a>
-			<?php endif; ?>
-		</div>
-	</section>
 </main>
 <?php include ROOT . "/includes/footer.php"; ?>
 <?php include ROOT . "/includes/signup.php"; ?>
