@@ -13,60 +13,60 @@
 .tour-card:hover,
 .card:hover {
     border-color: var(--border-hover);
-    box-shadow: 0 12px 32px rgba(0, 90, 156, 0.12);
+    box-shadow: 0 12px 32px rgba(1, 77, 78, 0.15);
     transform: translateY(-2px);
 }
 
 /* Premium Tour Cards with Ocean Blue Hover */
 .premium-card-container {
     box-shadow:
-        0 0 0 2px rgba(0, 90, 156, 0.3),
-        0 0 25px 8px rgba(0, 90, 156, 0.1),
+        0 0 0 2px rgba(1, 77, 78, 0.3),
+        0 0 25px 8px rgba(1, 77, 78, 0.1),
         0 10px 40px rgba(0, 0, 0, 0.1);
 }
 
 .premium-card-container:hover {
     box-shadow:
-        0 0 0 3px rgba(0, 90, 156, 0.5),
-        0 0 35px 12px rgba(0, 90, 156, 0.2),
+        0 0 0 3px rgba(1, 77, 78, 0.5),
+        0 0 35px 12px rgba(1, 77, 78, 0.2),
         0 15px 50px rgba(0, 0, 0, 0.15);
 }
 
-/* Type Badge - Sunset Orange */
+/* Type Badge - Teal */
 .premium-type-badge {
-    background: linear-gradient(135deg, rgba(255, 127, 80, 0.95), rgba(255, 99, 71, 0.95));
+    background: linear-gradient(135deg, rgba(1, 77, 78, 0.95), rgba(1, 58, 59, 0.95));
 }
 
-/* Price Tag - Sunset Orange */
+/* Price Tag - Deep Teal */
 .premium-price-tag {
-    background: linear-gradient(135deg, #FF7F50 0%, #FF6347 100%);
+    background: linear-gradient(135deg, #014d4e 0%, #013a3b 100%);
     color: #FFFFFF;
     font-weight: 800;
     box-shadow:
-        inset 2px 2px 4px rgba(255, 160, 122, 0.4),
-        inset -2px -2px 4px rgba(220, 80, 50, 0.4),
-        0 4px 12px rgba(255, 127, 80, 0.3);
+        inset 2px 2px 4px rgba(1, 109, 111, 0.4),
+        inset -2px -2px 4px rgba(0, 40, 41, 0.4),
+        0 4px 12px rgba(1, 77, 78, 0.3);
 }
 
-/* Tour Button - Sunset Orange */
+/* Tour Button - Deep Teal */
 .premium-tour-button {
-    background: linear-gradient(135deg, #FF7F50 0%, #FF6347 100%);
+    background: linear-gradient(135deg, #014d4e 0%, #013a3b 100%);
     box-shadow:
-        inset 2px 2px 4px rgba(255, 160, 122, 0.4),
-        inset -2px -2px 4px rgba(220, 80, 50, 0.4),
-        0 4px 15px rgba(255, 127, 80, 0.4);
+        inset 2px 2px 4px rgba(1, 109, 111, 0.4),
+        inset -2px -2px 4px rgba(0, 40, 41, 0.4),
+        0 4px 15px rgba(1, 77, 78, 0.4);
 }
 
 .premium-tour-button:hover {
-    background: linear-gradient(135deg, #FFA07A 0%, #FF7F50 100%);
+    background: linear-gradient(135deg, #016d6f 0%, #014d4e 100%);
     box-shadow:
-        inset 2px 2px 5px rgba(255, 180, 140, 0.5),
-        inset -2px -2px 5px rgba(240, 100, 70, 0.4),
-        0 6px 20px rgba(255, 127, 80, 0.5);
+        inset 2px 2px 5px rgba(1, 130, 133, 0.5),
+        inset -2px -2px 5px rgba(0, 60, 62, 0.4),
+        0 6px 20px rgba(1, 77, 78, 0.5);
 }
 
 .premium-tour-button:active {
-    background: linear-gradient(135deg, #FF6347 0%, #E85A2A 100%);
+    background: linear-gradient(135deg, #013a3b 0%, #012a2b 100%);
 }
 
 /* Brand Logo Color */
@@ -98,9 +98,9 @@ textarea:focus {
     box-shadow: 0 0 0 3px var(--brand-soft);
 }
 
-/* Custom Dropdown - Ocean Blue Arrow */
+/* Custom Dropdown - Teal Arrow */
 .custom-select-button::after {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23005A9C' fill-rule='evenodd' d='M7 9a1 1 0 0 0-.707 1.707l5 5a1 1 0 0 0 1.414 0l5-5A1 1 0 0 0 17 9z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23014d4e' fill-rule='evenodd' d='M7 9a1 1 0 0 0-.707 1.707l5 5a1 1 0 0 0 1.414 0l5-5A1 1 0 0 0 17 9z' clip-rule='evenodd'/%3E%3C/svg%3E");
 }
 
 .custom-select-button:hover,

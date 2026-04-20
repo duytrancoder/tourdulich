@@ -16,7 +16,31 @@
 				<a class="link-muted" href="<?php echo BASE_URL; ?>user/forgot-password">Quên mật khẩu?</a>
 			</div>
 			<button type="submit" name="signin" class="btn w-100">Đăng nhập</button>
+			<p class="helper-text" style="text-align:center; margin-top:0.6rem;">
+				<a href="<?php echo BASE_URL; ?>admin/index.php" class="link-muted">Đăng nhập quản trị viên</a>
+			</p>
+			<p class="helper-text">
+				Bạn chưa có tài khoản?
+				<a href="#" class="switch-to-signup" style="text-decoration:underline; color:var(--brand); font-weight:600;">Đăng ký</a>.
+			</p>
 			<p class="helper-text">Bằng việc đăng nhập, bạn đồng ý với <a href="<?php echo BASE_URL; ?>page/terms">Điều khoản</a> và <a href="<?php echo BASE_URL; ?>page/privacy">Chính sách bảo mật</a>.</p>
 		</form>
 	</div>
 </div>
+
+<script>
+// Switch from signin modal to signup modal
+document.addEventListener('DOMContentLoaded', function() {
+	var switchBtn = document.querySelector('.switch-to-signup');
+	if (!switchBtn) return;
+	switchBtn.addEventListener('click', function(e) {
+		e.preventDefault();
+		// Close signin modal
+		var signinModal = document.getElementById('signin-modal');
+		if (signinModal) signinModal.classList.remove('is-visible');
+		// Open signup modal
+		var signupModal = document.getElementById('signup-modal');
+		if (signupModal) signupModal.classList.add('is-visible');
+	});
+});
+</script>

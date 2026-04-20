@@ -16,52 +16,54 @@
 <body>
 <?php include ROOT . "/includes/header.php"; ?>
 <main>
-	<section class="hero" style="background-image: url('<?php echo BASE_URL; ?>admin/images/nentour.jpg');">
+	<section class="hero">
 		<div class="container hero__grid">
 			<div class="hero__content">
-				<p style="color: #e5e7eb;">GoTravel</p>
-				<h1 style="color: #ea2cc7ff;">Đặt tour du lịch dễ dàng chỉ trong vài phút</h1>
-				<p style="color: #333; font-size: 18px;">Hệ thống gọn nhẹ giúp bạn khám phá tour phù hợp, quản lý lịch sử đặt và nhận hỗ trợ tức thời. Thiết kế hướng tới trải nghiệm rõ ràng, tối giản.</p>
-				<div class="hero__cta">
-					<a class="btn" href="<?php echo BASE_URL; ?>package">Khám phá gói tour</a>
-					<?php if (empty($_SESSION["login"])): ?>
-						<a class="btn btn-ghost" href="#" data-modal-target="signup-modal">Đăng ký ngay</a>
-					<?php else: ?>
-						<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>tour/history">Lịch sử tour</a>
-					<?php endif; ?>
-				</div>
+				<p>GoTravel &mdash; Trải nghiệm đích thực</p>
+				<h1>Khám Phá <span class="hero-highlight">Việt Nam</span></h1>
+				<p>Tìm kiếm những tour du lịch tuyệt vời nhất cho kỳ nghỉ của bạn.</p>
 			</div>
-			<form class="hero__card" action="<?php echo BASE_URL; ?>package" method="get">
-				<p style="letter-spacing: .3rem; color:black; ">Tìm tour</p>
-				<h3 style="margin-top:0; color:black; font-size:25px;">Bắt đầu với nhu cầu của bạn</h3>
-				<div class="form-group">
-					<label for="keyword" style="color:black;">Từ khóa</label>
-					<input type="text" id="keyword" name="keyword" placeholder="Nhập từ khóa: Tên tour, địa điểm (VD: Đà Nẵng, Sa Pa, Hạ Long)">
-					<small class="helper-text" style="display: block; margin-top: 0.5rem; color: var(--muted); font-size: 0.85rem;">Ví dụ: Tên tour, địa điểm bạn muốn khám phá</small>
+
+			<!-- Hero Search Bar -->
+			<form class="hero-search-bar" action="<?php echo BASE_URL; ?>package" method="get">
+				<!-- Keyword field -->
+				<div class="hero-search-field">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<circle cx="11" cy="11" r="8"></circle>
+						<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+					</svg>
+					<input type="text" name="keyword" id="hero-keyword"
+						   placeholder="Từ khóa (ví dụ: Sapa, biển...)">
 				</div>
-				<div class="form-group">
-					<label for="location">Địa điểm</label>
-					<select name="location" id="location">
-						<option value="">-- Chọn địa điểm bạn muốn khám phá --</option>
+
+				<!-- Location field -->
+				<div class="hero-search-field">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+						<circle cx="12" cy="10" r="3"></circle>
+					</svg>
+					<select name="location" id="hero-location">
+						<option value="">Tất cả địa điểm</option>
 						<?php foreach ($data["locations"] as $loc): ?>
-							<option value="<?php echo htmlentities(
-           $loc->PackageLocation,
-       ); ?>"><?php echo htmlentities($loc->PackageLocation); ?></option>
+							<option value="<?php echo htmlentities($loc->PackageLocation); ?>">
+								<?php echo htmlentities($loc->PackageLocation); ?>
+							</option>
 						<?php endforeach; ?>
 					</select>
-					<small class="helper-text" style="display: block; margin-top: 0.5rem; color: var(--muted); font-size: 0.85rem;">Chọn địa điểm cụ thể hoặc để trống để xem tất cả</small>
 				</div>
-				<div class="form-group">
-					<label for="price">Ngân sách</label>
-					<select name="price" id="price">
-						<option value="">-- Chọn mức ngân sách phù hợp --</option>
-						<option value="under-200">Dưới 4.800.000 đ</option>
-						<option value="200-500">4.800.000 đ - 12.000.000 đ</option>
-						<option value="over-500">Trên 12.000.000 đ</option>
-					</select>
-					<small class="helper-text" style="display: block; margin-top: 0.5rem; color: var(--muted); font-size: 0.85rem;">Chọn khoảng giá phù hợp với ngân sách của bạn</small>
-				</div>
-				<button class="btn w-100" type="submit">Xem tour phù hợp</button>
+
+				<!-- Search button -->
+				<button class="hero-search-btn" type="submit" id="hero-search-submit">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+						<circle cx="11" cy="11" r="8"></circle>
+						<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+					</svg>
+					Tìm kiếm
+				</button>
+			</form>
+
+			<!-- Form cũ ẩn đi -->
+			<form class="hero__card" action="<?php echo BASE_URL; ?>package" method="get" style="display:none">
 			</form>
 		</div>
 	</section>

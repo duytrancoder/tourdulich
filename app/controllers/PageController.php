@@ -1,6 +1,12 @@
 <?php
 class PageController extends Controller {
     public function index($type = '') {
+        // Trang "Liên hệ" đã bị xóa — redirect về trang chủ
+        if ($type === 'contact') {
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+
         $pageModel = $this->model('PageModel');
         $page = $pageModel->getPageByType($type);
 
@@ -8,7 +14,6 @@ class PageController extends Controller {
             'aboutus' => 'Giới thiệu',
             'privacy' => 'Chính sách bảo mật',
             'terms' => 'Điều khoản sử dụng',
-            'contact' => 'Liên hệ',
         ];
         $titleText = $titleMap[$type] ?? ucfirst($type);
 
