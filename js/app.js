@@ -18,7 +18,6 @@ ready(() => {
     if (!navBar) return;
 
     const currentY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
-    const delta = currentY - lastScrollY;
     const navMenuOpen = nav && nav.classList.contains('is-open');
 
     if (currentY <= 10 || navMenuOpen) {
@@ -27,12 +26,12 @@ ready(() => {
       return;
     }
 
-    // Scroll down -> hide nav; scroll up -> show nav
-    if (delta > 4) {
-      navBar.classList.add('nav-hidden');
-    } else if (delta < -4) {
-      navBar.classList.remove('nav-hidden');
-    }
+    // Scroll down -> hide nav; scroll up -> show nav (anywhere on the page).
+    // Use small thresholds to prevent flicker on tiny scroll noise.
+    const goingDown = currentY > lastScrollY + 8;
+    const goingUp = currentY < lastScrollY - 2;
+    if (goingDown) navBar.classList.add('nav-hidden');
+    if (goingUp) navBar.classList.remove('nav-hidden');
 
     lastScrollY = currentY;
   };

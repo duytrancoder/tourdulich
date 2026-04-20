@@ -6,6 +6,7 @@
 	<title>GoTravel | Tour yêu thích</title>
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css?v=5.0">
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/modern-tour-cards.css?v=1.0">
+	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/tour-card-sample.css?v=1.0">
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/enhanced-forms.css?v=5.0">
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/theme-colors.css?v=5.0">
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/wishlist-button.css?v=1.0">
@@ -29,66 +30,41 @@
 		<div class="tour-grid">
 			<?php foreach ($data["wishlistItems"] as $package): ?>
 				<div class="tour-card">
-					<!-- Tour Type Badge -->
 					<div class="badge"><?php echo htmlentities($package->PackageType); ?></div>
-					
-					<!-- Image -->
-					<div class="tilt">
-						<div class="img">
-							<img src="<?php echo BASE_URL; ?>admin/packageimages/<?php echo htmlentities($package->PackageImage); ?>" 
-							     alt="<?php echo htmlentities($package->PackageName); ?>">
-						</div>
-					</div>
-					
-					<!-- Wishlist Heart Button -->
-					<button class="wishlist-heart" data-package-id="<?php echo htmlentities($package->PackageId); ?>" title="Xóa khỏi danh sách yêu thích">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-							<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-						</svg>
-					</button>
-					
-					<!-- Info Section -->
-					<div class="info">
-						<!-- Location -->
-						<div class="meta-top">
-							<div class="cat">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-									<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-									<circle cx="12" cy="10" r="3"></circle>
-								</svg>
-								<?php echo htmlentities($package->PackageLocation); ?>
-							</div>
-						</div>
-					
-						<!-- Tour Name -->
-						<h2 class="title"><?php echo htmlentities($package->PackageName); ?></h2>
-						
-						<!-- Description -->
-						<p class="desc"><?php echo htmlentities($package->PackageFetures); ?></p>
 
-						<!-- Duration -->
-						<div class="duration-row">
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-								<circle cx="12" cy="12" r="10"></circle>
-								<polyline points="12 6 12 12 16 14"></polyline>
-							</svg>
+					<div class="tour-card__media">
+						<img src="<?php echo BASE_URL; ?>admin/packageimages/<?php echo htmlentities($package->PackageImage); ?>"
+							alt="<?php echo htmlentities($package->PackageName); ?>">
+
+						<button class="wishlist-heart active" type="button" data-package-id="<?php echo htmlentities($package->PackageId); ?>"
+							aria-label="Xóa khỏi danh sách yêu thích" title="Xóa khỏi danh sách yêu thích">
+							<i class="fas fa-heart"></i>
+						</button>
+
+						<div class="tour-card__duration">
+							<i class="fas fa-calendar-alt"></i>
 							<span><?php echo htmlentities($package->TourDuration); ?></span>
 						</div>
+					</div>
 
-						<!-- Price -->
-						<div class="price-row">
-							<span class="price-label">Chỉ từ</span>
-							<span class="price-value"><?php echo Controller::formatVND($package->PackagePrice); ?></span>
+					<div class="tour-card__content">
+						<div class="tour-card__location">
+							<i class="fas fa-map-marker-alt"></i>
+							<span><?php echo htmlentities($package->PackageLocation); ?></span>
 						</div>
 
-						<!-- Button -->
-						<a href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities($package->PackageId); ?>" class="btn-detail">
-							<span>Xem chi tiết</span>
-							<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-								<path d="M5 12h14"></path>
-								<path d="M12 5l7 7-7 7"></path>
-							</svg>
-						</a>
+						<h3 class="tour-card__title"><?php echo htmlentities($package->PackageName); ?></h3>
+						<p class="tour-card__desc"><?php echo htmlentities($package->PackageFetures); ?></p>
+
+						<div class="tour-card__footer">
+							<div>
+								<span class="tour-card__price-label">GIÁ TỪ</span>
+								<div class="tour-card__price"><?php echo Controller::formatVND($package->PackagePrice); ?></div>
+							</div>
+							<a class="tour-card__btn" href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities($package->PackageId); ?>">
+								Chi tiết
+							</a>
+						</div>
 					</div>
 				</div>
 			<?php endforeach; ?>
