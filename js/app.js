@@ -11,13 +11,13 @@ ready(() => {
   const navToggle = document.querySelector('.nav-toggle');
   const nav = document.getElementById('siteNav');
   const search = document.querySelector('.nav-search');
-  let lastScrollY = window.scrollY || 0;
+  let lastScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
   let ticking = false;
 
   const updateNavOnScroll = () => {
     if (!navBar) return;
 
-    const currentY = window.scrollY || 0;
+    const currentY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
     const delta = currentY - lastScrollY;
     const navMenuOpen = nav && nav.classList.contains('is-open');
 
@@ -28,9 +28,9 @@ ready(() => {
     }
 
     // Scroll down -> hide nav; scroll up -> show nav
-    if (delta > 6) {
+    if (delta > 4) {
       navBar.classList.add('nav-hidden');
-    } else if (delta < -6) {
+    } else if (delta < -4) {
       navBar.classList.remove('nav-hidden');
     }
 
