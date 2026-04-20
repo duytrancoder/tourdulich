@@ -1,220 +1,350 @@
 <?php if (!empty($_SESSION['login'])): ?>
-<!-- Ensure Tailwind CSS is loaded, but avoid collision if already present -->
-<script src="https://cdn.tailwindcss.com"></script>
+<!-- Chat Widget - Pure CSS, no Tailwind dependency -->
+<style>
+#chat-widget {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+#chat-toggle {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    background: #014d4e;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(1, 77, 78, 0.4);
+    transition: transform 0.2s ease, background 0.2s ease;
+    outline: none;
+}
+#chat-toggle:hover { background: #013839; transform: scale(1.08); }
+#chat-toggle:active { transform: scale(0.95); }
+#chat-icon-open, #chat-icon-close {
+    position: absolute;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+#chat-icon-close { opacity: 0; transform: rotate(-90deg); }
+#chat-toggle.is-open #chat-icon-open { opacity: 0; transform: rotate(90deg); }
+#chat-toggle.is-open #chat-icon-close { opacity: 1; transform: rotate(0deg); }
+#unread-badge {
+    display: none;
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    border: 2px solid #fff;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+}
+#unread-badge.visible { display: flex; }
+#chat-window {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    bottom: 68px;
+    right: 0;
+    width: 320px;
+    height: 400px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    transform-origin: bottom right;
+    transform: scale(0.92) translateY(8px);
+    opacity: 0;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.22s ease;
+}
+#chat-window.is-open {
+    display: flex;
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+.chat-header {
+    background: #014d4e;
+    color: #fff;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(1,77,78,0.2);
+}
+.chat-header-left { display: flex; align-items: center; gap: 10px; }
+.chat-header-avatar {
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.chat-header h3 {
+    margin: 0; font-size: 14px; font-weight: 700; line-height: 1.3;
+    color: #fff !important;
+}
+.chat-header p {
+    margin: 0; font-size: 11px; color: rgba(255,255,255,0.75); line-height: 1;
+}
+.chat-close-btn {
+    background: none; border: none; cursor: pointer;
+    color: rgba(255,255,255,0.75); padding: 4px;
+    border-radius: 6px; transition: color 0.2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.chat-close-btn:hover { color: #fff; }
+#chat-messages {
+    flex: 1;
+    padding: 14px;
+    overflow-y: auto;
+    background: #f8fafb;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+#chat-messages::-webkit-scrollbar { width: 4px; }
+#chat-messages::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+.chat-start-label {
+    text-align: center;
+    font-size: 11px;
+    color: #9ca3af;
+    margin: 4px 0;
+}
+.chat-msg-wrap {
+    display: flex;
+    flex-direction: column;
+    max-width: 85%;
+    animation: msgFadeIn 0.25s ease forwards;
+}
+.chat-msg-wrap.from-user { align-self: flex-end; align-items: flex-end; }
+.chat-msg-wrap.from-admin { align-self: flex-start; align-items: flex-start; }
+.chat-bubble {
+    padding: 8px 13px;
+    border-radius: 16px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    word-break: break-word;
+}
+.from-user .chat-bubble {
+    background: #014d4e; color: #fff;
+    border-bottom-right-radius: 4px;
+}
+.from-admin .chat-bubble {
+    background: #fff; color: #1f2937;
+    border: 1px solid #e5e7eb;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.chat-time {
+    font-size: 10px;
+    color: #9ca3af;
+    margin-top: 3px;
+    padding: 0 3px;
+}
+.chat-input-area {
+    padding: 10px 12px;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+    flex-shrink: 0;
+}
+.chat-form { display: flex; gap: 8px; align-items: center; }
+.chat-form input {
+    flex: 1;
+    background: #f1f5f9;
+    border: 1.5px solid transparent;
+    border-radius: 24px;
+    padding: 8px 16px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    color: #1f2937;
+}
+.chat-form input:focus {
+    background: #fff;
+    border-color: #014d4e;
+    box-shadow: 0 0 0 3px rgba(1,77,78,0.1);
+}
+.chat-form button {
+    width: 36px; height: 36px;
+    background: #014d4e; color: #fff;
+    border: none; border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.15s;
+}
+.chat-form button:hover { background: #013839; }
+.chat-form button:active { transform: scale(0.9); }
+@keyframes msgFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
 
-<div id="chat-widget" class="fixed bottom-6 right-6 z-50 font-sans">
-    
-    <!-- Chat Window (hidden by default) -->
-    <div id="chat-window" class="hidden flex flex-col bg-white w-80 h-96 rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transition-all duration-300 transform scale-95 origin-bottom-right opacity-0 absolute bottom-[72px] right-0">
+<div id="chat-widget">
+    <!-- Chat Window -->
+    <div id="chat-window">
         <!-- Header -->
-        <div class="bg-teal-700 text-white p-4 flex justify-between items-center shadow-sm">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <div class="chat-header-avatar">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 </div>
                 <div>
-                    <h3 class="font-bold text-sm leading-tight">Hỗ trợ trực tuyến</h3>
-                    <p class="text-xs text-teal-100">Chúng tôi sẵn sàng giúp đỡ</p>
+                    <h3>Hỗ trợ trực tuyến</h3>
+                    <p>Chúng tôi sẵn sàng giúp đỡ</p>
                 </div>
             </div>
-            <button id="close-chat" class="text-teal-100 hover:text-white transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <button id="close-chat" class="chat-close-btn" aria-label="Đóng">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
 
-        <!-- Messages Area -->
-        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50 flex flex-col gap-3">
-            <div class="text-center text-xs text-gray-400 my-2">Bắt đầu cuộc trò chuyện</div>
-            <!-- Messages will be appended here via JS -->
+        <!-- Messages -->
+        <div id="chat-messages">
+            <div class="chat-start-label">Bắt đầu cuộc trò chuyện</div>
         </div>
 
-        <!-- Input Area -->
-        <div class="p-3 bg-white border-t border-gray-100">
-            <form id="chat-form" class="flex gap-2 relative">
-                <input type="text" id="chat-input" class="flex-1 bg-gray-100 border-transparent rounded-full px-4 py-2 text-sm focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 outline-none transition-all" placeholder="Nhập tin nhắn..." autocomplete="off" required>
-                <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white rounded-full w-9 h-9 flex items-center justify-center transition-colors flex-shrink-0">
-                    <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+        <!-- Input -->
+        <div class="chat-input-area">
+            <form id="chat-form" class="chat-form" autocomplete="off">
+                <input type="text" id="chat-input" placeholder="Nhập tin nhắn..." required>
+                <button type="submit" aria-label="Gửi">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Chat Bubble Toggle -->
-    <button id="chat-toggle" class="absolute bottom-0 right-0 bg-teal-600 hover:bg-teal-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg shadow-teal-600/30 transition-transform transform hover:scale-105 active:scale-95 focus:outline-none z-10">
-        <!-- Unread Badge -->
-        <span id="unread-badge" class="hidden absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">0</span>
-        <!-- Chat Icon -->
-        <svg id="chat-icon-open" class="w-6 h-6 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-        <!-- Close Icon -->
-        <svg id="chat-icon-close" class="w-6 h-6 absolute transition-opacity duration-300 opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <!-- Toggle Bubble -->
+    <button id="chat-toggle" aria-label="Mở chat hỗ trợ">
+        <span id="unread-badge">0</span>
+        <svg id="chat-icon-open" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+        <svg id="chat-icon-close" width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
     </button>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const chatToggle = document.getElementById('chat-toggle');
-    const closeChat = document.getElementById('close-chat');
-    const chatWindow = document.getElementById('chat-window');
-    const iconOpen = document.getElementById('chat-icon-open');
-    const iconClose = document.getElementById('chat-icon-close');
-    const chatForm = document.getElementById('chat-form');
-    const chatInput = document.getElementById('chat-input');
-    const chatMessages = document.getElementById('chat-messages');
-    const unreadBadge = document.getElementById('unread-badge');
-    
-    let isChatOpen = false;
-    let pollInterval = null;
-    let lastMessageId = 0;
+(function() {
+    var toggle = document.getElementById('chat-toggle');
+    var closeBtn = document.getElementById('close-chat');
+    var chatWindow = document.getElementById('chat-window');
+    var badge = document.getElementById('unread-badge');
+    var form = document.getElementById('chat-form');
+    var input = document.getElementById('chat-input');
+    var messages = document.getElementById('chat-messages');
+    var isOpen = false;
+    var lastId = 0;
+    var pollTimer = null;
+    var unreadTimer = null;
+    var BASE = '<?php echo BASE_URL; ?>';
 
-    // Toggle logic
-    function toggleChat() {
-        isChatOpen = !isChatOpen;
-        if (isChatOpen) {
-            chatWindow.classList.remove('hidden');
-            setTimeout(() => {
-                chatWindow.classList.remove('scale-95', 'opacity-0');
-                chatWindow.classList.add('scale-100', 'opacity-100');
-            }, 10);
-            iconOpen.classList.add('opacity-0');
-            iconClose.classList.remove('opacity-0');
-            unreadBadge.classList.add('hidden');
-            scrollToBottom();
-            fetchMessages(); // fetch immediately
-            // Start polling
-            pollInterval = setInterval(fetchMessages, 3000);
-        } else {
-            chatWindow.classList.remove('scale-100', 'opacity-100');
-            chatWindow.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                chatWindow.classList.add('hidden');
-            }, 300);
-            iconOpen.classList.remove('opacity-0');
-            iconClose.classList.add('opacity-0');
-            // Stop polling
-            clearInterval(pollInterval);
-            // Re-start unread polling
-            pollUnread();
-        }
+    function openChat() {
+        isOpen = true;
+        chatWindow.classList.add('is-open');
+        toggle.classList.add('is-open');
+        badge.classList.remove('visible');
+        fetchMessages();
+        pollTimer = setInterval(fetchMessages, 3000);
     }
 
-    chatToggle.addEventListener('click', toggleChat);
-    closeChat.addEventListener('click', toggleChat);
+    function closeChat() {
+        isOpen = false;
+        chatWindow.classList.remove('is-open');
+        toggle.classList.remove('is-open');
+        clearInterval(pollTimer);
+        startUnreadPoll();
+    }
 
-    // Intercept navbar links for "Yêu cầu hỗ trợ" to open the chat widget
-    document.querySelectorAll('a[href$="issue"]').forEach(link => {
+    toggle.addEventListener('click', function() { isOpen ? closeChat() : openChat(); });
+    closeBtn.addEventListener('click', closeChat);
+
+    // Intercept "Yêu cầu hỗ trợ" nav link
+    document.querySelectorAll('a[href$="issue"]').forEach(function(link) {
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            if (!isChatOpen) {
-                toggleChat();
-            } else {
-                chatWindow.classList.add('scale-105');
-                setTimeout(() => chatWindow.classList.remove('scale-105'), 200);
-            }
+            isOpen ? closeChat() : openChat();
         });
     });
 
-    function scrollToBottom() {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+    function formatTime(str) {
+        var d = new Date(str);
+        return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     }
 
-    function formatTime(dateStr) {
-        const d = new Date(dateStr);
-        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    function appendMsg(msg) {
+        var isUser = msg.Sender === 'user';
+        var wrap = document.createElement('div');
+        wrap.className = 'chat-msg-wrap ' + (isUser ? 'from-user' : 'from-admin');
+        wrap.innerHTML =
+            '<div class="chat-bubble">' + escHtml(msg.Message) + '</div>' +
+            '<span class="chat-time">' + formatTime(msg.CreatedAt) + '</span>';
+        messages.appendChild(wrap);
+        lastId = Math.max(lastId, parseInt(msg.id));
+        messages.scrollTop = messages.scrollHeight;
     }
 
-    function appendMessage(msg) {
-        const isUser = msg.Sender === 'user';
-        const alignClass = isUser ? 'self-end flex-row-reverse' : 'self-start';
-        const bgClass = isUser ? 'bg-teal-600 text-white rounded-br-none' : 'bg-white text-gray-800 border border-gray-100 shadow-sm rounded-bl-none';
-        
-        const html = `
-            <div class="flex flex-col ${alignClass} max-w-[85%] animate-fade-in-up">
-                <div class="${bgClass} px-3 py-2 rounded-2xl text-[14px] leading-relaxed break-words">
-                    ${msg.Message}
-                </div>
-                <div class="text-[10px] text-gray-400 mt-1 px-1 ${isUser ? 'text-right' : 'text-left'}">
-                    ${formatTime(msg.CreatedAt)}
-                </div>
-            </div>
-        `;
-        chatMessages.insertAdjacentHTML('beforeend', html);
-        lastMessageId = Math.max(lastMessageId, msg.id);
+    function escHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
     function fetchMessages() {
-        fetch('<?php echo BASE_URL; ?>chat/getMessages')
-            .then(res => res.json())
-            .then(res => {
-                if(res.status === 'success') {
-                    // Simple logic: if new messages, re-render all (or just append)
-                    // For safety, let's clear and re-render to handle read states easily, 
-                    // OR only append if id > lastMessageId.
-                    
-                    const newMessages = res.data.filter(m => m.id > lastMessageId);
-                    if (newMessages.length > 0) {
-                        newMessages.forEach(appendMessage);
-                        scrollToBottom();
-                    }
+        fetch(BASE + 'chat/getMessages')
+            .then(function(r){ return r.json(); })
+            .then(function(res) {
+                if (res.status === 'success') {
+                    res.data.filter(function(m){ return parseInt(m.id) > lastId; })
+                        .forEach(appendMsg);
                 }
-            })
-            .catch(err => console.error(err));
+            }).catch(function(){});
     }
 
     function fetchUnread() {
-        if(isChatOpen) return;
-        fetch('<?php echo BASE_URL; ?>chat/getUnreadCount')
-            .then(res => res.json())
-            .then(res => {
-                if(res.status === 'success' && res.count > 0) {
-                    unreadBadge.textContent = res.count;
-                    unreadBadge.classList.remove('hidden');
+        if (isOpen) return;
+        fetch(BASE + 'chat/getUnreadCount')
+            .then(function(r){ return r.json(); })
+            .then(function(res) {
+                if (res.status === 'success' && res.count > 0) {
+                    badge.textContent = res.count;
+                    badge.classList.add('visible');
                 } else {
-                    unreadBadge.classList.add('hidden');
+                    badge.classList.remove('visible');
                 }
-            });
+            }).catch(function(){});
     }
 
-    // Send Message
-    chatForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const text = chatInput.value.trim();
-        if(!text) return;
-        
-        chatInput.value = '';
-        
-        const formData = new FormData();
-        formData.append('message', text);
+    function startUnreadPoll() {
+        clearInterval(unreadTimer);
+        unreadTimer = setInterval(fetchUnread, 3000);
+    }
 
-        fetch('<?php echo BASE_URL; ?>chat/sendMessage', {
-            method: 'POST',
-            body: formData
-        }).then(res => res.json()).then(res => {
-            if(res.status === 'success') {
-                fetchMessages(); // Immediately fetch to update view
-            }
-        });
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var text = input.value.trim();
+        if (!text) return;
+        input.value = '';
+        var fd = new FormData();
+        fd.append('message', text);
+        fetch(BASE + 'chat/sendMessage', { method: 'POST', body: fd })
+            .then(function(r){ return r.json(); })
+            .then(function(res) { if (res.status === 'success') fetchMessages(); })
+            .catch(function(){});
     });
 
-    // Unread polling when closed
-    function pollUnread() {
-        setInterval(fetchUnread, 3000);
-    }
-    
-    // Initial fetch if we want badge
     fetchUnread();
-    // Start background unread poll
-    pollUnread();
-
-    // Add a simple fade-in-up animation CSS
-    const style = document.createElement('style');
-    style.innerHTML = `
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in-up { animation: fadeInUp 0.3s ease forwards; }
-    `;
-    document.head.appendChild(style);
-});
+    startUnreadPoll();
+})();
 </script>
 <?php endif; ?>

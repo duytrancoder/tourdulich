@@ -31,3 +31,11 @@
 </footer>
 <script src="<?php echo BASE_URL; ?>public/js/toast-notifications.js?v=1.1"></script>
 <script src="<?php echo BASE_URL; ?>js/app.js"></script>
+<?php
+// Show chat widget on all pages EXCEPT account/profile/change-password pages
+$_chatExcluded = ['user/account', 'user/profile', 'user/change-password'];
+$_chatCurrentUrl = trim($_GET['url'] ?? '', '/');
+if (!in_array($_chatCurrentUrl, $_chatExcluded)):
+    include ROOT . "/app/views/partials/user_chat_widget.php";
+endif;
+?>
