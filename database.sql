@@ -27,6 +27,7 @@ SET NAMES utf8mb4;
 
 -- 2) DROP TABLES (clean import)
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `tblreviews`;
 DROP TABLE IF EXISTS `tblitinerary`;
 DROP TABLE IF EXISTS `tblwishlist`;
 DROP TABLE IF EXISTS `tblbooking`;
@@ -139,6 +140,20 @@ CREATE TABLE `tblwishlist` (
   UNIQUE KEY `user_package` (`UserEmail`,`PackageId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE `tblreviews` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `BookingId` int(11) NOT NULL,
+  `UserEmail` varchar(100) NOT NULL,
+  `PackageId` int(11) NOT NULL,
+  `Rating` tinyint(1) NOT NULL,
+  `Comment` text DEFAULT NULL,
+  `CreatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_booking_review` (`BookingId`),
+  KEY `idx_package` (`PackageId`),
+  KEY `idx_user` (`UserEmail`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE `tblitinerary` (
   `ItineraryId` int(11) NOT NULL AUTO_INCREMENT,
   `PackageId` int(11) NOT NULL,
@@ -162,6 +177,11 @@ ALTER TABLE `tblwishlist`
 
 ALTER TABLE `tblitinerary`
   ADD CONSTRAINT `fk_itinerary_package` FOREIGN KEY (`PackageId`) REFERENCES `tbltourpackages` (`PackageId`) ON DELETE CASCADE;
+
+ALTER TABLE `tblreviews`
+  ADD CONSTRAINT `fk_review_booking` FOREIGN KEY (`BookingId`) REFERENCES `tblbooking` (`BookingId`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_review_user` FOREIGN KEY (`UserEmail`) REFERENCES `tblusers` (`EmailId`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_review_package` FOREIGN KEY (`PackageId`) REFERENCES `tbltourpackages` (`PackageId`) ON DELETE CASCADE;
 
 -- 5) SEED DATA
 INSERT INTO `tbladmin` (`id`, `UserName`, `Password`, `updationDate`) VALUES
@@ -200,6 +220,7 @@ ALTER TABLE `tblissues` AUTO_INCREMENT = 9;
 ALTER TABLE `tblpages` AUTO_INCREMENT = 22;
 ALTER TABLE `tblwishlist` AUTO_INCREMENT = 1;
 ALTER TABLE `tblitinerary` AUTO_INCREMENT = 1;
+ALTER TABLE `tblreviews` AUTO_INCREMENT = 1;
 
 COMMIT;
   `CreatedAt` timestamp NOT NULL DEFAULT current_timestamp()

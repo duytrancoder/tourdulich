@@ -47,4 +47,25 @@ class BookingModel extends Model {
         $query->bindParam(':bid', $bookingId, PDO::PARAM_INT);
         return $query->execute();
     }
+    
+    public function getCompletedBookingForReview($bookingId, $userEmail, $packageId) {
+        $sql = "SELECT BookingId FROM tblbooking 
+                WHERE BookingId=:bid AND UserEmail=:email AND PackageId=:pid AND status=3 LIMIT 1";
+        $query = $this->db->prepare($sql);
+        $query->bindParam(':bid',   $bookingId,  PDO::PARAM_INT);
+        $query->bindParam(':email', $userEmail,  PDO::PARAM_STR);
+        $query->bindParam(':pid',   $packageId,  PDO::PARAM_INT);
+        $query->execute();
+        return $query->fetch(PDO::FETCH_OBJ);
+    }
+    
+    public function completeBooking($bookingId) {
+        $status = 3;
+        $sql = "UPDATE tblbooking SET status=:status WHERE BookingId=:bid";
+        $query = $this->db->prepare($sql);
+        $query->bindParam(':status', $status, PDO::PARAM_INT);
+        $query->bindParam(':bid', $bookingId, PDO::PARAM_INT);
+        return $query->execute();
+    }
 }
+

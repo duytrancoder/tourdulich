@@ -47,6 +47,17 @@ if(isset($_GET['del']))
 	$msg="Đã xóa bản ghi đặt tour";
 }
 
+// Status 3: Admin mark booking as Completed
+if(isset($_GET['complete']))
+{
+	$cmpid = intval($_GET['complete']);
+	$sql = "UPDATE tblbooking SET status=3 WHERE BookingId=:cmpid";
+	$query = $dbh->prepare($sql);
+	$query->bindParam(':cmpid', $cmpid, PDO::PARAM_INT);
+	$query->execute();
+	$msg = "Tour đã được đánh dấu là Hoàn thành.";
+}
+
 $pageTitle = "GoTravel Admin | Quản lý đặt tour";
 $currentPage = 'manage-bookings';
 $sql = "SELECT tblbooking.BookingId as bookid,tblusers.FullName as fname,tblusers.MobileNumber as mnumber,tblusers.EmailId as email,tbltourpackages.PackageName as pckname,tbltourpackages.TourDuration as tourduration,tblbooking.PackageId as pid,tblbooking.FromDate as fdate,tblbooking.ToDate as tdate,tblbooking.Comment as comment,tblbooking.NumberOfPeople as numppl,tblbooking.TotalPrice as totalprice,tblbooking.status as status,tblbooking.CancelledBy as cancelby,tblbooking.UpdationDate as upddate,tblbooking.RegDate as regdate from tblusers join  tblbooking on  tblbooking.UserEmail=tblusers.EmailId join tbltourpackages on tbltourpackages.PackageId=tblbooking.PackageId ORDER BY tblbooking.RegDate DESC";
@@ -83,10 +94,11 @@ include('includes/layout-start.php');
 				<?php if($query->rowCount() > 0) {
 					foreach($results as $result) {
 						$statusClass = 'is-pending';
-						$statusText = 'Chờ xử lý';
-						if($result->status==1){ $statusClass='is-approved'; $statusText='Đã xác nhận'; }
-						if($result->status==2 && $result->cancelby=='a'){ $statusClass='is-cancelled'; $statusText='Quản trị viên hủy'; }
-						if($result->status==2 && $result->cancelby=='u'){ $statusClass='is-cancelled'; $statusText='Người dùng hủy'; }
+					$statusText = 'Chờ xử lý';
+					if($result->status==1){ $statusClass='is-approved'; $statusText='Đã xác nhận'; }
+					if($result->status==2 && $result->cancelby=='a'){ $statusClass='is-cancelled'; $statusText='Quản trị viên hủy'; }
+					if($result->status==2 && $result->cancelby=='u'){ $statusClass='is-cancelled'; $statusText='Người dùng hủy'; }
+					if($result->status==3){ $statusClass='is-completed'; $statusText='✓ Đã hoàn thành'; }
 				?>
 				<tr>
 					<td><strong>#<?php echo htmlentities($result->bookid);?></strong></td>
@@ -98,9 +110,15 @@ include('includes/layout-start.php');
 					<td><?php echo number_format($result->totalprice, 0, ',', '.') . ' VND';?></td>
 					<td><span class="status-chip <?php echo $statusClass;?>"><?php echo htmlentities($statusText);?></span></td>
 					<td>
-						<div style="display:flex; gap:.5rem;">
+						<div style="display:flex; gap:.5rem; flex-wrap:wrap;">
 							<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/view-booking.php?bid=<?php echo htmlentities($result->bookid);?>">Chi tiết</a>
-							<a class="btn btn-danger" href="<?php echo BASE_URL; ?>admin/manage-bookings.php?del=<?php echo htmlentities($result->bookid);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa đặt tour #<?php echo htmlentities($result->bookid);?>?');">Xóa</a>
+							<?php if($result->status == 1): ?>
+								<a class="btn btn-success" href="<?php echo BASE_URL; ?>admin/manage-bookings.php?complete=<?php echo htmlentities($result->bookid);?>" onclick="return confirm('Xác nhận hoàn thành tour #<?php echo htmlentities($result->bookid);?>?');">Hoàn thành</a>
+							<?php elseif($result->status == 3): ?>
+								<span class="btn btn-locked" style="cursor:default;opacity:0.6;">&#128274; Đã khóa</span>
+							<?php else: ?>
+								<a class="btn btn-danger" href="<?php echo BASE_URL; ?>admin/manage-bookings.php?del=<?php echo htmlentities($result->bookid);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa đặt tour #<?php echo htmlentities($result->bookid);?>?');">Xóa</a>
+							<?php endif; ?>
 						</div>
 					</td>
 				</tr>
