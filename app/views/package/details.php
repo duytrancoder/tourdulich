@@ -93,7 +93,7 @@
 
 				<!-- Itinerary Section - Simple Layout -->
 				<?php if (isset($data["itineraries"]) && count($data["itineraries"]) > 0): ?>
-					<section class="card">
+					<section class="card itinerary-section">
 						<h3>Lộ trình chi tiết</h3>
 						<div class="itinerary-list">
 							<?php foreach ($data["itineraries"] as $item): ?>
@@ -160,11 +160,11 @@
 			</div>
 			<div class="review-filter-bar" id="reviewFilterBar">
 				<button type="button" class="review-filter-chip is-active" data-rating="all">Tất cả</button>
-				<button type="button" class="review-filter-chip" data-rating="5">5 Sao</button>
-				<button type="button" class="review-filter-chip" data-rating="4">4 Sao</button>
-				<button type="button" class="review-filter-chip" data-rating="3">3 Sao</button>
-				<button type="button" class="review-filter-chip" data-rating="2">2 Sao</button>
-				<button type="button" class="review-filter-chip" data-rating="1">1 Sao</button>
+				<button type="button" class="review-filter-chip" data-rating="5"><span>5</span><span class="chip-star">&#9733;</span></button>
+				<button type="button" class="review-filter-chip" data-rating="4"><span>4</span><span class="chip-star">&#9733;</span></button>
+				<button type="button" class="review-filter-chip" data-rating="3"><span>3</span><span class="chip-star">&#9733;</span></button>
+				<button type="button" class="review-filter-chip" data-rating="2"><span>2</span><span class="chip-star">&#9733;</span></button>
+				<button type="button" class="review-filter-chip" data-rating="1"><span>1</span><span class="chip-star">&#9733;</span></button>
 			</div>
 			<div class="review-list-wrapper">
 				<div id="reviewListContainer"></div>

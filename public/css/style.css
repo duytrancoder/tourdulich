@@ -258,6 +258,13 @@ section+section {
   top: 0;
   z-index: 100;
   box-shadow: 0 2px 12px rgba(1, 77, 78, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  will-change: transform;
+}
+
+.nav-bar.nav-hidden {
+  transform: translateY(-105%);
+  box-shadow: none;
 }
 
 .nav-bar__content {
@@ -1180,6 +1187,9 @@ section+section {
 }
 
 .review-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   border: none;
   border-radius: 999px;
   padding: 0.45rem 0.9rem;
@@ -1195,8 +1205,17 @@ section+section {
   color: #fff;
 }
 
+.review-filter-chip .chip-star {
+  color: #f59e0b;
+  font-size: 0.95em;
+}
+
 .review-filter-chip:hover {
   transform: translateY(-1px);
+}
+
+.itinerary-section {
+  margin-top: 1rem;
 }
 
 .review-list-wrapper {

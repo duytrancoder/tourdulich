@@ -7,19 +7,57 @@ const ready = (callback) => {
 };
 
 ready(() => {
+  const navBar = document.querySelector('.nav-bar');
   const navToggle = document.querySelector('.nav-toggle');
   const nav = document.getElementById('siteNav');
   const search = document.querySelector('.nav-search');
+  let lastScrollY = window.scrollY || 0;
+  let ticking = false;
+
+  const updateNavOnScroll = () => {
+    if (!navBar) return;
+
+    const currentY = window.scrollY || 0;
+    const delta = currentY - lastScrollY;
+    const navMenuOpen = nav && nav.classList.contains('is-open');
+
+    if (currentY <= 10 || navMenuOpen) {
+      navBar.classList.remove('nav-hidden');
+      lastScrollY = currentY;
+      return;
+    }
+
+    // Scroll down -> hide nav; scroll up -> show nav
+    if (delta > 6) {
+      navBar.classList.add('nav-hidden');
+    } else if (delta < -6) {
+      navBar.classList.remove('nav-hidden');
+    }
+
+    lastScrollY = currentY;
+  };
 
   if (navToggle && nav) {
     navToggle.addEventListener('click', () => {
       const isOpen = nav.classList.toggle('is-open');
       navToggle.setAttribute('aria-expanded', isOpen);
+      if (navBar) {
+        navBar.classList.remove('nav-hidden');
+      }
       if (search) {
         search.classList.toggle('is-open');
       }
     });
   }
+
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(() => {
+      updateNavOnScroll();
+      ticking = false;
+    });
+  }, { passive: true });
 
   const openModal = (id) => {
     const modal = document.getElementById(id);
