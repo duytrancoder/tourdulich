@@ -43,4 +43,32 @@ class ReviewModel extends Model {
         $q->execute();
         return $q->fetch(PDO::FETCH_OBJ);
     }
+
+    public function getRatingBreakdown($packageId) {
+        $sql = "SELECT Rating, COUNT(*) as total
+                FROM tblreviews
+                WHERE PackageId = :pid
+                GROUP BY Rating";
+        $q = $this->db->prepare($sql);
+        $q->bindParam(':pid', $packageId, PDO::PARAM_INT);
+        $q->execute();
+        $rows = $q->fetchAll(PDO::FETCH_OBJ);
+
+        $breakdown = [
+            1 => 0,
+            2 => 0,
+            3 => 0,
+            4 => 0,
+            5 => 0
+        ];
+
+        foreach ($rows as $row) {
+            $rating = (int)$row->Rating;
+            if ($rating >= 1 && $rating <= 5) {
+                $breakdown[$rating] = (int)$row->total;
+            }
+        }
+
+        return $breakdown;
+    }
 }

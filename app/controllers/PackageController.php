@@ -28,9 +28,17 @@ class PackageController extends Controller {
         $itineraryModel = $this->model('ItineraryModel');
         $itineraries = $itineraryModel->getByPackageId($id);
 
+        $reviewModel = $this->model('ReviewModel');
+        $reviews = $reviewModel->getReviewsByPackage($id);
+        $averageInfo = $reviewModel->getAverageRating($id);
+        $ratingBreakdown = $reviewModel->getRatingBreakdown($id);
+
         $data = [
             'package' => $package,
             'itineraries' => $itineraries,
+            'reviews' => $reviews,
+            'averageInfo' => $averageInfo,
+            'ratingBreakdown' => $ratingBreakdown,
             'error' => $_SESSION['error'] ?? null,
             'msg' => $_SESSION['msg'] ?? null
         ];

@@ -368,106 +368,12 @@
 </script>
 <script src="<?php echo BASE_URL; ?>public/js/account.js?v=1.0"></script>
 <script src="<?php echo BASE_URL; ?>public/js/wishlist.js?v=1.1"></script>
+<script src="<?php echo BASE_URL; ?>public/js/review-modal.js?v=1.0"></script>
 <script>
 	function showCancelReason(event, reason) {
 		event.preventDefault();
 		alert('Lý do hủy đơn:\n\n' + reason);
 	}
-
-	(function () {
-		var modal = document.getElementById('reviewModal');
-		var closeBtn = document.getElementById('reviewModalClose');
-		var form = document.getElementById('reviewForm');
-		var bookingInput = document.getElementById('reviewBookingId');
-		var packageInput = document.getElementById('reviewPackageId');
-		var ratingInput = document.getElementById('reviewRating');
-		var stars = Array.prototype.slice.call(document.querySelectorAll('#ratingStars .rating-star'));
-		var ratingHint = document.getElementById('ratingHint');
-		var ratingLabels = {
-			1: '1 sao - Chưa hài lòng',
-			2: '2 sao - Tạm ổn',
-			3: '3 sao - Tốt',
-			4: '4 sao - Rất tốt',
-			5: '5 sao - Tuyệt vời'
-		};
-
-		function updateStars(value) {
-			var selected = parseInt(value || 0, 10);
-			stars.forEach(function (star, index) {
-				if (index < selected) {
-					star.classList.add('is-active');
-				} else {
-					star.classList.remove('is-active');
-				}
-			});
-			ratingHint.textContent = selected ? ratingLabels[selected] : 'Chọn số sao bạn muốn đánh giá.';
-		}
-
-		function closeModal() {
-			modal.classList.remove('is-visible');
-			modal.setAttribute('aria-hidden', 'true');
-		}
-
-		document.querySelectorAll('.js-open-review').forEach(function (btn) {
-			btn.addEventListener('click', function () {
-				bookingInput.value = btn.getAttribute('data-booking-id') || '';
-				packageInput.value = btn.getAttribute('data-package-id') || '';
-				form.reset();
-				ratingInput.value = '';
-				updateStars(0);
-				modal.classList.add('is-visible');
-				modal.setAttribute('aria-hidden', 'false');
-			});
-		});
-		stars.forEach(function (star) {
-			star.addEventListener('click', function () {
-				var value = star.getAttribute('data-value');
-				ratingInput.value = value;
-				updateStars(value);
-			});
-		});
-
-		closeBtn.addEventListener('click', closeModal);
-		modal.addEventListener('click', function (event) {
-			if (event.target === modal) {
-				closeModal();
-			}
-		});
-
-		form.addEventListener('submit', function (event) {
-			event.preventDefault();
-			if (!ratingInput.value) {
-				alert('Vui lòng chọn số sao trước khi gửi đánh giá.');
-				return;
-			}
-			var submitBtn = form.querySelector('button[type="submit"]');
-			submitBtn.disabled = true;
-			submitBtn.textContent = 'Đang gửi...';
-
-			var payload = new URLSearchParams(new FormData(form));
-			fetch('<?php echo BASE_URL; ?>review/submit', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-				},
-				body: payload.toString()
-			})
-				.then(function (response) { return response.json(); })
-				.then(function (result) {
-					alert(result.message || 'Đã xử lý yêu cầu.');
-					if (result.status === 'success') {
-						window.location.reload();
-					}
-				})
-				.catch(function () {
-					alert('Không thể gửi đánh giá. Vui lòng thử lại.');
-				})
-				.finally(function () {
-					submitBtn.disabled = false;
-					submitBtn.textContent = 'Gửi đánh giá';
-				});
-		});
-	})();
 </script>
 </body>
 </html>
