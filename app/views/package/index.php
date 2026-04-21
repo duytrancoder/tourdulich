@@ -7,7 +7,7 @@
 	<title>GoTravel | Danh sách tour</title>
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css?v=3.0">
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/modern-tour-cards.css?v=1.0">
-	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/tour-card-sample.css?v=1.0">
+	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/tour-card-sample.css?v=1.2">
 </head>
 
 <body>
