@@ -182,18 +182,25 @@ class UserController extends Controller {
         if (isset($_POST['submit5'])) {
             $password = $_POST['password'] ?? '';
             $newpassword = $_POST['newpassword'] ?? '';
+            $confirmpassword = $_POST['confirmpassword'] ?? '';
             $email = $_SESSION['login'];
 
             // Validate passwords
             if (empty($password) || empty($newpassword)) {
                 $_SESSION['error'] = "Vui lòng nhập đầy đủ thông tin";
-                header('location:' . BASE_URL . 'user/change-password');
+                header('location:' . BASE_URL . 'user/account#security');
                 exit;
             }
 
             if (strlen($newpassword) < 6) {
                 $_SESSION['error'] = "Mật khẩu mới phải có ít nhất 6 ký tự";
-                header('location:' . BASE_URL . 'user/change-password');
+                header('location:' . BASE_URL . 'user/account#security');
+                exit;
+            }
+
+            if ($confirmpassword !== '' && $newpassword !== $confirmpassword) {
+                $_SESSION['error'] = "Mật khẩu mới và xác nhận mật khẩu không khớp";
+                header('location:' . BASE_URL . 'user/account#security');
                 exit;
             }
 
@@ -209,7 +216,7 @@ class UserController extends Controller {
                 $_SESSION['error'] = "Mật khẩu hiện tại không chính xác";
             }
         }
-        header('location:' . BASE_URL . 'user/change-password');
+        header('location:' . BASE_URL . 'user/account#security');
         exit;
     }
 
