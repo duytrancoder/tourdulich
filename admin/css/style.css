@@ -224,6 +224,65 @@ button, input, select, textarea {
   gap: 1rem;
 }
 
+.package-type-help-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.package-type-help-icon:hover {
+  background: #f8f8f8;
+}
+
+.package-type-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.45);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.package-type-modal.is-visible {
+  display: block;
+}
+
+.package-type-modal.is-animating {
+  opacity: 1;
+}
+
+.package-type-modal__content {
+  background: var(--card);
+  margin: 8vh auto;
+  padding: 2rem;
+  border-radius: 12px;
+  width: min(720px, 100%);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.2);
+  transform: translateY(18px) scale(0.98);
+  opacity: 0;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  position: relative;
+}
+
+.package-type-modal.is-animating .package-type-modal__content {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
 .admin-page-head h1 {
   margin: 0;
   font-size: 1.5rem;

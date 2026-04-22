@@ -60,8 +60,48 @@ if(isset($_GET['complete']))
 
 $pageTitle = "GoTravel Admin | Quản lý đặt tour";
 $currentPage = 'manage-bookings';
-$sql = "SELECT tblbooking.BookingId as bookid,tblusers.FullName as fname,tblusers.MobileNumber as mnumber,tblusers.EmailId as email,tbltourpackages.PackageName as pckname,tbltourpackages.TourDuration as tourduration,tblbooking.PackageId as pid,tblbooking.FromDate as fdate,tblbooking.ToDate as tdate,tblbooking.Comment as comment,tblbooking.NumberOfPeople as numppl,tblbooking.TotalPrice as totalprice,tblbooking.status as status,tblbooking.CancelledBy as cancelby,tblbooking.UpdationDate as upddate,tblbooking.RegDate as regdate from tblusers join  tblbooking on  tblbooking.UserEmail=tblusers.EmailId join tbltourpackages on tbltourpackages.PackageId=tblbooking.PackageId ORDER BY tblbooking.RegDate DESC";
+$searchBookingId = trim($_GET['booking_id'] ?? '');
+$searchCustomer = trim($_GET['customer'] ?? '');
+$searchTourInfo = trim($_GET['tour_info'] ?? '');
+
+$sql = "SELECT tblbooking.BookingId as bookid,tblusers.FullName as fname,tblusers.MobileNumber as mnumber,tblusers.EmailId as email,tbltourpackages.PackageName as pckname,tbltourpackages.TourDuration as tourduration,tblbooking.PackageId as pid,tblbooking.FromDate as fdate,tblbooking.ToDate as tdate,tblbooking.Comment as comment,tblbooking.NumberOfPeople as numppl,tblbooking.TotalPrice as totalprice,tblbooking.status as status,tblbooking.CancelledBy as cancelby,tblbooking.UpdationDate as upddate,tblbooking.RegDate as regdate from tblusers join  tblbooking on  tblbooking.UserEmail=tblusers.EmailId join tbltourpackages on tbltourpackages.PackageId=tblbooking.PackageId WHERE 1=1";
+
+if ($searchBookingId !== '') {
+	$normalizedBookingId = ltrim($searchBookingId, '#');
+	if (ctype_digit($normalizedBookingId)) {
+		$sql .= " AND tblbooking.BookingId = :booking_id";
+		$searchBookingId = $normalizedBookingId;
+	} else {
+		$sql .= " AND 1=0";
+	}
+}
+
+if ($searchCustomer !== '') {
+	$sql .= " AND (tblusers.FullName LIKE :customer_name OR tblusers.EmailId LIKE :customer_email)";
+}
+
+if ($searchTourInfo !== '') {
+	$sql .= " AND (tbltourpackages.PackageName LIKE :tour_name OR tbltourpackages.TourDuration LIKE :tour_duration)";
+}
+
+$sql .= " ORDER BY tblbooking.RegDate DESC";
+
 $query = $dbh -> prepare($sql);
+
+if ($searchBookingId !== '' && ctype_digit($searchBookingId)) {
+	$query->bindValue(':booking_id', (int)$searchBookingId, PDO::PARAM_INT);
+}
+
+if ($searchCustomer !== '') {
+	$query->bindValue(':customer_name', '%' . $searchCustomer . '%', PDO::PARAM_STR);
+	$query->bindValue(':customer_email', '%' . $searchCustomer . '%', PDO::PARAM_STR);
+}
+
+if ($searchTourInfo !== '') {
+	$query->bindValue(':tour_name', '%' . $searchTourInfo . '%', PDO::PARAM_STR);
+	$query->bindValue(':tour_duration', '%' . $searchTourInfo . '%', PDO::PARAM_STR);
+}
+
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
 include('includes/layout-start.php');
@@ -74,6 +114,28 @@ include('includes/layout-start.php');
 	</section>
 	<?php if($error){?><div class="alert error"><?php echo htmlentities($error);?></div><?php } ?>
 	<?php if($msg){?><div class="alert success"><?php echo htmlentities($msg);?></div><?php } ?>
+	<section class="card" style="margin-bottom: 1.5rem;">
+		<form method="get" class="form-stack">
+			<div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+				<div class="form-group">
+					<label for="booking_id">Mã (#ID)</label>
+					<input type="text" id="booking_id" name="booking_id" placeholder="Ví dụ: #101 hoặc 101" value="<?php echo htmlentities($_GET['booking_id'] ?? ''); ?>">
+				</div>
+				<div class="form-group">
+					<label for="customer">Khách hàng</label>
+					<input type="text" id="customer" name="customer" placeholder="Tên hoặc email khách hàng" value="<?php echo htmlentities($searchCustomer); ?>">
+				</div>
+				<div class="form-group">
+					<label for="tour_info">Thông tin Tour</label>
+					<input type="text" id="tour_info" name="tour_info" placeholder="Tên tour hoặc thời gian tour" value="<?php echo htmlentities($searchTourInfo); ?>">
+				</div>
+			</div>
+			<div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+				<button type="submit" class="btn btn-primary">Tìm kiếm</button>
+				<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/manage-bookings.php">Xóa bộ lọc</a>
+			</div>
+		</form>
+	</section>
 	<section class="card">
 		<div class="table-responsive">
 			<table class="table">
@@ -124,7 +186,7 @@ include('includes/layout-start.php');
 				</tr>
 				<?php }
 				} else { ?>
-				<tr><td colspan="9"><div class="empty-state">Hiện chưa có đặt tour nào.</div></td></tr>
+				<tr><td colspan="9"><div class="empty-state"><?php echo (!empty($_GET['booking_id']) || !empty($searchCustomer) || !empty($searchTourInfo)) ? 'Không tìm thấy đặt tour phù hợp.' : 'Hiện chưa có đặt tour nào.'; ?></div></td></tr>
 				<?php } ?>
 				</tbody>
 			</table>

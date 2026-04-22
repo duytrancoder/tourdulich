@@ -118,6 +118,10 @@
 									<i class="fas fa-map-marker-alt"></i>
 									<span><?php echo htmlentities($package->PackageLocation); ?></span>
 								</div>
+								<div class="tour-card__location">
+									<i class="fas fa-tag"></i>
+									<span>Loại gói: <?php echo htmlentities($package->PackageType); ?></span>
+								</div>
 
 								<h3 class="tour-card__title"><?php echo htmlentities($package->PackageName); ?></h3>
 								<p class="tour-card__desc"><?php echo htmlentities($package->PackageFetures); ?></p>
