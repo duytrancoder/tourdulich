@@ -342,6 +342,7 @@ if(isset($_GET['pid'])) {
 		<section class="card">
 			<h3>✅ Gói tour đã tạo</h3>
 			<div class="form-grid">
+				<div><strong>Mã gói:</strong> <?php echo Helper::formatPackageId($package->PackageId); ?></div>
 				<div><strong>Tên gói:</strong> <?php echo htmlentities($package->PackageName); ?></div>
 				<div><strong>Loại:</strong> <?php echo htmlentities($package->PackageType); ?></div>
 				<div><strong>Địa điểm:</strong> <?php echo htmlentities($package->PackageLocation); ?></div>

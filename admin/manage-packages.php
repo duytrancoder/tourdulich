@@ -2,6 +2,7 @@
 session_start();
 error_reporting(0);
 include('includes/config.php');
+require_once dirname(__DIR__) . '/core/Helper.php';
 if(strlen($_SESSION['alogin'])==0)
 {	
 header('location:index.php');
@@ -30,7 +31,7 @@ $currentPage = 'manage-packages';
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $searchType = isset($_GET['type']) ? trim($_GET['type']) : '';
 $searchLocation = isset($_GET['location']) ? trim($_GET['location']) : '';
-$normalizedSearchId = ltrim($search, '#');
+$normalizedSearchId = preg_replace('/^#?PKG-?/i', '', $search);
 
 $sql = "SELECT * FROM tbltourpackages WHERE 1=1";
 
@@ -137,7 +138,7 @@ include('includes/layout-start.php');
 						foreach($results as $result)
 						{	?>
 						<tr>
-							<td><?php echo htmlentities($result->PackageId);?></td>
+							<td><?php echo Helper::formatPackageId($result->PackageId);?></td>
 							<td><?php echo htmlentities($result->PackageName);?></td>
 							<td><?php echo htmlentities($result->PackageType);?></td>
 							<td><?php echo htmlentities($result->PackageLocation);?></td>

@@ -2,6 +2,7 @@
 session_start();
 error_reporting(0);
 include('includes/config.php');
+require_once dirname(__DIR__) . '/core/Helper.php';
 if(strlen($_SESSION['alogin'])==0)
 	{	
 header('location:index.php');
@@ -113,7 +114,7 @@ $query->bindParam(':pdetails',$pdetails,PDO::PARAM_STR);
 	?>
 		<section class="admin-page-head">
 			<div>
-				<h1>Cập nhật gói tour</h1>
+				<h1>Cập nhật gói tour <?php echo Helper::formatPackageId($package->PackageId); ?></h1>
 				<p>Điều chỉnh thông tin gói tour, quản lý hình ảnh và lộ trình.</p>
 			</div>
 		</section>
@@ -134,6 +135,10 @@ $query->bindParam(':pdetails',$pdetails,PDO::PARAM_STR);
 			<h3>Thông tin gói tour</h3>
 			<form name="package" method="post" class="form-stack">
 				<div class="form-grid">
+					<div class="form-group">
+						<label>Mã gói tour</label>
+						<input type="text" value="<?php echo Helper::formatPackageId($package->PackageId); ?>" disabled>
+					</div>
 					<div class="form-group">
 						<label for="packagename">Tên gói</label>
 						<input type="text" name="packagename" id="packagename" value="<?php echo htmlentities($package->PackageName);?>" required>

@@ -42,9 +42,7 @@
 																					$data["package"]->PackageImage,
 																				); ?>" alt="<?php echo htmlentities($data["package"]->PackageName); ?>">
 						<h2><?php echo htmlentities($data["package"]->PackageName); ?></h2>
-						<p class="badge">#PKG-<?php echo htmlentities(
-													$data["package"]->PackageId,
-												); ?></p>
+						<p class="badge"><?php echo Helper::formatPackageId($data["package"]->PackageId); ?></p>
 
 						<!-- Wishlist Button - Đẹp mắt và rõ ràng -->
 						<button class="wishlist-btn" data-package-id="<?php echo htmlentities($data["package"]->PackageId); ?>" id="wishlistBtn">

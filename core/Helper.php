@@ -209,4 +209,13 @@ class Helper {
     public static function randomString($length = 32) {
         return bin2hex(random_bytes($length / 2));
     }
+
+    /**
+     * Format Package ID to standard string (e.g. #PKG-19)
+     * @param int $id
+     * @return string
+     */
+    public static function formatPackageId($id) {
+        return "#PKG-" . $id;
+    }
 }
