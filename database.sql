@@ -1,29 +1,15 @@
 -- ============================================
--- DATABASE WEBDULICH - SCRIPT TỔNG HỢP
--- Tạo database hoàn chỉnh cho dự án Du lịch
+-- DATABASE WEBDULICH - CLEAN MASTER SCRIPT
 -- ============================================
 
--- 1. TẠO DATABASE (Nếu chưa có) VÀ SỬ DỤNG
-CREATE DATABASE IF NOT EXISTS `webdulich` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `webdulich`;
-
--- 2. THIẾT LẬP MÔI TRƯỜNG
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
-
--- ============================================
--- DATABASE WEBDULICH - FULL SCHEMA (MySQL/XAMPP)
--- Run this script directly in phpMyAdmin or mysql CLI
--- ============================================
+SET NAMES utf8mb4;
 
 -- 1) CREATE DATABASE & USE
 CREATE DATABASE IF NOT EXISTS `webdulich` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `webdulich`;
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
-SET NAMES utf8mb4;
 
 -- 2) DROP TABLES (clean import)
 SET FOREIGN_KEY_CHECKS = 0;
@@ -36,12 +22,12 @@ DROP TABLE IF EXISTS `tblenquiry`;
 DROP TABLE IF EXISTS `tblpages`;
 DROP TABLE IF EXISTS `tbltourpackages`;
 DROP TABLE IF EXISTS `tblusers`;
-DROP TABLE IF EXISTS `tbladmin`;
+DROP TABLE IF EXISTS `admin`;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- 3) TABLE DEFINITIONS
 
-CREATE TABLE `tbladmin` (
+CREATE TABLE `admin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `UserName` varchar(100) NOT NULL,
   `Password` varchar(100) NOT NULL,
@@ -76,7 +62,7 @@ CREATE TABLE `tbltourpackages` (
   `PackageDetails` mediumtext NOT NULL,
   `PackageImage` varchar(100) NOT NULL,
   `Creationdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `UpdationDate` timestamp NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`PackageId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -92,13 +78,11 @@ CREATE TABLE `tblbooking` (
   `AdminNotes` mediumtext DEFAULT NULL,
   `CancelReason` mediumtext DEFAULT NULL,
   `RegDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `status` int(11) NOT NULL,
+  `status` int(11) NOT NULL DEFAULT 0,
   `CancelledBy` varchar(5) DEFAULT NULL,
   `UpdationDate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `CustomerMessage` mediumtext DEFAULT NULL,
-  PRIMARY KEY (`BookingId`),
-  KEY `idx_user_email` (`UserEmail`),
-  KEY `idx_package` (`PackageId`)
+  PRIMARY KEY (`BookingId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `tblenquiry` (
@@ -120,7 +104,7 @@ CREATE TABLE `tblissues` (
   `Description` mediumtext NOT NULL,
   `PostingDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `AdminRemark` mediumtext DEFAULT NULL,
-  `AdminremarkDate` timestamp NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `AdminremarkDate` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -129,7 +113,7 @@ CREATE TABLE `tblpages` (
   `type` varchar(255) NOT NULL DEFAULT '',
   `detail` longtext NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `tblwishlist` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -149,233 +133,71 @@ CREATE TABLE `tblreviews` (
   `Comment` text DEFAULT NULL,
   `CreatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_booking_review` (`BookingId`),
-  KEY `idx_package` (`PackageId`),
-  KEY `idx_user` (`UserEmail`)
+  UNIQUE KEY `unique_booking_review` (`BookingId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `tblitinerary` (
   `ItineraryId` int(11) NOT NULL AUTO_INCREMENT,
   `PackageId` int(11) NOT NULL,
-  `TimeLabel` varchar(255) NOT NULL COMMENT 'Time period (e.g., "Ngày 1 - Sáng", "08:00 - 10:00")',
-  `Activity` text NOT NULL COMMENT 'Activity description for this time period',
-  `SortOrder` int(11) DEFAULT 0 COMMENT 'Display order (lower numbers first)',
+  `TimeLabel` varchar(255) NOT NULL,
+  `Activity` text NOT NULL,
+  `SortOrder` int(11) DEFAULT 0,
   `CreatedAt` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`ItineraryId`),
-  KEY `PackageId` (`PackageId`),
-  KEY `SortOrder` (`SortOrder`)
+  PRIMARY KEY (`ItineraryId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 4) FOREIGN KEYS
-ALTER TABLE `tblbooking`
-  ADD CONSTRAINT `fk_booking_package` FOREIGN KEY (`PackageId`) REFERENCES `tbltourpackages` (`PackageId`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_booking_user` FOREIGN KEY (`UserEmail`) REFERENCES `tblusers` (`EmailId`) ON DELETE CASCADE;
+-- 4) SEED DATA
 
-ALTER TABLE `tblwishlist`
-  ADD CONSTRAINT `fk_wishlist_package` FOREIGN KEY (`PackageId`) REFERENCES `tbltourpackages` (`PackageId`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_wishlist_user` FOREIGN KEY (`UserEmail`) REFERENCES `tblusers` (`EmailId`) ON DELETE CASCADE;
+-- Admin
+INSERT INTO `admin` (`id`, `UserName`, `Password`) VALUES
+(1, 'admin', 'f925916e2754e5e03f75dd58a5733251');
 
-ALTER TABLE `tblitinerary`
-  ADD CONSTRAINT `fk_itinerary_package` FOREIGN KEY (`PackageId`) REFERENCES `tbltourpackages` (`PackageId`) ON DELETE CASCADE;
+-- Users
+INSERT INTO `tblusers` (`id`, `FullName`, `MobileNumber`, `EmailId`, `Password`, `Address`, `DateOfBirth`, `Gender`) VALUES
+(101, 'Nguyễn Văn Khoa', '0910000001', 'user01@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Da Nang', '1998-01-01', 'Nam'),
+(102, 'Trần Thị Lan', '0910000002', 'user02@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Hue', '1998-01-02', 'Nu'),
+(103, 'Phạm Minh Tuấn', '0910000003', 'user03@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Hoi An', '1998-01-03', 'Nam'),
+(104, 'Lê Thị Hương', '0910000004', 'user04@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Da Lat', '1998-01-04', 'Nu'),
+(105, 'Hoàng Đức Mạnh', '0910000005', 'user05@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Nha Trang', '1998-01-05', 'Nam');
 
-ALTER TABLE `tblreviews`
-  ADD CONSTRAINT `fk_review_booking` FOREIGN KEY (`BookingId`) REFERENCES `tblbooking` (`BookingId`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_review_user` FOREIGN KEY (`UserEmail`) REFERENCES `tblusers` (`EmailId`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_review_package` FOREIGN KEY (`PackageId`) REFERENCES `tbltourpackages` (`PackageId`) ON DELETE CASCADE;
+-- Tour Packages (Detailed & Engaging)
+INSERT INTO `tbltourpackages` (`PackageId`, `PackageName`, `PackageType`, `TourDuration`, `PackageLocation`, `PackagePrice`, `PackageFetures`, `PackageDetails`, `PackageImage`) VALUES
+(201, 'Đà Nẵng Biển Ngọc - Kỳ Nghỉ Sang Trọng', 'Tour cao cấp', '3 ngay 2 dem', 'Da Nang', 3100000, 'Dịch vụ xe Limousine đưa đón, Khách sạn view panorama toàn thành phố', 'Khám phá thiên đường giữa lòng đại dương với những rặng san hô rực rỡ sắc màu. Hành trình sẽ đưa bạn đến với những hòn đảo hoang sơ, nơi tiếng sóng vỗ rì rào hòa cùng tiếng gió đại ngàn. Bạn sẽ được thưởng thức những món hải sản tươi sống vừa được đánh bắt và tham gia vào những hoạt động mạo hiểm như lặn biển, chèo kayak.', 'tour01.jpg'),
+(202, 'Sắc Màu Cố Đô - Hành Trình Di Sản', 'Tour tiêu chuẩn', '2 ngay 1 dem', 'Hue', 3200000, 'Hướng dẫn viên am hiểu lịch sử, Workshop làm đồ thủ công truyền thống', 'Hành trình tìm về cội nguồn văn hóa dân tộc. Bạn sẽ được tản bộ trên những con phố cổ kính, lắng nghe tiếng chuông chùa vang vọng trong sương sớm và chiêm ngưỡng những công trình kiến trúc di sản nghìn năm tuổi. Đừng quên thử sức mình với các workshop làm đồ thủ công truyền thống để cảm nhận sự tinh xảo trong đôi bàn tay người nghệ nhân.', 'tour02.jpg'),
+(203, 'Phố Cổ Hội An - Ánh Sáng Lung Linh', 'Tour riêng', '3 ngay 2 dem', 'Hoi An', 3300000, 'Trải nghiệm workshop làm lồng đèn, Thưởng thức bữa tối chuẩn Michelin địa phương', 'Khám phá vẻ đẹp huyền ảo của Hội An về đêm. Bạn sẽ được tự tay làm những chiếc đèn lồng xinh xắn, đi thuyền trên sông Hoài và thưởng thức những món ăn đặc sản tinh túy nhất của vùng đất Quảng Nam.', 'tour03.jpg'),
+(204, 'Đà Lạt Mùa Sương Sớm - Chill Cùng Thiên Nhiên', 'Tour tiết kiệm', '2 ngay 1 dem', 'Da Lat', 3400000, 'Tặng gói chụp ảnh chuyên nghiệp, Nghỉ dưỡng tại homestay sân vườn', 'Nâng tầm kỳ nghỉ của bạn với dịch vụ nghỉ dưỡng cao cấp nhất. Tận hưởng không gian riêng tư tại các resort 5 sao bên bờ biển, thưởng thức bữa tối lãng mạn dưới ánh nến và thư giãn với các liệu trình spa chuyên nghiệp.', 'tour04.jpg'),
+(205, 'Nha Trang Làn Biển Xanh - Cuộc Phiêu Lưu Đại Dương', 'Tour tiêu chuẩn', '3 ngay 2 dem', 'Nha Trang', 3500000, 'Trải nghiệm lặn biển ngắm san hô độc quyền, Cano cao tốc riêng biệt', 'Chinh phục những cung đường mây ngàn và những đỉnh núi cao vút. Đây là tour dành cho những tâm hồn ưa mạo hiểm, muốn thử thách bản thân và tận hưởng cảm giác tự do giữa đất trời bao la.', 'tour05.jpg');
 
--- 5) SEED DATA
-INSERT INTO `tbladmin` (`id`, `UserName`, `Password`, `updationDate`) VALUES
-(1, 'admin', 'f925916e2754e5e03f75dd58a5733251', '2017-05-13 11:18:49');
+-- Itinerary
+INSERT INTO `tblitinerary` (`ItineraryId`, `PackageId`, `TimeLabel`, `Activity`, `SortOrder`) VALUES
+(301, 201, 'Ngày 1 - 08:00', 'Đón khách tại sân bay Đà Nẵng và nhận phòng khách sạn.', 1),
+(302, 201, 'Ngày 1 - 14:00', 'Tham quan Bán đảo Sơn Trà và Linh Ứng Tự.', 2),
+(303, 202, 'Ngày 1 - 09:00', 'Tham quan Đại Nội Huế và nghe thuyết minh về lịch sử vương triều.', 1),
+(304, 202, 'Ngày 1 - 19:00', 'Nghe ca Huế trên sông Hương và thả đèn hoa đăng cầu may.', 2);
 
-INSERT INTO `tblusers` (`id`, `FullName`, `MobileNumber`, `EmailId`, `Password`, `Avatar`, `Address`, `DateOfBirth`, `Gender`, `RegDate`, `UpdationDate`) VALUES
-(12, 'Le Van Uy', '0763165881', 'leuy26011@gmail.com', '17b9cdbb06619ebae36bfeb59dd89449', NULL, NULL, NULL, NULL, '2025-11-20 04:20:33', NULL),
-(13, 'Le Van Uy', '0389378485', 'leuy260105@gmail.com', '258d88e5ebfa52d32ad49bf932146263', NULL, NULL, NULL, NULL, '2025-11-21 03:14:09', NULL);
+-- Bookings
+INSERT INTO `tblbooking` (`BookingId`, `PackageId`, `UserEmail`, `FromDate`, `ToDate`, `Comment`, `NumberOfPeople`, `TotalPrice`, `status`) VALUES
+(401, 201, 'user01@gmail.com', '2026-06-01', '2026-06-03', 'Chuyến đi kỷ niệm 10 năm ngày cưới.', 2, 6200000.00, 1),
+(402, 202, 'user02@gmail.com', '2026-06-02', '2026-06-03', 'Muốn tìm hiểu sâu về văn hóa Huế.', 1, 3200000.00, 1);
 
-INSERT INTO `tbltourpackages` (`PackageId`, `PackageName`, `PackageType`, `TourDuration`, `PackageLocation`, `PackagePrice`, `PackageFetures`, `PackageDetails`, `PackageImage`, `Creationdate`, `UpdationDate`) VALUES
-(7, 'TOUR VIP 2N1Đ KHÁM PHÁ CHỢ NỔI CÁI RĂNG - TRẢI NGHIỆM TÂY ĐÔ ĐẬM ĐÀ BẢN SẮC', 'Gia Đình', '2 ngày 1 đêm', 'Miền Tây', 100, 'Đưa đón tận tình', 'Nếu bạn chỉ có 2 ngày nhưng vẫn muốn cảm nhận trọn vẹn nét đẹp sông nước miền Tây, Tour Miền Tây 2N1Đ sẽ là lựa chọn phù hợp nhất. Chuyến đi đưa bạn từ khung cảnh miệt vườn xanh mát đến trải nghiệm bữa tối trên du thuyền, ngắm thành phố Cần Thơ lung linh về đêm.', 'tour_mientay.webp', '2025-11-20 04:12:40', '0000-00-00 00:00:00'),
-(8, 'Ha Long Bay Instagram Tour: Most Famous Spots', 'Cặp Đôi', '1 ngày', 'Hạ Long', 270, 'Đưa đón tận tình', 'Our Ha Long Bay Tour will take you to the most Instagrammable and adventurous spots in Ha Long Bay all in one day.', 'tour_halong.webp', '2025-11-21 04:00:59', '0000-00-00 00:00:00'),
-(9, 'Tour Du Lịch Khám Phá Cao Nguyên Mộc Châu 2N1Đ', 'Gia Đình', '2 ngày 1 đêm', 'Hà Nội - Thác Chiềng Khoa - Đồi Chè - Vườn Hồng Chín - Mộc Châu', 70, 'Phục vụ nhiệt tình', 'Chương trình du lịch cao nguyên Mộc Châu.', 'mocchau.jpg', '2025-11-21 06:59:45', '0000-00-00 00:00:00');
+-- Reviews
+INSERT INTO `tblreviews` (`id`, `BookingId`, `UserEmail`, `PackageId`, `Rating`, `Comment`) VALUES
+(1, 401, 'user01@gmail.com', 201, 5, 'Một trải nghiệm thực sự tuyệt vời! Tôi đã đi nhiều nơi nhưng sự chu đáo của GoTravel làm tôi bất ngờ.'),
+(2, 402, 'user02@gmail.com', 202, 4, 'Hướng dẫn viên am hiểu kiến thức lịch sử, nói chuyện rất duyên. Tôi đã học được rất nhiều điều mới.');
 
-INSERT INTO `tblbooking` (`BookingId`, `PackageId`, `UserEmail`, `FromDate`, `ToDate`, `Comment`, `NumberOfPeople`, `TotalPrice`, `AdminNotes`, `CancelReason`, `RegDate`, `status`, `CancelledBy`, `UpdationDate`, `CustomerMessage`) VALUES
-(11, 7, 'leuy26011@gmail.com', '2025-11-02', '2025-11-04', 'Mong sẽ được tận hưởng một chuyến đi trọn vẹn', 2, 200.00, NULL, NULL, '2025-11-20 04:21:14', 1, NULL, '2025-11-21 06:31:48', NULL),
-(12, 7, 'leuy26011@gmail.com', '2025-11-30', '2025-12-01', 'Hãy hoàn thiện các dịch vụ giúp tôi', 1, 100.00, NULL, 'Khách hàng có việc đột xuất', '2025-11-21 03:32:39', 2, 'u', '2025-11-21 03:36:53', NULL),
-(13, 8, 'leuy26011@gmail.com', '2025-11-28', '2025-11-30', 'Hãy đón tôi đúng giờ', 1, 270.00, NULL, NULL, '2025-11-21 06:47:30', 1, NULL, '2025-11-21 06:48:29', NULL);
-
-INSERT INTO `tblissues` (`id`, `UserEmail`, `Issue`, `Description`, `PostingDate`, `AdminRemark`, `AdminremarkDate`) VALUES
-(8, 'leuy26011@gmail.com', 'Tôi gặp sự cố ở tour', 'Hãy cho người tới giúp tôi', '2025-11-21 06:35:01', 'Tôi đồng ý', '2025-11-21 06:48:49');
-
+-- Pages
 INSERT INTO `tblpages` (`id`, `type`, `detail`) VALUES
-(1, 'terms', 'Chưa có gì'),
-(2, 'privacy', 'Nội dung chính sách bảo mật'),
-(3, 'aboutus', 'Giới thiệu về công ty'),
-(11, 'contact', '0763165881');
+(1, 'terms', 'Nội dung điều khoản dịch vụ...'),
+(2, 'privacy', 'Nội dung chính sách bảo mật...'),
+(3, 'aboutus', 'GoTravel là đơn vị lữ hành hàng đầu với hơn 10 năm kinh nghiệm...'),
+(11, 'contact', 'Hotline: 0910-000-000 | Email: contact@gotravel.com');
 
--- 6) AUTO INCREMENT FIXES (align with seed IDs)
-ALTER TABLE `tbladmin` AUTO_INCREMENT = 2;
-ALTER TABLE `tblusers` AUTO_INCREMENT = 14;
-ALTER TABLE `tbltourpackages` AUTO_INCREMENT = 10;
-ALTER TABLE `tblbooking` AUTO_INCREMENT = 14;
-ALTER TABLE `tblenquiry` AUTO_INCREMENT = 8;
-ALTER TABLE `tblissues` AUTO_INCREMENT = 9;
-ALTER TABLE `tblpages` AUTO_INCREMENT = 22;
-ALTER TABLE `tblwishlist` AUTO_INCREMENT = 1;
-ALTER TABLE `tblitinerary` AUTO_INCREMENT = 1;
-ALTER TABLE `tblreviews` AUTO_INCREMENT = 1;
+-- Auto Increment Fixes
+ALTER TABLE `admin` AUTO_INCREMENT = 2;
+ALTER TABLE `tblusers` AUTO_INCREMENT = 131;
+ALTER TABLE `tbltourpackages` AUTO_INCREMENT = 231;
+ALTER TABLE `tblbooking` AUTO_INCREMENT = 441;
+ALTER TABLE `tblitinerary` AUTO_INCREMENT = 353;
+ALTER TABLE `tblreviews` AUTO_INCREMENT = 50;
 
 COMMIT;
-  `CreatedAt` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Cấu trúc bảng cho bảng `tblitinerary`
---
-
-CREATE TABLE `tblitinerary` (
-  `ItineraryId` int(11) NOT NULL,
-  `PackageId` int(11) NOT NULL,
-  `TimeLabel` varchar(255) NOT NULL COMMENT 'Time period (e.g., "Ngày 1 - Sáng", "08:00 - 10:00")',
-  `Activity` text NOT NULL COMMENT 'Activity description for this time period',
-  `SortOrder` int(11) DEFAULT 0 COMMENT 'Display order (lower numbers first)',
-  `CreatedAt` timestamp DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Chỉ mục cho các bảng đã đổ
---
-
---
--- Chỉ mục cho bảng `tbladmin`
---
-ALTER TABLE `tbladmin`
-  ADD PRIMARY KEY (`id`);
-
---
--- Chỉ mục cho bảng `tblbooking`
---
-ALTER TABLE `tblbooking`
-  ADD PRIMARY KEY (`BookingId`);
-
---
--- Chỉ mục cho bảng `tblenquiry`
---
-ALTER TABLE `tblenquiry`
-  ADD PRIMARY KEY (`id`);
-
---
--- Chỉ mục cho bảng `tblissues`
---
-ALTER TABLE `tblissues`
-  ADD PRIMARY KEY (`id`);
-
---
--- Chỉ mục cho bảng `tblpages`
---
-ALTER TABLE `tblpages`
-  ADD PRIMARY KEY (`id`);
-
---
--- Chỉ mục cho bảng `tbltourpackages`
---
-ALTER TABLE `tbltourpackages`
-  ADD PRIMARY KEY (`PackageId`);
-
---
--- Chỉ mục cho bảng `tblusers`
---
-ALTER TABLE `tblusers`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `EmailId` (`EmailId`),
-  ADD KEY `EmailId_2` (`EmailId`);
-
---
--- Chỉ mục cho bảng `tblwishlist`
---
-ALTER TABLE `tblwishlist`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_package` (`UserEmail`, `PackageId`);
-
---
--- Chỉ mục cho bảng `tblitinerary`
---
-ALTER TABLE `tblitinerary`
-  ADD PRIMARY KEY (`ItineraryId`),
-  ADD KEY `PackageId` (`PackageId`),
-  ADD KEY `SortOrder` (`SortOrder`);
-
---
--- AUTO_INCREMENT cho các bảng đã đổ
---
-
---
--- AUTO_INCREMENT cho bảng `tbladmin`
---
-ALTER TABLE `tbladmin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT cho bảng `tblbooking`
---
-ALTER TABLE `tblbooking`
-  MODIFY `BookingId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
---
--- AUTO_INCREMENT cho bảng `tblenquiry`
---
-ALTER TABLE `tblenquiry`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT cho bảng `tblissues`
---
-ALTER TABLE `tblissues`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT cho bảng `tblpages`
---
-ALTER TABLE `tblpages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
-
---
--- AUTO_INCREMENT cho bảng `tbltourpackages`
---
-ALTER TABLE `tbltourpackages`
-  MODIFY `PackageId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT cho bảng `tblusers`
---
-ALTER TABLE `tblusers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
---
--- AUTO_INCREMENT cho bảng `tblwishlist`
---
-ALTER TABLE `tblwishlist`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT cho bảng `tblitinerary`
---
-ALTER TABLE `tblitinerary`
-  MODIFY `ItineraryId` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- Ràng buộc cho các bảng đã đổ
---
-
---
--- Ràng buộc cho bảng `tblitinerary`
---
-ALTER TABLE `tblitinerary`
-  ADD CONSTRAINT `fk_itinerary_package` FOREIGN KEY (`PackageId`) REFERENCES `tbltourpackages` (`PackageId`) ON DELETE CASCADE;
-
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
