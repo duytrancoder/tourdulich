@@ -30,13 +30,16 @@ $currentPage = 'manage-packages';
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $searchType = isset($_GET['type']) ? trim($_GET['type']) : '';
 $searchLocation = isset($_GET['location']) ? trim($_GET['location']) : '';
+$normalizedSearchId = ltrim($search, '#');
 
 $sql = "SELECT * FROM tbltourpackages WHERE 1=1";
-$params = [];
 
 if (!empty($search)) {
-	$sql .= " AND PackageName LIKE :search";
-	$params[':search'] = '%' . $search . '%';
+	$sql .= " AND (PackageName LIKE :search_name";
+	if (ctype_digit($normalizedSearchId)) {
+		$sql .= " OR PackageId = :search_id";
+	}
+	$sql .= ")";
 }
 
 if (!empty($searchType)) {
@@ -52,8 +55,20 @@ if (!empty($searchLocation)) {
 $sql .= " ORDER BY PackageId DESC";
 
 $query = $dbh->prepare($sql);
-foreach ($params as $key => $value) {
-	$query->bindValue($key, $value, PDO::PARAM_STR);
+
+if (!empty($search)) {
+	$query->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
+	if (ctype_digit($normalizedSearchId)) {
+		$query->bindValue(':search_id', (int)$normalizedSearchId, PDO::PARAM_INT);
+	}
+}
+
+if (!empty($searchType)) {
+	$query->bindValue(':type', '%' . $searchType . '%', PDO::PARAM_STR);
+}
+
+if (!empty($searchLocation)) {
+	$query->bindValue(':location', '%' . $searchLocation . '%', PDO::PARAM_STR);
 }
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
@@ -75,8 +90,8 @@ include('includes/layout-start.php');
 			<form method="get" action="" class="form-stack">
 				<div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
 					<div class="form-group">
-						<label for="search">Tìm theo tên</label>
-						<input type="text" name="search" id="search" placeholder="Nhập tên gói tour..." value="<?php echo htmlentities($search); ?>">
+						<label for="search">Tìm theo mã/ tên gói</label>
+						<input type="text" name="search" id="search" placeholder="Nhập mã hoặc tên gói tour..." value="<?php echo htmlentities($search); ?>">
 					</div>
 					<div class="form-group">
 						<label for="type">Loại gói</label>
@@ -105,7 +120,7 @@ include('includes/layout-start.php');
 				<table class="table">
 					<thead>
 						<tr>
-							<th>#</th>
+							<th>Mã gói tour</th>
 							<th>Tên gói</th>
 							<th>Loại gói</th>
 							<th>Địa điểm</th>
@@ -117,13 +132,12 @@ include('includes/layout-start.php');
 					</thead>
 					<tbody>
 					<?php
-					$cnt=1;
 					if($query->rowCount() > 0)
 					{
 						foreach($results as $result)
 						{	?>
 						<tr>
-							<td><?php echo htmlentities($cnt);?></td>
+							<td><?php echo htmlentities($result->PackageId);?></td>
 							<td><?php echo htmlentities($result->PackageName);?></td>
 							<td><?php echo htmlentities($result->PackageType);?></td>
 							<td><?php echo htmlentities($result->PackageLocation);?></td>
@@ -137,7 +151,7 @@ include('includes/layout-start.php');
 								</div>
 							</td>
 						</tr>
-					<?php $cnt++; }} else { ?>
+					<?php }} else { ?>
 						<tr><td colspan="8"><div class="empty-state">
 							<?php if(!empty($search) || !empty($searchType) || !empty($searchLocation)) { ?>
 								Không tìm thấy gói tour phù hợp. <a href="<?php echo BASE_URL; ?>admin/manage-packages.php">Xóa bộ lọc</a>

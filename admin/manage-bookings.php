@@ -67,10 +67,8 @@ $searchTourInfo = trim($_GET['tour_info'] ?? '');
 $sql = "SELECT tblbooking.BookingId as bookid,tblusers.FullName as fname,tblusers.MobileNumber as mnumber,tblusers.EmailId as email,tbltourpackages.PackageName as pckname,tbltourpackages.TourDuration as tourduration,tblbooking.PackageId as pid,tblbooking.FromDate as fdate,tblbooking.ToDate as tdate,tblbooking.Comment as comment,tblbooking.NumberOfPeople as numppl,tblbooking.TotalPrice as totalprice,tblbooking.status as status,tblbooking.CancelledBy as cancelby,tblbooking.UpdationDate as upddate,tblbooking.RegDate as regdate from tblusers join  tblbooking on  tblbooking.UserEmail=tblusers.EmailId join tbltourpackages on tbltourpackages.PackageId=tblbooking.PackageId WHERE 1=1";
 
 if ($searchBookingId !== '') {
-	$normalizedBookingId = ltrim($searchBookingId, '#');
-	if (ctype_digit($normalizedBookingId)) {
+	if (ctype_digit($searchBookingId)) {
 		$sql .= " AND tblbooking.BookingId = :booking_id";
-		$searchBookingId = $normalizedBookingId;
 	} else {
 		$sql .= " AND 1=0";
 	}
@@ -119,7 +117,7 @@ include('includes/layout-start.php');
 			<div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
 				<div class="form-group">
 					<label for="booking_id">Mã (#ID)</label>
-					<input type="text" id="booking_id" name="booking_id" placeholder="Ví dụ: #101 hoặc 101" value="<?php echo htmlentities($_GET['booking_id'] ?? ''); ?>">
+					<input type="text" id="booking_id" name="booking_id" placeholder="Nhập mã tour" value="<?php echo htmlentities($_GET['booking_id'] ?? ''); ?>">
 				</div>
 				<div class="form-group">
 					<label for="customer">Khách hàng</label>
@@ -163,7 +161,7 @@ include('includes/layout-start.php');
 					if($result->status==3){ $statusClass='is-completed'; $statusText='✓ Đã hoàn thành'; }
 				?>
 				<tr>
-					<td><strong>#<?php echo htmlentities($result->bookid);?></strong></td>
+					<td><strong><?php echo htmlentities($result->bookid);?></strong></td>
 					<td><?php echo htmlentities($result->fname);?></td>
 					<td><?php echo htmlentities($result->pckname);?></td>
 					<td><?php echo htmlentities($result->tourduration);?></td>
