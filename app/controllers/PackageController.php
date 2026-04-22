@@ -4,17 +4,15 @@ class PackageController extends Controller {
         $packageModel = $this->model('PackageModel');
 
         $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
-        $locationFilter = isset($_GET['location']) ? trim($_GET['location']) : '';
+        $typeFilter = isset($_GET['type']) ? trim($_GET['type']) : '';
         $priceFilter = isset($_GET['price']) ? $_GET['price'] : '';
 
-        $packages = $packageModel->getFilteredPackages($keyword, $locationFilter, $priceFilter);
-        $locations = $packageModel->getDistinctLocations();
+        $packages = $packageModel->getFilteredPackages($keyword, $typeFilter, $priceFilter);
 
         $data = [
             'packages' => $packages,
-            'locations' => $locations,
             'keyword' => $keyword,
-            'locationFilter' => $locationFilter,
+            'typeFilter' => $typeFilter,
             'priceFilter' => $priceFilter
         ];
 

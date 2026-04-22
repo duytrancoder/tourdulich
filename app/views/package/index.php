@@ -28,16 +28,13 @@
 																				); ?>" placeholder="Tên tour, địa điểm">
 					</div>
 					<div class="form-group">
-						<label for="location">Địa điểm</label>
-						<select id="location" name="location">
+						<label for="type">Loại gói tour</label>
+						<select id="type" name="type">
 							<option value="">Tất cả</option>
-							<?php foreach ($data["locations"] as $loc): ?>
-								<option value="<?php echo htmlentities($loc->PackageLocation); ?>" <?php if (
-																										$data["locationFilter"] === $loc->PackageLocation
-																									) {
-																										echo "selected";
-																									} ?>><?php echo htmlentities($loc->PackageLocation); ?></option>
-							<?php endforeach; ?>
+							<option value="Tour tiết kiệm" <?php if (isset($data["typeFilter"]) && $data["typeFilter"] === "Tour tiết kiệm") echo "selected"; ?>>Tour tiết kiệm</option>
+							<option value="Tour tiêu chuẩn" <?php if (isset($data["typeFilter"]) && $data["typeFilter"] === "Tour tiêu chuẩn") echo "selected"; ?>>Tour tiêu chuẩn</option>
+							<option value="Tour cao cấp" <?php if (isset($data["typeFilter"]) && $data["typeFilter"] === "Tour cao cấp") echo "selected"; ?>>Tour cao cấp</option>
+							<option value="Tour riêng" <?php if (isset($data["typeFilter"]) && $data["typeFilter"] === "Tour riêng") echo "selected"; ?>>Tour riêng</option>
 						</select>
 					</div>
 					<div class="form-group">

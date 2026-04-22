@@ -37,13 +37,13 @@ class PackageModel extends Model {
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
-    public function getFilteredPackages($keyword, $location, $price) {
+    public function getFilteredPackages($keyword, $type, $price) {
         $sql = "SELECT * FROM tbltourpackages WHERE 1=1";
         if($keyword !== '') {
-            $sql .= " AND PackageName LIKE :keyword";
+            $sql .= " AND (PackageName LIKE :keyword OR PackageLocation LIKE :keyword)";
         }
-        if($location !== '') {
-            $sql .= " AND PackageLocation = :location";
+        if($type !== '') {
+            $sql .= " AND PackageType = :type";
         }
         if($price === 'under-200') {
             $sql .= " AND PackagePrice < 4800000"; // dưới 4.8 triệu
@@ -59,8 +59,8 @@ class PackageModel extends Model {
             $likeKeyword = "%".$keyword."%";
             $query->bindParam(':keyword', $likeKeyword, PDO::PARAM_STR);
         }
-        if($location !== '') {
-            $query->bindParam(':location', $location, PDO::PARAM_STR);
+        if($type !== '') {
+            $query->bindParam(':type', $type, PDO::PARAM_STR);
         }
         $query->execute();
         return $query->fetchAll(PDO::FETCH_OBJ);

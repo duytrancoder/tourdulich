@@ -37,19 +37,18 @@
 						   placeholder="Từ khóa (ví dụ: Sapa, biển...)">
 				</div>
 
-				<!-- Location field -->
+				<!-- Loại gói tour field -->
 				<div class="hero-search-field">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 						<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
 						<circle cx="12" cy="10" r="3"></circle>
 					</svg>
-					<select name="location" id="hero-location">
-						<option value="">Tất cả địa điểm</option>
-						<?php foreach ($data["locations"] as $loc): ?>
-							<option value="<?php echo htmlentities($loc->PackageLocation); ?>">
-								<?php echo htmlentities($loc->PackageLocation); ?>
-							</option>
-						<?php endforeach; ?>
+					<select name="type" id="hero-type">
+						<option value="">Loại gói tour</option>
+						<option value="Tour tiết kiệm">Tour tiết kiệm</option>
+						<option value="Tour tiêu chuẩn">Tour tiêu chuẩn</option>
+						<option value="Tour cao cấp">Tour cao cấp</option>
+						<option value="Tour riêng">Tour riêng</option>
 					</select>
 				</div>
 

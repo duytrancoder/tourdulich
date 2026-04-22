@@ -54,7 +54,7 @@
 						<ul class="summary-list">
 							<li><span>Loại gói</span><strong><?php echo htmlentities(
 																	$data["package"]->PackageType,
-																); ?></strong></li>
+																); ?> <span class="tooltip-icon" onclick="openPackageTypeModal()" title="Xem chi tiết mô tả loại gói" style="cursor: pointer; display: inline-flex; justify-content: center; align-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.7rem; font-weight: bold; margin-left: 4px;">?</span></strong></li>
 							<li><span>Địa điểm</span><strong><?php echo htmlentities(
 																	$data["package"]->PackageLocation,
 																); ?></strong></li>
@@ -175,6 +175,57 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Package Type Modal -->
+	<div id="packageTypeModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+		<div class="modal-content" style="background-color: var(--card-bg, #fff); margin: 10% auto; padding: 2rem; border-radius: 8px; width: 80%; max-width: 600px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative;">
+			<span class="close" onclick="closePackageTypeModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; right: 20px; top: 15px;">&times;</span>
+			<h3 style="margin-bottom: 1.5rem; color: var(--text-primary);">Chi tiết các loại gói tour</h3>
+			
+			<div style="margin-bottom: 1.5rem;">
+				<h4 style="color: var(--primary);">1. Gói Tiết kiệm (Economy)</h4>
+				<p style="margin-bottom: 0.5rem; line-height: 1.5; font-size: 0.95rem;"><strong>Mô tả:</strong> "Hành trình tối ưu chi phí nhưng vẫn đảm bảo trải nghiệm trọn vẹn những điểm đến tiêu biểu nhất. Gói này sử dụng hệ thống khách sạn 2-3 sao sạch sẽ, phương tiện di chuyển đời mới và các bữa ăn đặc sản địa phương cơ bản. Lựa chọn hoàn hảo cho các bạn trẻ ưa khám phá hoặc nhóm khách muốn tiết kiệm ngân sách."</p>
+				<p style="color: var(--accent); font-weight: 500; font-size: 0.95rem;">Thông điệp chính: Tiết kiệm tối đa - Khám phá trọn vẹn.</p>
+			</div>
+			
+			<div style="margin-bottom: 1.5rem;">
+				<h4 style="color: var(--primary);">2. Gói Tiêu chuẩn (Standard)</h4>
+				<p style="margin-bottom: 0.5rem; line-height: 1.5; font-size: 0.95rem;"><strong>Mô tả:</strong> "Sự kết hợp hoàn hảo giữa chất lượng dịch vụ và mức giá hợp lý. Quý khách sẽ được lưu trú tại hệ thống khách sạn 3-4 sao tiện nghi, thực đơn ăn uống đa dạng và lịch trình được thiết kế cân bằng giữa tham quan và nghỉ ngơi. Đây là dòng tour 'quốc dân' được 80% gia đình và nhân viên văn phòng lựa chọn."</p>
+				<p style="color: var(--accent); font-weight: 500; font-size: 0.95rem;">Thông điệp chính: Dịch vụ chỉn chu - Giá cả hợp lý.</p>
+			</div>
+			
+			<div style="margin-bottom: 1.5rem;">
+				<h4 style="color: var(--primary);">3. Gói Cao cấp (Premium)</h4>
+				<p style="margin-bottom: 0.5rem; line-height: 1.5; font-size: 0.95rem;"><strong>Mô tả:</strong> "Nâng tầm trải nghiệm kỳ nghỉ với những dịch vụ đẳng cấp nhất. Quý khách sẽ tận hưởng không gian nghỉ dưỡng tại các resort/khách sạn 4-5 sao sang trọng, di chuyển bằng xe Limousine đời mới hoặc vé máy bay giờ đẹp. Lịch trình bao gồm các điểm tham quan độc quyền, tiệc tối cao cấp và hướng dẫn viên chuyên nghiệp suốt tuyến."</p>
+				<p style="color: var(--accent); font-weight: 500; font-size: 0.95rem;">Thông điệp chính: Đẳng cấp thượng lưu - Trải nghiệm độc bản.</p>
+			</div>
+			
+			<div style="margin-bottom: 1.5rem;">
+				<h4 style="color: var(--primary);">4. Gói Tour riêng (Private)</h4>
+				<p style="margin-bottom: 0.5rem; line-height: 1.5; font-size: 0.95rem;"><strong>Mô tả:</strong> "Hoàn toàn riêng tư và linh hoạt theo ý muốn của bạn. Không còn cảnh phải chờ đợi đoàn đông, hành trình này được thiết kế dành riêng cho gia đình hoặc nhóm bạn của bạn. Bạn có thể tự do thay đổi thời gian khởi hành, yêu cầu thêm các điểm check-in yêu thích và có xe cùng hướng dẫn viên phục vụ riêng biệt."</p>
+				<p style="color: var(--accent); font-weight: 500; font-size: 0.95rem;">Thông điệp chính: Tự do tối đa - Cá nhân hóa hành trình.</p>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Modal controls for Package Type
+		function openPackageTypeModal() {
+			document.getElementById('packageTypeModal').style.display = 'block';
+		}
+		
+		function closePackageTypeModal() {
+			document.getElementById('packageTypeModal').style.display = 'none';
+		}
+		
+		window.addEventListener('click', function(event) {
+			var modal = document.getElementById('packageTypeModal');
+			if (event.target == modal) {
+				modal.style.display = 'none';
+			}
+		});
+	</script>
+
 	<?php endif; ?>
 	<script>
 		// Pass BASE_URL from PHP to JavaScript
