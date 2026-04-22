@@ -15,11 +15,13 @@ class HomeController extends Controller {
         $totalTours = $packageModel->getTotalToursCount();
         $totalPages = ceil($totalTours / $toursPerPage);
         $locations = $packageModel->getDistinctLocations();
+        $types = $packageModel->getDistinctTypes();
 
         // Prepare data for the view
         $data = [
             'packages' => $packages,
             'locations' => $locations,
+            'types' => $types,
             'currentPage' => $currentPage,
             'totalPages' => $totalPages,
             'totalTours' => $totalTours

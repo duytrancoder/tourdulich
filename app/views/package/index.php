@@ -31,10 +31,12 @@
 						<label for="type">Loại gói tour</label>
 						<select id="type" name="type">
 							<option value="">Tất cả</option>
-							<option value="Tour tiết kiệm" <?php if (isset($data["typeFilter"]) && $data["typeFilter"] === "Tour tiết kiệm") echo "selected"; ?>>Tour tiết kiệm</option>
-							<option value="Tour tiêu chuẩn" <?php if (isset($data["typeFilter"]) && $data["typeFilter"] === "Tour tiêu chuẩn") echo "selected"; ?>>Tour tiêu chuẩn</option>
-							<option value="Tour cao cấp" <?php if (isset($data["typeFilter"]) && $data["typeFilter"] === "Tour cao cấp") echo "selected"; ?>>Tour cao cấp</option>
-							<option value="Tour riêng" <?php if (isset($data["typeFilter"]) && $data["typeFilter"] === "Tour riêng") echo "selected"; ?>>Tour riêng</option>
+							<?php foreach($data['types'] as $type): ?>
+								<option value="<?php echo htmlentities($type->PackageType); ?>" 
+									<?php if (isset($data["typeFilter"]) && $data["typeFilter"] === $type->PackageType) echo "selected"; ?>>
+									<?php echo htmlentities($type->PackageType); ?>
+								</option>
+							<?php endforeach; ?>
 						</select>
 					</div>
 					<div class="form-group">

@@ -8,9 +8,11 @@ class PackageController extends Controller {
         $priceFilter = isset($_GET['price']) ? $_GET['price'] : '';
 
         $packages = $packageModel->getFilteredPackages($keyword, $typeFilter, $priceFilter);
+        $types = $packageModel->getDistinctTypes();
 
         $data = [
             'packages' => $packages,
+            'types' => $types,
             'keyword' => $keyword,
             'typeFilter' => $typeFilter,
             'priceFilter' => $priceFilter

@@ -45,10 +45,11 @@
 					</svg>
 					<select name="type" id="hero-type">
 						<option value="">Loại gói tour</option>
-						<option value="Tour tiết kiệm">Tour tiết kiệm</option>
-						<option value="Tour tiêu chuẩn">Tour tiêu chuẩn</option>
-						<option value="Tour cao cấp">Tour cao cấp</option>
-						<option value="Tour riêng">Tour riêng</option>
+						<?php foreach($data['types'] as $type): ?>
+							<option value="<?php echo htmlentities($type->PackageType); ?>">
+								<?php echo htmlentities($type->PackageType); ?>
+							</option>
+						<?php endforeach; ?>
 					</select>
 				</div>
 

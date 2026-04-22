@@ -37,10 +37,17 @@ class PackageModel extends Model {
         return $query->fetchAll(PDO::FETCH_OBJ);
     }
 
+    public function getDistinctTypes() {
+        $sql = "SELECT DISTINCT PackageType FROM tbltourpackages WHERE PackageType <> '' ORDER BY PackageType";
+        $query = $this->db->prepare($sql);
+        $query->execute();
+        return $query->fetchAll(PDO::FETCH_OBJ);
+    }
+
     public function getFilteredPackages($keyword, $type, $price) {
         $sql = "SELECT * FROM tbltourpackages WHERE 1=1";
         if($keyword !== '') {
-            $sql .= " AND (PackageName LIKE :keyword OR PackageLocation LIKE :keyword)";
+            $sql .= " AND (PackageName LIKE :keyword1 OR PackageLocation LIKE :keyword2)";
         }
         if($type !== '') {
             $sql .= " AND PackageType = :type";
@@ -57,7 +64,8 @@ class PackageModel extends Model {
         $query = $this->db->prepare($sql);
         if($keyword !== '') {
             $likeKeyword = "%".$keyword."%";
-            $query->bindParam(':keyword', $likeKeyword, PDO::PARAM_STR);
+            $query->bindParam(':keyword1', $likeKeyword, PDO::PARAM_STR);
+            $query->bindParam(':keyword2', $likeKeyword, PDO::PARAM_STR);
         }
         if($type !== '') {
             $query->bindParam(':type', $type, PDO::PARAM_STR);
