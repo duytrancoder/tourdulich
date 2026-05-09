@@ -66,6 +66,14 @@ $router->get('/api/secure-ping', function() {
 // Auth Routes
 $router->post('/api/auth/login', 'AuthController@login');
 $router->post('/api/auth/register', 'AuthController@register');
+$router->post('/api/auth/forgot-password', 'AuthController@forgotPassword');
+$router->post('/api/auth/check-availability', 'AuthController@checkAvailability');
+
+// Public Enquiry Route (không cần JWT)
+$router->post('/api/enquiries', 'PublicEnquiryController@submit');
+
+// User Issue Routes (JWT bắt buộc)
+$router->post('/api/user/issues', 'UserIssueController@submit');
 
 // Admin Tour Routes (Protected by JWT)
 $router->get('/api/admin/tours', 'AdminTourController@index');

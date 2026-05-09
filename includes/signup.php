@@ -12,15 +12,16 @@ async function checkAvailability() {
 	}
 	statusField.textContent = 'Đang kiểm tra...';
 	try{
-		const formData = new FormData();
-		formData.append('emailid', email);
-		const response = await fetch('<?php echo BASE_URL; ?>user/check-availability', {
+		const response = await fetch((window.BASE_API_URL || '/tour1/api/') + 'auth/check-availability', {
 			method: 'POST',
-			body: formData
+            headers: {
+                'Content-Type': 'application/json'
+            },
+			body: JSON.stringify({ email: email })
 		});
 		const result = await response.json();
 		statusField.textContent = result.message;
-		if(result.available){
+		if(result.success && result.data.available){
 			document.getElementById('submit').disabled = false;
 			statusField.style.color = 'green';
 		} else {

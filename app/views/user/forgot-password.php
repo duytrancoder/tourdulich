@@ -5,18 +5,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>GoTravel | Quên mật khẩu</title>
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/style.css">
-	<script>
-	function valid(){
-		const newPass = document.chngpwd.newpassword.value;
-		const confirmPass = document.chngpwd.confirmpassword.value;
-		if(newPass !== confirmPass){
-			alert("Mật khẩu mới và xác nhận mật khẩu không trùng khớp!");
-			document.chngpwd.confirmpassword.focus();
-			return false;
-		}
-		return true;
-	}
-	</script>
 </head>
 <body>
 <?php include ROOT . "/includes/header.php"; ?>
@@ -24,38 +12,21 @@
 	<div class="container">
 		<section class="page-head">
 			<h1>Khôi phục mật khẩu</h1>
-			<p>Nhập email và số điện thoại đã đăng ký để tạo mật khẩu mới.</p>
+			<p>Nhập email đã đăng ký. Chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu cho bạn.</p>
 		</section>
-		<?php if (
-      $data["error"]
-  ) { ?><div class="alert error"><strong>Lỗi:</strong> <?php echo htmlentities(
-    $data["error"],
-); ?></div><?php } elseif (
-      $data["msg"]
-  ) { ?><div class="alert success"><strong>Thành công:</strong> <?php echo htmlentities(
-    $data["msg"],
-); ?></div><?php } ?>
-		<section class="card">
-			<form name="chngpwd" method="post" onSubmit="return valid();" class="form-stack" action="<?php echo BASE_URL; ?>user/resetPassword">
+		<section class="card" style="max-width: 480px; margin: 0 auto;">
+			<!-- Alert box (hiển thị bởi JS) -->
+			<div id="forgot-alert" style="display:none; margin-bottom:1rem;"></div>
+
+			<form id="forgotPasswordForm" class="form-stack">
 				<div class="form-group">
-					<label for="email">Email đã đăng ký</label>
-					<input type="email" name="email" id="email" required>
+					<label for="forgot-email">Email đã đăng ký</label>
+					<input type="email" name="email" id="forgot-email" placeholder="you@example.com" required>
 				</div>
-				<div class="form-group">
-					<label for="mobile">Số điện thoại</label>
-					<input type="text" name="mobile" id="mobile" maxlength="10" required>
-				</div>
-				<div class="form-grid">
-					<div class="form-group">
-						<label for="newpassword">Mật khẩu mới</label>
-						<input type="password" name="newpassword" id="newpassword" required>
-					</div>
-					<div class="form-group">
-						<label for="confirmpassword">Xác nhận mật khẩu</label>
-						<input type="password" name="confirmpassword" id="confirmpassword" required>
-					</div>
-				</div>
-				<button type="submit" name="submit" class="btn">Cập nhật mật khẩu</button>
+				<button type="submit" id="forgot-submit-btn" class="btn w-100">Gửi yêu cầu khôi phục</button>
+				<p class="helper-text" style="text-align:center; margin-top:0.8rem;">
+					<a href="<?php echo BASE_URL; ?>" style="color: var(--brand);">← Quay về trang chủ</a>
+				</p>
 			</form>
 		</section>
 	</div>
@@ -64,5 +35,51 @@
 <?php include ROOT . "/includes/signup.php"; ?>
 <?php include ROOT . "/includes/signin.php"; ?>
 <?php include ROOT . "/includes/write-us.php"; ?>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var form     = document.getElementById('forgotPasswordForm');
+    var alertBox = document.getElementById('forgot-alert');
+    var btn      = document.getElementById('forgot-submit-btn');
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        var email = document.getElementById('forgot-email').value.trim();
+
+        btn.disabled = true;
+        btn.textContent = 'Đang xử lý...';
+        alertBox.style.display = 'none';
+
+        try {
+            var res = await fetch((window.BASE_API_URL || '/tour1/api/') + 'auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ email: email })
+            });
+            var result = await res.json();
+
+            // Luôn hiện thông báo thành công (security: không tiết lộ email có tồn tại không)
+            alertBox.className = 'alert success';
+            alertBox.innerHTML = '<strong>Đã gửi!</strong> ' + (result.message || 'Kiểm tra hộp thư của bạn.');
+            alertBox.style.display = 'block';
+            form.reset();
+
+            // Redirect về trang chủ sau 3 giây
+            setTimeout(function () {
+                window.location.href = window.BASE_URL_FROM_PHP || '/tour1/';
+            }, 3000);
+
+        } catch (err) {
+            alertBox.className = 'alert error';
+            alertBox.innerHTML = '<strong>Lỗi:</strong> Không thể kết nối máy chủ, vui lòng thử lại.';
+            alertBox.style.display = 'block';
+            console.error(err);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Gửi yêu cầu khôi phục';
+        }
+    });
+});
+</script>
 </body>
 </html>

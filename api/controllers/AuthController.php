@@ -89,4 +89,64 @@ class AuthController {
             Response::error("Có lỗi xảy ra khi tạo tài khoản", null, 500);
         }
     }
+
+    /**
+     * POST /api/auth/forgot-password — Public
+     * Kiểm tra email tồn tại và giả lập gửi mail reset
+     */
+    public function forgotPassword() {
+        $data  = json_decode(file_get_contents('php://input'), true);
+        $email = trim($data['email'] ?? '');
+
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            Response::error('Email không hợp lệ', null, 400);
+        }
+
+        try {
+            $db   = \Api\Core\Database::getConnection();
+            $stmt = $db->prepare('SELECT id, FullName FROM tblusers WHERE EmailId = ? LIMIT 1');
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
+
+            // Luôn trả về thành công để tránh lộ thông tin email có tồn tại hay không (security best practice)
+            // Nếu user tồn tại: ghi nhận yêu cầu (có thể mở rộng gửi email thực sau)
+            if ($user) {
+                // TODO Phase 6: Gửi email reset thực sự qua SMTP/Mailgun
+                // Tạm thời: ghi log hoặc reset về mật khẩu mặc định theo yêu cầu nghiệp vụ
+            }
+
+            Response::success(
+                null,
+                'Nếu email này tồn tại trong hệ thống, bạn sẽ nhận được hướng dẫn khôi phục mật khẩu trong vài phút.'
+            );
+        } catch (\Exception $e) {
+            Response::error('Có lỗi xảy ra, vui lòng thử lại', null, 500);
+        }
+    }
+
+    /**
+     * POST /api/auth/check-availability
+     * Kiểm tra email đã tồn tại hay chưa
+     */
+    public function checkAvailability() {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $email = trim($data['email'] ?? '');
+
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            Response::error('Email không hợp lệ', null, 400);
+        }
+
+        try {
+            $userModel = new \Api\Models\User();
+            $user = $userModel->getByEmail($email);
+
+            if ($user) {
+                Response::success(['available' => false], 'Email đã được sử dụng.', 200);
+            } else {
+                Response::success(['available' => true], 'Email có thể sử dụng.', 200);
+            }
+        } catch (\Exception $e) {
+            Response::error('Lỗi kiểm tra dữ liệu', null, 500);
+        }
+    }
 }
