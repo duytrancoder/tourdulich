@@ -23,13 +23,25 @@ class Tour {
         }
 
         if (!empty($type)) {
+            // Map slug from REST API to actual DB values
+            $typeMap = [
+                'economy' => 'Tour tiết kiệm',
+                'standard' => 'Tour tiêu chuẩn',
+                'premium' => 'Tour cao cấp',
+                'private' => 'Tour riêng'
+            ];
+            
+            $dbType = $typeMap[$type] ?? $type; // Fallback to raw value if not mapped
+
             $sql .= " AND PackageType LIKE :type";
-            $params[':type'] = '%' . $type . '%';
+            $params[':type'] = '%' . $dbType . '%';
         }
 
         if (!empty($location)) {
+            // Restore spaces from slug (ha-noi -> ha noi)
+            $dbLocation = str_replace('-', ' ', $location);
             $sql .= " AND PackageLocation LIKE :location";
-            $params[':location'] = '%' . $location . '%';
+            $params[':location'] = '%' . $dbLocation . '%';
         }
 
         $sql .= " ORDER BY PackageId DESC";

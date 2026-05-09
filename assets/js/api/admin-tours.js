@@ -70,7 +70,19 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const search = document.getElementById('search').value;
             const type = document.getElementById('type').value;
-            const location = document.getElementById('location').value;
+            let location = document.getElementById('location').value;
+            
+            // Slugify location per architecture rules
+            if (location) {
+                location = location.toLowerCase()
+                    .normalize('NFD') // Tách dấu
+                    .replace(/[\u0300-\u036f]/g, '') // Bỏ dấu
+                    .replace(/đ/g, 'd').replace(/Đ/g, 'D') // Đổi đ/Đ thành d/D
+                    .replace(/[^a-z0-9 ]/g, '') // Xóa ký tự đặc biệt (giữ lại khoảng trắng)
+                    .trim()
+                    .replace(/\s+/g, '-'); // Thay khoảng trắng bằng gạch ngang
+            }
+            
             loadPackages(search, type, location);
         });
     }

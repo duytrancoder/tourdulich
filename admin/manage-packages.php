@@ -35,10 +35,10 @@ include('includes/layout-start.php');
 						<label for="type">Loại gói</label>
 						<select name="type" id="type">
 							<option value="">-- Tất cả loại gói --</option>
-							<option value="Tour tiết kiệm" <?php if($searchType == 'Tour tiết kiệm') echo 'selected'; ?>>Tour tiết kiệm</option>
-							<option value="Tour tiêu chuẩn" <?php if($searchType == 'Tour tiêu chuẩn') echo 'selected'; ?>>Tour tiêu chuẩn</option>
-							<option value="Tour cao cấp" <?php if($searchType == 'Tour cao cấp') echo 'selected'; ?>>Tour cao cấp</option>
-							<option value="Tour riêng" <?php if($searchType == 'Tour riêng') echo 'selected'; ?>>Tour riêng</option>
+							<option value="economy">Tour tiết kiệm</option>
+							<option value="standard">Tour tiêu chuẩn</option>
+							<option value="premium">Tour cao cấp</option>
+							<option value="private">Tour riêng</option>
 						</select>
 					</div>
 					<div class="form-group">
