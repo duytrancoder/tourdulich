@@ -8,6 +8,10 @@
     RewriteCond %{REQUEST_URI} ^/tour1/?$
     RewriteRule ^(.*)$ public/index.php [L]
     
+    # Route /api/ to the new API entry point
+    RewriteCond %{REQUEST_URI} ^/tour1/api/?
+    RewriteRule ^api/(.*)$ api/index.php [L,QSA]
+
     # Redirect all other requests to the public directory
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

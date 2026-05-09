@@ -3,7 +3,7 @@
 		<button class="modal__close" data-modal-close aria-label="Đóng">&times;</button>
 		<h3>Đăng nhập</h3>
 		<p class="helper-text">Truy cập để quản lý lịch sử tour và gửi yêu cầu hỗ trợ.</p>
-		<form method="post" class="form-stack" action="<?php echo BASE_URL; ?>user/login">
+		<form class="form-stack">
 			<div class="form-group">
 				<label for="signin-email">Email</label>
 				<input type="email" name="email" id="signin-email" placeholder="you@example.com" required>
@@ -44,3 +44,5 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 });
 </script>
+<!-- Include API Auth Handler -->
+<script src="<?php echo BASE_URL; ?>assets/js/api/auth.js"></script>

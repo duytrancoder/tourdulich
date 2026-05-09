@@ -38,7 +38,7 @@ async function checkAvailability() {
 		<button class="modal__close" data-modal-close aria-label="Đóng">&times;</button>
 		<h3>Tạo tài khoản</h3>
 		<p class="helper-text">Chỉ mất vài giây để bắt đầu quản lý lịch trình tour của bạn.</p>
-		<form name="signup" method="post" class="form-stack" action="<?php echo BASE_URL; ?>user/signup">
+		<form name="signup" class="form-stack">
 			<div class="form-group">
 				<label for="signup-name">Họ và tên</label>
 				<input type="text" id="signup-name" name="fname" autocomplete="off" required>
