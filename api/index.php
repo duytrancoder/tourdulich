@@ -1,4 +1,10 @@
 <?php
+// Suppress PHP errors/warnings from corrupting JSON output
+// Errors will be caught via try/catch in controllers instead
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(0);
+
 // Set CORS headers required for REST API
 header("Access-Control-Allow-Origin: *"); // For production, replace * with your domain
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");

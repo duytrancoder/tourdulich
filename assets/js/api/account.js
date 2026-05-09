@@ -29,9 +29,19 @@ async function fetchAccountData(token) {
         });
 
         if (response.status === 401) {
+            // Token hết hạn hoặc không hợp lệ — xóa token và redirect về home
             localStorage.removeItem('jwt_token');
             localStorage.removeItem('user_data');
-            window.location.href = '/tour1/';
+            window.location.href = window.BASE_URL_FROM_PHP || '/tour1/';
+            return;
+        }
+
+        // Kiểm tra Content-Type trước khi parse JSON để tránh crash
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const rawText = await response.text();
+            console.error('API returned non-JSON response:', rawText);
+            showLoadingError('Lỗi máy chủ: API trả về dữ liệu không hợp lệ. Kiểm tra console để biết chi tiết.');
             return;
         }
 
@@ -43,13 +53,31 @@ async function fetchAccountData(token) {
             renderBookings(data.bookings);
             renderWishlist(data.wishlist);
         } else {
-            alert("Lỗi khi tải thông tin: " + result.message);
+            showLoadingError('Không thể tải dữ liệu: ' + (result.message || 'Lỗi không xác định'));
         }
     } catch (err) {
         console.error("Fetch error:", err);
-        alert("Lỗi kết nối máy chủ");
+        showLoadingError('Lỗi kết nối đến máy chủ. Vui lòng tải lại trang.');
     }
 }
+
+/**
+ * Hiển thị lỗi tải dữ liệu ra tất cả các tab content
+ */
+function showLoadingError(message) {
+    const ids = ['profile-tab-content', 'bookings-tab-content', 'wishlist-tab-content'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.innerHTML = `<div style="text-align:center; padding: 2rem; color: var(--danger, #ef4444);">
+                <i class="fas fa-exclamation-circle" style="font-size:2rem; margin-bottom:0.5rem;"></i>
+                <p>${message}</p>
+                <button class="btn btn-ghost" onclick="location.reload()" style="margin-top:1rem;">Thử lại</button>
+            </div>`;
+        }
+    });
+}
+
 
 function renderProfile(profile) {
     const container = document.getElementById('profile-tab-content');

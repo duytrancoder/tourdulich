@@ -50,18 +50,41 @@ class JWTHandler {
 
     /**
      * Middleware to verify Bearer token from Request Headers
+     * Supports multiple environments: Apache module, CGI, FastCGI, XAMPP
      * 
      * @return object Decoded user data
      */
     public static function verifyBearerToken() {
-        $headers = apache_request_headers();
-        
-        if (isset($headers['Authorization'])) {
-            $authHeader = $headers['Authorization'];
-        } else if (isset($headers['authorization'])) {
-            $authHeader = $headers['authorization'];
-        } else if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+        $authHeader = null;
+
+        // Method 1: apache_request_headers() — works on Apache mod_php
+        if (function_exists('apache_request_headers')) {
+            $apacheHeaders = apache_request_headers();
+            if (isset($apacheHeaders['Authorization'])) {
+                $authHeader = $apacheHeaders['Authorization'];
+            } elseif (isset($apacheHeaders['authorization'])) {
+                $authHeader = $apacheHeaders['authorization'];
+            }
+        }
+
+        // Method 2: $_SERVER superglobals — works on Apache CGI/FastCGI (XAMPP default)
+        if (!$authHeader) {
+            if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+                $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+            } elseif (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+                // When mod_rewrite is used, Apache sometimes renames the header
+                $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+            }
+        }
+
+        // Method 3: getallheaders() — PHP 7+ built-in fallback
+        if (!$authHeader && function_exists('getallheaders')) {
+            $allHeaders = getallheaders();
+            if (isset($allHeaders['Authorization'])) {
+                $authHeader = $allHeaders['Authorization'];
+            } elseif (isset($allHeaders['authorization'])) {
+                $authHeader = $allHeaders['authorization'];
+            }
         }
 
         if (!$authHeader) {
@@ -81,4 +104,5 @@ class JWTHandler {
             Response::error($e->getMessage(), null, 401);
         }
     }
+
 }
