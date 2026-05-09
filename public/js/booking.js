@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btnBook.disabled = true;
 
         try {
-            const response = await fetch('/tour1/api/user/booking', {
+            const response = await fetch((window.BASE_API_URL || '/tour1/api/') + 'user/booking', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchAccountData(token) {
     try {
-        const response = await fetch('/tour1/api/user/account', {
+        const response = await fetch((window.BASE_API_URL || '/tour1/api/') + 'user/account', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -154,7 +154,7 @@ function renderProfile(profile) {
 
         const token = localStorage.getItem('jwt_token');
         try {
-            const res = await fetch('/tour1/api/user/profile', {
+            const res = await fetch((window.BASE_API_URL || '/tour1/api/') + 'user/profile', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -204,7 +204,7 @@ function setupPasswordForm(token) {
         };
 
         try {
-            const res = await fetch('/tour1/api/user/password', {
+            const res = await fetch((window.BASE_API_URL || '/tour1/api/') + 'user/password', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -341,7 +341,7 @@ async function cancelBooking(bookingId) {
     if (!token) return;
 
     try {
-        const response = await fetch(`/tour1/api/user/booking/${bookingId}`, {
+        const response = await fetch((window.BASE_API_URL || '/tour1/api/') + `user/booking/${bookingId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,

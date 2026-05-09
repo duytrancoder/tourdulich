@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                const response = await fetch('/tour1/api/admin/tours', {
+                const response = await fetch((window.BASE_API_URL || '/tour1/api/') + 'admin/tours', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const token = localStorage.getItem('jwt_token');
         try {
-            const response = await fetch(`/tour1/api/admin/tours/${id}`, {
+            const response = await fetch((window.BASE_API_URL || '/tour1/api/') + `admin/tours/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -127,7 +127,7 @@ async function loadPackages(search = '', type = '', location = '') {
     if (location) params.append('location', location);
     
     try {
-        const response = await fetch(`/tour1/api/admin/tours?${params.toString()}`, {
+        const response = await fetch((window.BASE_API_URL || '/tour1/api/') + `admin/tours?${params.toString()}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

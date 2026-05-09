@@ -2,7 +2,9 @@
  * API Auth Handler for Frontend
  */
 
-const API_BASE_URL = '/tour1/api';
+// Sử dụng BASE_API_URL được inject bởi PHP (includes/header.php) — không hardcode /tour1/
+const API_BASE_URL = (window.BASE_API_URL || '/tour1/api/').replace(/\/$/, '');
+
 
 // Utility to handle fetch logic with JSON headers
 async function apiFetch(endpoint, method = 'GET', data = null) {

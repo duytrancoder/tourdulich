@@ -74,7 +74,7 @@
 						<h3>Đổi mật khẩu</h3>
 						<p class="helper-text">Đảm bảo tài khoản của bạn luôn an toàn bằng mật khẩu mạnh.</p>
 						
-						<form name="changePasswordForm" method="post" class="form-stack" action="<?php echo BASE_URL; ?>user/updatePassword">
+						<form name="changePasswordForm" class="form-stack" id="changePasswordForm">
 							<div class="form-group">
 								<label for="password">Mật khẩu hiện tại <span class="required">*</span></label>
 								<input type="password" name="password" id="password" required>

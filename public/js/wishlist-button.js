@@ -29,7 +29,7 @@ function checkWishlistStatus(packageId) {
     const token = localStorage.getItem('jwt_token');
     if (!token) return;
 
-    fetch('/tour1/api/user/wishlist', {
+    fetch((window.BASE_API_URL || '/tour1/api/') + 'user/wishlist', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ function toggleWishlistButton(packageId) {
 
     wishlistBtn.classList.add('loading');
 
-    fetch(`/tour1/api/user/wishlist/toggle/${packageId}`, {
+    fetch((window.BASE_API_URL || '/tour1/api/') + `user/wishlist/toggle/${packageId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

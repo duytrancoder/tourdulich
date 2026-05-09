@@ -31,7 +31,7 @@ function initializeWishlistHearts() {
     const token = localStorage.getItem('jwt_token');
     if (!token) return; // Không lấy nếu chưa đăng nhập
 
-    fetch('/tour1/api/user/wishlist', {
+    fetch((window.BASE_API_URL || '/tour1/api/') + 'user/wishlist', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ function toggleWishlist(heartButton) {
     heartButton.style.pointerEvents = 'none';
     heartButton.style.opacity = '0.6';
 
-    fetch(`/tour1/api/user/wishlist/toggle/${packageId}`, {
+    fetch((window.BASE_API_URL || '/tour1/api/') + `user/wishlist/toggle/${packageId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -118,7 +118,7 @@
     };
 
     try {
-      var response = await fetch('/tour1/api/user/review', {
+      var response = await fetch((window.BASE_API_URL || '/tour1/api/') + 'user/review', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
