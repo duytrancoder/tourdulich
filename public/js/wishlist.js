@@ -25,32 +25,31 @@ document.addEventListener('DOMContentLoaded', function () {
  * Initialize wishlist hearts based on current user's wishlist
  */
 function initializeWishlistHearts() {
-    // Get all package IDs on the current page
     const hearts = document.querySelectorAll('.wishlist-heart');
-
     if (hearts.length === 0) return;
 
-    // Fetch user's wishlist package IDs
-    fetch(BASE_URL + 'wishlist/getIds', {
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return; // Không lấy nếu chưa đăng nhập
+
+    fetch('/tour1/api/user/wishlist', {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
         }
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.packageIds && data.packageIds.length > 0) {
-                hearts.forEach(heart => {
-                    const packageId = parseInt(heart.dataset.packageId);
-                    if (data.packageIds.includes(packageId)) {
-                        heart.classList.add('active');
-                    }
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching wishlist:', error);
-        });
+    .then(response => response.json())
+    .then(res => {
+        if (res.success && res.data && res.data.packageIds) {
+            hearts.forEach(heart => {
+                const packageId = parseInt(heart.dataset.packageId);
+                if (res.data.packageIds.includes(packageId)) {
+                    heart.classList.add('active');
+                }
+            });
+        }
+    })
+    .catch(error => console.error('Error fetching wishlist:', error));
 }
 
 /**
@@ -58,9 +57,15 @@ function initializeWishlistHearts() {
  */
 function toggleWishlist(heartButton) {
     const packageId = heartButton.dataset.packageId;
+    if (!packageId) return;
 
-    if (!packageId) {
-        console.error('Package ID not found');
+    const token = localStorage.getItem('jwt_token');
+    if (!token) {
+        const signinModal = document.getElementById('signin-modal');
+        if (signinModal) {
+            signinModal.classList.add('is-visible');
+            showToast('Vui lòng đăng nhập để lưu tour yêu thích', 'warning');
+        }
         return;
     }
 
@@ -68,64 +73,53 @@ function toggleWishlist(heartButton) {
     heartButton.style.pointerEvents = 'none';
     heartButton.style.opacity = '0.6';
 
-    // Make AJAX request to toggle wishlist
-    fetch(BASE_URL + 'wishlist/toggle/' + packageId, {
-        method: 'GET',
+    fetch(`/tour1/api/user/wishlist/toggle/${packageId}`, {
+        method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
         }
     })
-        .then(response => response.json())
-        .then(data => {
-            // Remove loading state
-            heartButton.style.pointerEvents = '';
-            heartButton.style.opacity = '';
+    .then(response => response.json())
+    .then(res => {
+        heartButton.style.pointerEvents = '';
+        heartButton.style.opacity = '';
 
-            if (data.success) {
-                // Update heart state
-                if (data.inWishlist) {
-                    heartButton.classList.add('active');
-                    showToast('Đã thêm vào danh sách yêu thích', 'success');
-                } else {
-                    heartButton.classList.remove('active');
-                    showToast('Đã xóa khỏi danh sách yêu thích', 'info');
+        if (res.success) {
+            if (res.data && res.data.inWishlist) {
+                heartButton.classList.add('active');
+                showToast(res.message, 'success');
+            } else {
+                heartButton.classList.remove('active');
+                showToast(res.message, 'info');
 
-                    // If on wishlist page, remove the card
-                    if (window.location.href.includes('account')) {
-                        const tourCard = heartButton.closest('.tour-card');
-                        if (tourCard) {
-                            tourCard.style.transition = 'all 0.3s ease';
-                            tourCard.style.opacity = '0';
-                            tourCard.style.transform = 'scale(0.9)';
-                            setTimeout(() => {
-                                tourCard.remove();
-
-                                // Check if wishlist is now empty
-                                const remainingCards = document.querySelectorAll('.tour-card');
-                                if (remainingCards.length === 0) {
-                                    location.reload(); // Reload to show empty state
-                                }
-                            }, 300);
-                        }
+                // If on wishlist page, remove the card
+                if (window.location.href.includes('account')) {
+                    const tourCard = heartButton.closest('.tour-card');
+                    if (tourCard) {
+                        tourCard.style.transition = 'all 0.3s ease';
+                        tourCard.style.opacity = '0';
+                        tourCard.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            tourCard.remove();
+                            const remainingCards = document.querySelectorAll('.tour-card');
+                            if (remainingCards.length === 0) {
+                                location.reload(); // Reload to show empty state
+                            }
+                        }, 300);
                     }
                 }
-            } else if (data.requireLogin) {
-                // User not logged in, show login modal
-                const signinModal = document.getElementById('signin-modal');
-                if (signinModal) {
-                    signinModal.classList.add('is-visible');
-                    showToast('Vui lòng đăng nhập để lưu tour yêu thích', 'warning');
-                }
-            } else {
-                showToast('Có lỗi xảy ra. Vui lòng thử lại', 'error');
             }
-        })
-        .catch(error => {
-            console.error('Error toggling wishlist:', error);
-            heartButton.style.pointerEvents = '';
-            heartButton.style.opacity = '';
-            showToast('Có lỗi xảy ra. Vui lòng thử lại', 'error');
-        });
+        } else {
+            showToast(res.message || 'Có lỗi xảy ra', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error toggling wishlist:', error);
+        heartButton.style.pointerEvents = '';
+        heartButton.style.opacity = '';
+        showToast('Có lỗi xảy ra. Vui lòng thử lại', 'error');
+    });
 }
 
 /**

@@ -26,25 +26,27 @@ document.addEventListener('DOMContentLoaded', function () {
  * Check if tour is in wishlist and update button state
  */
 function checkWishlistStatus(packageId) {
-    const wishlistBtn = document.getElementById('wishlistBtn');
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return;
 
-    fetch(BASE_URL + 'wishlist/check/' + packageId, {
+    fetch('/tour1/api/user/wishlist', {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
         }
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.inWishlist) {
+    .then(response => response.json())
+    .then(res => {
+        if (res.success && res.data && res.data.packageIds) {
+            if (res.data.packageIds.includes(parseInt(packageId))) {
                 updateButtonState(true);
             } else {
                 updateButtonState(false);
             }
-        })
-        .catch(error => {
-            console.error('Error checking wishlist:', error);
-        });
+        }
+    })
+    .catch(error => console.error('Error checking wishlist:', error));
 }
 
 /**
@@ -52,43 +54,42 @@ function checkWishlistStatus(packageId) {
  */
 function toggleWishlistButton(packageId) {
     const wishlistBtn = document.getElementById('wishlistBtn');
+    const token = localStorage.getItem('jwt_token');
+    
+    if (!token) {
+        const signinModal = document.getElementById('signin-modal');
+        if (signinModal) {
+            signinModal.classList.add('is-visible');
+            showToast('Vui lòng đăng nhập để lưu tour yêu thích', 'warning');
+        }
+        return;
+    }
 
-    // Add loading state
     wishlistBtn.classList.add('loading');
 
-    fetch(BASE_URL + 'wishlist/toggle/' + packageId, {
-        method: 'GET',
+    fetch(`/tour1/api/user/wishlist/toggle/${packageId}`, {
+        method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
         }
     })
-        .then(response => response.json())
-        .then(data => {
-            // Remove loading state
-            wishlistBtn.classList.remove('loading');
+    .then(response => response.json())
+    .then(res => {
+        wishlistBtn.classList.remove('loading');
 
-            if (data.success) {
-                // Update button state
-                updateButtonState(data.inWishlist);
-
-                // Show toast notification
-                showToast(data.message, data.inWishlist ? 'success' : 'info');
-            } else if (data.requireLogin) {
-                // User not logged in, show login modal
-                const signinModal = document.getElementById('signin-modal');
-                if (signinModal) {
-                    signinModal.classList.add('is-visible');
-                    showToast('Vui lòng đăng nhập để lưu tour yêu thích', 'warning');
-                }
-            } else {
-                showToast('Có lỗi xảy ra. Vui lòng thử lại', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error toggling wishlist:', error);
-            wishlistBtn.classList.remove('loading');
-            showToast('Có lỗi xảy ra. Vui lòng thử lại', 'error');
-        });
+        if (res.success) {
+            updateButtonState(res.data.inWishlist);
+            showToast(res.message, res.data.inWishlist ? 'success' : 'info');
+        } else {
+            showToast(res.message || 'Có lỗi xảy ra', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error toggling wishlist:', error);
+        wishlistBtn.classList.remove('loading');
+        showToast('Có lỗi xảy ra. Vui lòng thử lại', 'error');
+    });
 }
 
 /**

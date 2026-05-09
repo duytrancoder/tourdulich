@@ -65,9 +65,8 @@
 					</section>
 					<section class="card">
 						<h3>Đặt tour</h3>
-						<form name="book" method="post" class="form-stack" action="<?php echo BASE_URL; ?>package/book/<?php echo htmlentities(
-																															$data["package"]->PackageId,
-																														); ?>">
+						<form id="booking-form" class="form-stack">
+							<input type="hidden" id="package-id" name="packageId" value="<?php echo htmlentities($data["package"]->PackageId); ?>">
 							<div class="form-group">
 								<label for="departuredate">Ngày khởi hành</label>
 								<input type="date" id="departuredate" name="departuredate" required>
@@ -80,11 +79,8 @@
 								<label for="comment">Ghi chú</label>
 								<textarea id="comment" name="comment" placeholder="Nêu thêm yêu cầu cụ thể"></textarea>
 							</div>
-							<?php if (!empty($_SESSION["login"])): ?>
-								<button type="submit" name="submit2" class="btn">Đặt tour</button>
-							<?php else: ?>
-								<a class="btn btn-ghost" href="#" data-modal-target="signin-modal">Đăng nhập để đặt tour</a>
-							<?php endif; ?>
+							<div id="booking-alert" class="alert" style="display:none; margin-top:10px;"></div>
+							<button type="submit" id="btn-book-tour" class="btn">Đặt tour</button>
 						</form>
 					</section>
 				</div>
@@ -259,6 +255,7 @@
 	</script>
 	<script src="<?php echo BASE_URL; ?>public/js/wishlist-button.js?v=1.1"></script>
 	<script src="<?php echo BASE_URL; ?>public/js/package-reviews-modal.js?v=1.0"></script>
+	<script src="<?php echo BASE_URL; ?>public/js/booking.js?v=1.0"></script>
 </body>
 
 </html>

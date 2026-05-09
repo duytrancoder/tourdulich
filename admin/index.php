@@ -38,6 +38,23 @@ if(isset($_POST['login']))
 			
 			if ($passwordValid) {
 				$_SESSION['alogin'] = $uname;
+				
+				// Generate Admin JWT Token
+				require_once dirname(__DIR__) . '/vendor/autoload.php';
+				// Require JWTHandler manually in case autoload doesn't cover Api\Core natively here
+				require_once dirname(__DIR__) . '/api/core/JWTHandler.php';
+				
+				$payload = [
+					'id' => 0,
+					'email' => $uname, // admin username
+					'name' => 'Administrator',
+					'role' => 'admin'
+				];
+				$token = \Api\Core\JWTHandler::encode($payload);
+				
+				// Set cookie to transfer to localstorage on next page
+				setcookie('admin_jwt_token', $token, time() + 86400, '/');
+				
 				header('location:dashboard.php');
 				exit;
 			} else {
@@ -57,6 +74,11 @@ if(isset($_POST['login']))
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>GoTravel Admin | Đăng nhập</title>
 	<link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/css/style.css">
+	<script>
+		// Clear any leftover admin tokens when visiting login page
+		localStorage.removeItem('jwt_token');
+		document.cookie = "admin_jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+	</script>
 </head>
 <body class="auth-page" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../admin/packageimages/tour_halong.webp') no-repeat center center; background-size: cover;">
 	<div class="auth-card">

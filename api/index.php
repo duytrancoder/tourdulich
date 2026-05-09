@@ -68,6 +68,10 @@ $router->delete('/api/admin/tours/{id}', 'AdminTourController@delete');
 
 // User Account Routes (Protected by JWT)
 $router->get('/api/user/account', 'UserAccountController@index');
+$router->get('/api/user/wishlist', 'UserWishlistController@getIds');
+$router->post('/api/user/wishlist/toggle/{id}', 'UserWishlistController@toggle');
+$router->post('/api/user/booking', 'UserBookingController@book');
+$router->delete('/api/user/booking/{id}', 'UserBookingController@cancel');
 
 // Dispatch the request
 $requestMethod = $_SERVER['REQUEST_METHOD'];

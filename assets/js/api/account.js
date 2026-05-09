@@ -185,16 +185,49 @@ function renderBookings(bookings) {
                         </div>
                     </div>
                 </div>
-                <div class="booking-footer">
+                <div class="booking-footer" style="display:flex; justify-content:space-between; align-items:center;">
                     <a href="${window.BASE_URL_FROM_PHP}package/details/${booking.pkgid}" class="btn btn-ghost btn-compact">
                         <i class="fas fa-eye"></i> Xem chi tiết
                     </a>
+                    ${booking.status == 0 ? `
+                        <button class="btn btn-compact" style="background:var(--danger); border-color:var(--danger);" onclick="cancelBooking(${booking.bookid})">
+                            <i class="fas fa-times"></i> Hủy
+                        </button>
+                    ` : ''}
                 </div>
             </div>
         `;
     });
     html += '</div>';
     container.innerHTML = html;
+}
+
+async function cancelBooking(bookingId) {
+    if (!confirm('Bạn có chắc chắn muốn hủy đặt tour này không?')) return;
+
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return;
+
+    try {
+        const response = await fetch(`/tour1/api/user/booking/${bookingId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
+            }
+        });
+        const res = await response.json();
+        
+        if (res.success) {
+            alert('Hủy tour thành công');
+            fetchAccountData(token); // reload data
+        } else {
+            alert(res.message || 'Có lỗi xảy ra');
+        }
+    } catch (error) {
+        console.error('Cancel booking error:', error);
+        alert('Lỗi kết nối');
+    }
 }
 
 function renderWishlist(wishlistItems) {

@@ -11,6 +11,10 @@ if (ini_get("session.use_cookies")) {
 }
 unset($_SESSION['alogin']);
 session_destroy(); 
+
+// Clear JWT Cookie
+setcookie('admin_jwt_token', '', time() - 3600, '/');
+
 header("location:" . BASE_URL . "admin/index.php"); 
 ?>
 
