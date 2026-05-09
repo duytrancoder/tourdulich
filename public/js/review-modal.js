@@ -89,10 +89,18 @@
     return;
   }
 
-  form.addEventListener("submit", function (event) {
+  form.addEventListener("submit", async function (event) {
     event.preventDefault();
+
     if (!ratingInput || !ratingInput.value) {
       alert("Vui lòng chọn số sao trước khi gửi đánh giá.");
+      return;
+    }
+
+    // Kiểm tra JWT token (Quy tắc: Không dùng Session, chỉ dùng localStorage)
+    var token = localStorage.getItem('jwt_token');
+    if (!token) {
+      alert("Vui lòng đăng nhập để gửi đánh giá.");
       return;
     }
 
@@ -101,31 +109,79 @@
       submitBtn.textContent = "Đang gửi...";
     }
 
-    var payload = new URLSearchParams(new FormData(form));
-    fetch(baseUrl + "review/submit", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-      },
-      body: payload.toString(),
-    })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (result) {
-        alert(result.message || "Đã xử lý yêu cầu.");
-        if (result.status === "success") {
-          window.location.reload();
-        }
-      })
-      .catch(function () {
-        alert("Không thể gửi đánh giá. Vui lòng thử lại.");
-      })
-      .finally(function () {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Gửi đánh giá";
-        }
+    // Payload JSON theo chuẩn REST API mới
+    var payload = {
+      booking_id: parseInt(bookingInput ? bookingInput.value : 0),
+      package_id: parseInt(packageInput ? packageInput.value : 0),
+      rating:     parseInt(ratingInput.value),
+      comment:    (form.querySelector('#reviewComment') || {}).value || ''
+    };
+
+    try {
+      var response = await fetch('/tour1/api/user/review', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
+
+      var result = await response.json();
+
+      if (result.success) {
+        closeModal();
+        // Reload reviews list mà KHÔNG tải lại toàn bộ trang
+        if (result.data && result.data.reviews) {
+          reloadReviewList(result.data.reviews);
+        }
+        alert(result.message || "Cảm ơn bạn đã đánh giá!");
+        // Reload bookings để cập nhật nút "Đánh giá" -> đã đánh giá
+        if (typeof fetchAccountData === 'function') {
+          fetchAccountData(token);
+        }
+      } else {
+        alert(result.message || "Không thể gửi đánh giá. Vui lòng thử lại.");
+      }
+    } catch (err) {
+      console.error("Review submit error:", err);
+      alert("Lỗi kết nối máy chủ. Vui lòng thử lại.");
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Gửi đánh giá";
+      }
+    }
   });
+
+  /**
+   * Cập nhật danh sách review trên trang mà không reload trang
+   * result.data.reviews là mảng review mới nhất từ API
+   */
+  function reloadReviewList(reviews) {
+    var container = document.querySelector('.reviews-list, #reviews-section, [data-reviews-container]');
+    if (!container || !reviews) return;
+
+    if (reviews.length === 0) {
+      container.innerHTML = '<p>Chưa có đánh giá nào.</p>';
+      return;
+    }
+
+    var html = reviews.map(function(r) {
+      var date = new Date(r.CreatedAt).toLocaleDateString('vi-VN');
+      var stars = '★'.repeat(r.Rating) + '☆'.repeat(5 - r.Rating);
+      return '<div class="review-item">' +
+        '<div class="review-header">' +
+          '<strong>' + (r.FullName || 'Ẩn danh') + '</strong>' +
+          '<span class="review-stars" style="color:#f59e0b">' + stars + '</span>' +
+          '<span class="review-date">' + date + '</span>' +
+        '</div>' +
+        '<p class="review-comment">' + (r.Comment || '') + '</p>' +
+        '</div>';
+    }).join('');
+
+    container.innerHTML = html;
+  }
+
 })();

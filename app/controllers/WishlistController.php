@@ -1,27 +1,17 @@
 <?php
 class WishlistController extends Controller {
     /**
-     * Display user's wishlist page
+     * Trang danh sách yêu thích — chỉ trả về HTML Shell
+     * Mọi dữ liệu được load qua REST API: GET /api/user/wishlist (assets/js/api/account.js)
      */
     public function index() {
-        if (strlen($_SESSION['login']) == 0) {
-            header('location:' . BASE_URL);
-            exit;
-        }
-
-        $wishlistModel = $this->model('WishlistModel');
-        $userEmail = $_SESSION['login'];
-        $wishlistItems = $wishlistModel->getWishlistByUser($userEmail);
-
+        // Không kiểm tra Session, không gọi Model
+        // JS (account.js) sẽ kiểm tra JWT và redirect nếu chưa đăng nhập
         $data = [
-            'wishlistItems' => $wishlistItems,
-            'error' => $_SESSION['error'] ?? null,
-            'msg' => $_SESSION['msg'] ?? null
+            'wishlistItems' => [],
+            'error'         => null,
+            'msg'           => null
         ];
-        unset($_SESSION['error'], $_SESSION['msg']);
-
         $this->view('wishlist/index', $data);
     }
-
-
 }

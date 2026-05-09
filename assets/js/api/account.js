@@ -7,13 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Kiểm tra trạng thái đăng nhập
     const token = localStorage.getItem('jwt_token');
     if (!token) {
-        // Chưa đăng nhập, đá về trang chủ
         window.location.href = window.BASE_URL_FROM_PHP || '/';
         return;
     }
 
     // 2. Fetch dữ liệu Account
     fetchAccountData(token);
+    
+    // 3. Khởi tạo form Đổi mật khẩu (form tĩnh trong HTML)
+    setupPasswordForm(token);
 });
 
 async function fetchAccountData(token) {
@@ -105,12 +107,114 @@ function renderProfile(profile) {
         </form>
     `;
 
-    // Chúng ta sẽ gắn sự kiện Submit Update Profile sau khi API Update được viết (Phase 5)
-    document.getElementById('js-profile-form').addEventListener('submit', (e) => {
+    // Gắn sự kiện Submit cho Profile Form bằng Fetch + JWT
+    document.getElementById('js-profile-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        alert('Chức năng cập nhật đang được nâng cấp lên REST API!');
+        const form = e.target;
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+        btn.disabled = true;
+
+        const payload = {
+            name:        form.querySelector('#name').value.trim(),
+            mobileno:    form.querySelector('#mobileno').value.trim(),
+            address:     (form.querySelector('#address')?.value || '').trim(),
+            dateofbirth: (form.querySelector('#dateofbirth')?.value || '').trim(),
+            gender:      (form.querySelector('#gender')?.value || '').trim()
+        };
+
+        const token = localStorage.getItem('jwt_token');
+        try {
+            const res = await fetch('/tour1/api/user/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            if (result.success) {
+                showToast(result.message || 'Hồ sơ đã được cập nhật!', 'success');
+            } else {
+                showToast(result.message || 'Cập nhật thất bại', 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            showToast('Lỗi kết nối máy chủ', 'error');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
     });
 }
+
+/**
+ * Gắn sự kiện Submit cho form Đổi mật khẩu (static HTML trong view)
+ */
+function setupPasswordForm(token) {
+    const form = document.querySelector('form[name="changePasswordForm"]');
+    if (!form) return;
+
+    // Chuyển form sang Fetch, không còn action POST truyền thống
+    form.removeAttribute('action');
+    form.removeAttribute('method');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button[type="submit"]');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang đổi...';
+        btn.disabled = true;
+
+        const payload = {
+            password:        form.querySelector('#password').value,
+            newpassword:     form.querySelector('#newpassword').value,
+            confirmpassword: form.querySelector('#confirmpassword').value
+        };
+
+        try {
+            const res = await fetch('/tour1/api/user/password', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            if (result.success) {
+                showToast(result.message || 'Đổi mật khẩu thành công!', 'success');
+                form.reset();
+            } else {
+                showToast(result.message || 'Đổi mật khẩu thất bại', 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            showToast('Lỗi kết nối máy chủ', 'error');
+        } finally {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }
+    });
+}
+
+/**
+ * Helper: Hiển thị toast notification
+ */
+function showToast(message, type = 'success') {
+    // Sử dụng hệ thống toast đã có sẵn nếu có, fallback về alert
+    if (window.showToastNotification) {
+        window.showToastNotification(message, type);
+        return;
+    }
+    // Fallback
+    alert(message);
+}
+
 
 function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
