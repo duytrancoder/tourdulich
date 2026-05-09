@@ -1,75 +1,6 @@
 <?php
-session_start();
-error_reporting(0);
-include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
-{	
-header('location:index.php');
-}
-else{ 
-$msg = '';
-$error = '';
-if(isset($_GET['del']))
-{
-$delid=intval($_GET['del']);
-$sql = "DELETE FROM tblusers WHERE id=:delid";
-$query = $dbh->prepare($sql);
-$query -> bindParam(':delid',$delid, PDO::PARAM_STR);
-if($query -> execute()){
-	$msg="Đã xóa người dùng thành công";
-}else{
-	$error="Không thể xóa người dùng.";
-}
-}
-
 $pageTitle = "GoTravel Admin | Quản lý người dùng";
 $currentPage = 'manage-users';
-
-// Search functionality
-$searchName = isset($_GET['name']) ? trim($_GET['name']) : '';
-$searchPhone = isset($_GET['phone']) ? trim($_GET['phone']) : '';
-$searchEmail = isset($_GET['email']) ? trim($_GET['email']) : '';
-$normalizedUserId = ltrim($searchName, '#');
-
-$sql = "SELECT * FROM tblusers WHERE 1=1";
-
-if (!empty($searchName)) {
-	$sql .= " AND (FullName LIKE :name_text";
-	if (ctype_digit($normalizedUserId)) {
-		$sql .= " OR id = :user_id";
-	}
-	$sql .= ")";
-}
-
-if (!empty($searchPhone)) {
-	$sql .= " AND MobileNumber LIKE :phone";
-}
-
-if (!empty($searchEmail)) {
-	$sql .= " AND EmailId LIKE :email";
-}
-
-$sql .= " ORDER BY id DESC";
-
-$query = $dbh->prepare($sql);
-
-if (!empty($searchName)) {
-	$query->bindValue(':name_text', '%' . $searchName . '%', PDO::PARAM_STR);
-	if (ctype_digit($normalizedUserId)) {
-		$query->bindValue(':user_id', (int)$normalizedUserId, PDO::PARAM_INT);
-	}
-}
-
-if (!empty($searchPhone)) {
-	$query->bindValue(':phone', '%' . $searchPhone . '%', PDO::PARAM_STR);
-}
-
-if (!empty($searchEmail)) {
-	$query->bindValue(':email', '%' . $searchEmail . '%', PDO::PARAM_STR);
-}
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
-
 include('includes/layout-start.php');
 ?>
 		<section class="admin-page-head">
@@ -78,36 +9,36 @@ include('includes/layout-start.php');
 				<p>Danh sách tài khoản khách hàng đăng ký trên hệ thống.</p>
 			</div>
 		</section>
-		<?php if($error){?><div class="alert error"><?php echo htmlentities($error);?></div><?php } ?>
-		<?php if($msg){?><div class="alert success"><?php echo htmlentities($msg);?></div><?php } ?>
+
+		<div id="user-alert" style="display:none; margin-bottom: 1rem;"></div>
 		
 		<!-- Search Form -->
 		<section class="card" style="margin-bottom: 1.5rem;">
-			<form method="get" action="" class="form-stack">
+			<form id="userSearchForm" class="form-stack">
 				<div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
 					<div class="form-group">
 						<label for="name">Mã/ họ tên người dùng</label>
-						<input type="text" name="name" id="name" placeholder="Nhập mã hoặc họ tên người dùng..." value="<?php echo htmlentities($searchName); ?>">
+						<input type="text" id="searchName" placeholder="Nhập mã hoặc họ tên người dùng...">
 					</div>
 					<div class="form-group">
 						<label for="phone">Số điện thoại</label>
-						<input type="text" name="phone" id="phone" placeholder="Nhập số điện thoại..." value="<?php echo htmlentities($searchPhone); ?>">
+						<input type="text" id="searchPhone" placeholder="Nhập số điện thoại...">
 					</div>
 					<div class="form-group">
 						<label for="email">Email</label>
-						<input type="text" name="email" id="email" placeholder="Nhập email..." value="<?php echo htmlentities($searchEmail); ?>">
+						<input type="text" id="searchEmail" placeholder="Nhập email...">
 					</div>
 				</div>
 				<div style="display: flex; gap: 0.5rem;">
 					<button type="submit" class="btn btn-primary">🔍 Tìm kiếm</button>
-					<a href="<?php echo BASE_URL; ?>admin/manage-users.php" class="btn btn-ghost">Xóa bộ lọc</a>
+					<button type="button" id="clearSearch" class="btn btn-ghost">Xóa bộ lọc</button>
 				</div>
 			</form>
 		</section>
 		
 		<section class="card">
 			<div class="table-responsive">
-				<table class="table">
+				<table class="table" id="usersTable">
 					<thead>
 						<tr>
 							<th>Mã người dùng</th>
@@ -118,35 +49,114 @@ include('includes/layout-start.php');
 							<th>Thao tác</th>
 						</tr>
 					</thead>
-					<tbody>
-						<?php 
-						if($query->rowCount() > 0)
-						{
-							foreach($results as $result)
-							{	?>		
-						<tr>
-							<td><?php echo htmlentities($result->id);?></td>
-							<td><?php echo htmlentities($result->FullName);?></td>
-							<td><?php echo htmlentities($result->MobileNumber);?></td>
-							<td><?php echo htmlentities($result->EmailId);?></td>
-							<td><?php echo htmlentities($result->RegDate);?></td>
-							<td style="white-space:nowrap;">
-								<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/user-details.php?id=<?php echo htmlentities($result->id);?>">Xem chi tiết</a>
-								<a class="btn btn-danger" href="<?php echo BASE_URL; ?>admin/manage-users.php?del=<?php echo htmlentities($result->id);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này không?');">Xóa</a>
-							</td>
-						</tr>
-						<?php }} else { ?>
-						<tr><td colspan="7"><div class="empty-state">
-							<?php if(!empty($searchName) || !empty($searchPhone) || !empty($searchEmail)) { ?>
-								Không tìm thấy người dùng phù hợp. <a href="<?php echo BASE_URL; ?>admin/manage-users.php">Xóa bộ lọc</a>
-							<?php } else { ?>
-								Chưa có người dùng nào.
-							<?php } ?>
-						</div></td></tr>
-						<?php } ?>
+					<tbody id="usersList">
+						<tr><td colspan="6" style="text-align:center;">Đang tải dữ liệu...</td></tr>
 					</tbody>
 				</table>
 			</div>
 		</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const usersList = document.getElementById('usersList');
+    const searchForm = document.getElementById('userSearchForm');
+    const alertBox = document.getElementById('user-alert');
+    const token = localStorage.getItem('jwt_token');
+
+    async function fetchUsers() {
+        const name = document.getElementById('searchName').value;
+        const phone = document.getElementById('searchPhone').value;
+        const email = document.getElementById('searchEmail').value;
+        
+        let url = (window.BASE_API_URL || '/tour1/api/') + 'admin/users?';
+        if (name) url += `name=${encodeURIComponent(name)}&`;
+        if (phone) url += `phone=${encodeURIComponent(phone)}&`;
+        if (email) url += `email=${encodeURIComponent(email)}&`;
+
+        try {
+            const response = await fetch(url, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                renderUsers(result.data);
+            } else {
+                showError(result.message);
+            }
+        } catch (error) {
+            showError('Lỗi kết nối máy chủ.');
+        }
+    }
+
+    function renderUsers(users) {
+        if (users.length === 0) {
+            usersList.innerHTML = '<tr><td colspan="6" style="text-align:center;">Không tìm thấy người dùng nào.</td></tr>';
+            return;
+        }
+
+        usersList.innerHTML = users.map(user => `
+            <tr>
+                <td>#${user.id}</td>
+                <td>${user.FullName}</td>
+                <td>${user.MobileNumber}</td>
+                <td>${user.EmailId}</td>
+                <td>${user.RegDate}</td>
+                <td style="white-space:nowrap;">
+                    <a class="btn btn-ghost" href="user-details.php?id=${user.id}">Xem chi tiết</a>
+                    <button class="btn btn-danger" onclick="deleteUser(${user.id})">Xóa</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    window.deleteUser = async function(id) {
+        if (!confirm('Bạn có chắc chắn muốn xóa người dùng này không?')) return;
+
+        try {
+            const response = await fetch((window.BASE_API_URL || '/tour1/api/') + `admin/users/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                showSuccess(result.message);
+                fetchUsers();
+            } else {
+                showError(result.message);
+            }
+        } catch (error) {
+            showError('Lỗi khi xóa người dùng.');
+        }
+    };
+
+    function showError(msg) {
+        alertBox.className = 'alert error';
+        alertBox.textContent = msg;
+        alertBox.style.display = 'block';
+    }
+
+    function showSuccess(msg) {
+        alertBox.className = 'alert success';
+        alertBox.textContent = msg;
+        alertBox.style.display = 'block';
+        setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
+    }
+
+    searchForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        fetchUsers();
+    });
+
+    document.getElementById('clearSearch').addEventListener('click', () => {
+        searchForm.reset();
+        fetchUsers();
+    });
+
+    // Initial load
+    fetchUsers();
+});
+</script>
+
 <?php include('includes/layout-end.php'); ?>
-<?php } ?>

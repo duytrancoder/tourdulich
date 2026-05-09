@@ -77,6 +77,37 @@ class Tour {
         return $stmt->execute([$packageId, $timeLabel, $activity, $sortOrder]);
     }
 
+    public function getById($id) {
+        $stmt = $this->db->prepare("SELECT * FROM tbltourpackages WHERE PackageId = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+
+    public function getItineraries($packageId) {
+        $stmt = $this->db->prepare("SELECT * FROM tblitinerary WHERE PackageId = ? ORDER BY SortOrder ASC, ItineraryId ASC");
+        $stmt->execute([$packageId]);
+        return $stmt->fetchAll();
+    }
+
+    public function update($id, $data) {
+        $fields = [];
+        $params = [':id' => $id];
+
+        foreach ($data as $key => $value) {
+            $fields[] = "$key = :$key";
+            $params[":$key"] = $value;
+        }
+
+        $sql = "UPDATE tbltourpackages SET " . implode(', ', $fields) . " WHERE PackageId = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($params);
+    }
+
+    public function clearItineraries($packageId) {
+        $stmt = $this->db->prepare("DELETE FROM tblitinerary WHERE PackageId = ?");
+        return $stmt->execute([$packageId]);
+    }
+
     public function delete($id) {
         $sql = "DELETE FROM tbltourpackages WHERE PackageId = :id";
         $stmt = $this->db->prepare($sql);

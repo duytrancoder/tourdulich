@@ -68,6 +68,7 @@ $router->post('/api/auth/login', 'AuthController@login');
 $router->post('/api/auth/register', 'AuthController@register');
 $router->post('/api/auth/forgot-password', 'AuthController@forgotPassword');
 $router->post('/api/auth/check-availability', 'AuthController@checkAvailability');
+$router->post('/api/auth/admin-login', 'AuthController@adminLogin');
 
 // Public Enquiry Route (không cần JWT)
 $router->post('/api/enquiries', 'PublicEnquiryController@submit');
@@ -75,10 +76,31 @@ $router->post('/api/enquiries', 'PublicEnquiryController@submit');
 // User Issue Routes (JWT bắt buộc)
 $router->post('/api/user/issues', 'UserIssueController@submit');
 
+// Admin Routes (Protected by JWT - Admin role)
+$router->get('/api/admin/users', 'AdminUserController@index');
+$router->delete('/api/admin/users/{id}', 'AdminUserController@delete');
+$router->get('/api/admin/pages/{id}', 'AdminPageController@show');
+$router->put('/api/admin/pages/{id}', 'AdminPageController@update');
+
+// Admin Booking Routes
+$router->get('/api/admin/bookings', 'AdminBookingController@index');
+$router->get('/api/admin/bookings/{id}', 'AdminBookingController@show');
+$router->put('/api/admin/bookings/{id}', 'AdminBookingController@update');
+
+// Admin Issue Routes
+$router->get('/api/admin/issues', 'AdminIssueController@index');
+$router->put('/api/admin/issues/{id}', 'AdminIssueController@update');
+
 // Admin Tour Routes (Protected by JWT)
 $router->get('/api/admin/tours', 'AdminTourController@index');
+$router->get('/api/admin/tours/{id}', 'AdminTourController@show');
 $router->post('/api/admin/tours', 'AdminTourController@create');
+$router->post('/api/admin/tours/{id}', 'AdminTourController@update'); // Handle update via POST for multipart support
 $router->delete('/api/admin/tours/{id}', 'AdminTourController@delete');
+
+// Alias for 'packages' to match user request
+$router->get('/api/admin/packages/{id}', 'AdminTourController@show');
+$router->post('/api/admin/packages/{id}', 'AdminTourController@update');
 
 // User Account Routes (Protected by JWT)
 $router->get('/api/user/account', 'UserAccountController@index');
@@ -96,6 +118,11 @@ $router->get('/api/reviews/{id}', 'UserReviewController@getByPackage');   // Pub
 // Dispatch the request
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $requestUri = $_SERVER['REQUEST_URI'];
+
+// Method Spoofing for PUT/DELETE with multipart/form-data
+if ($requestMethod === 'POST' && isset($_POST['_method'])) {
+    $requestMethod = strtoupper($_POST['_method']);
+}
 
 // Clean base path from URI if necessary (depends on your server config)
 // If URI is like /tour1/api/ping, we want to strip the /tour1 part for the router

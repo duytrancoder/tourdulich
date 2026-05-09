@@ -98,6 +98,85 @@ class AdminTourController {
     }
 
     /**
+     * GET /api/admin/tours/{id}
+     */
+    public function show($id) {
+        $tourModel = new Tour();
+        $tour = $tourModel->getById($id);
+        
+        if ($tour) {
+            $tour['itineraries'] = $tourModel->getItineraries($id);
+            Response::success($tour, "Lấy chi tiết tour thành công");
+        } else {
+            Response::error("Gói tour không tồn tại", null, 404);
+        }
+    }
+
+    /**
+     * PUT /api/admin/tours/{id} (Cập nhật Tour & Itinerary)
+     * Vì multipart/form-data không hỗ trợ PUT trong PHP mặc định, 
+     * chúng ta sẽ xử lý PATCH/PUT bằng cách đọc stream hoặc dùng POST + _method override.
+     * Tuy nhiên, trong context này, chúng ta sẽ viết update() nhận $_POST và $_FILES.
+     */
+    public function update($id) {
+        // Validation
+        $name = $_POST['packagename'] ?? '';
+        $type = $_POST['packagetype'] ?? '';
+        $location = $_POST['packagelocation'] ?? '';
+        $duration = $_POST['tourduration'] ?? '';
+        $price = $_POST['packageprice'] ?? 0;
+        $features = $_POST['packagefeatures'] ?? '';
+        $details = $_POST['packagedetails'] ?? '';
+
+        if (empty($name) || empty($type) || empty($location) || empty($duration) || empty($features) || empty($details)) {
+            Response::error("Vui lòng điền đầy đủ thông tin", null, 400);
+        }
+
+        $tourModel = new Tour();
+        $existingTour = $tourModel->getById($id);
+        if (!$existingTour) {
+            Response::error("Gói tour không tồn tại", null, 404);
+        }
+
+        $data = [
+            'PackageName' => $name,
+            'PackageType' => $type,
+            'PackageLocation' => $location,
+            'TourDuration' => $duration,
+            'PackagePrice' => $price,
+            'PackageFetures' => $features,
+            'PackageDetails' => $details
+        ];
+
+        // Xử lý ảnh
+        if (isset($_FILES['packageimage']) && $_FILES['packageimage']['error'] === UPLOAD_ERR_OK) {
+            $filename = preg_replace('/[^a-zA-Z0-9-_\.]/', '', basename($_FILES['packageimage']['name']));
+            $uploadPath = dirname(dirname(__DIR__)) . "/public/packageimages/" . $filename;
+            
+            if (move_uploaded_file($_FILES['packageimage']['tmp_name'], $uploadPath)) {
+                $data['PackageImage'] = $filename;
+            }
+        }
+
+        if ($tourModel->update($id, $data)) {
+            // Xử lý Itinerary: Full Array Replacement
+            $itineraryData = $_POST['itineraryData'] ?? '';
+            if ($itineraryData !== '') {
+                $itineraries = json_decode($itineraryData, true);
+                if (is_array($itineraries)) {
+                    $tourModel->clearItineraries($id);
+                    foreach ($itineraries as $index => $item) {
+                        $tourModel->addItinerary($id, $item['timeLabel'], $item['activity'], $index + 1);
+                    }
+                }
+            }
+            Response::success(null, "Cập nhật gói tour thành công");
+        } else {
+            Response::error("Lỗi khi cập nhật dữ liệu", null, 500);
+        }
+    }
+
+    /**
      * DELETE /api/admin/tours/{id}
      */
     public function delete($id) {

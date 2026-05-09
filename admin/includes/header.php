@@ -15,7 +15,7 @@
 			</button>
 			<div class="admin-profile__menu" id="adminProfileMenu">
 				<a href="<?php echo BASE_URL; ?>admin/change-password.php">Hồ sơ &amp; bảo mật</a>
-				<a href="<?php echo BASE_URL; ?>admin/logout.php">Đăng xuất</a>
+				<a href="javascript:void(0);" onclick="adminLogout()">Đăng xuất</a>
 			</div>
 		</div>
 	</div>

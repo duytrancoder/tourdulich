@@ -1,367 +1,253 @@
 <?php
-session_start();
-error_reporting(0);
-include('includes/config.php');
-require_once dirname(__DIR__) . '/core/Helper.php';
-if(strlen($_SESSION['alogin'])==0)
-	{	
-header('location:index.php');
-}
-else{
-$pid=intval($_GET['pid']);	
+$pid = intval($_GET['pid'] ?? 0);
+$pageTitle = "GoTravel Admin | Cập nhật gói tour";
+$currentPage = 'manage-packages';
+include('includes/layout-start.php');
+?>
+	<section class="admin-page-head">
+		<div>
+			<a href="manage-packages.php" class="btn btn-ghost" style="margin-bottom:1rem;">← Quay lại danh sách</a>
+			<h1>Cập nhật gói tour #<?php echo $pid; ?></h1>
+			<p>Điều chỉnh thông tin gói tour và quản lý lịch trình chi tiết.</p>
+		</div>
+	</section>
 
-// Handle Itinerary Add
-if(isset($_POST['addItinerary'])) {
-	$timeLabel = $_POST['timeLabel'];
-	$activity = $_POST['activity'];
-	
-	$sql = "SELECT COALESCE(MAX(SortOrder), 0) + 1 as NextOrder FROM tblitinerary WHERE PackageId = :pid";
-	$query = $dbh->prepare($sql);
-	$query->bindParam(':pid', $pid, PDO::PARAM_INT);
-	$query->execute();
-	$result = $query->fetch(PDO::FETCH_OBJ);
-	$sortOrder = $result->NextOrder;
-	
-	$sql = "INSERT INTO tblitinerary (PackageId, TimeLabel, Activity, SortOrder) VALUES (:pid, :timeLabel, :activity, :sortOrder)";
-	$query = $dbh->prepare($sql);
-	$query->bindParam(':pid', $pid, PDO::PARAM_INT);
-	$query->bindParam(':timeLabel', $timeLabel, PDO::PARAM_STR);
-	$query->bindParam(':activity', $activity, PDO::PARAM_STR);
-	$query->bindParam(':sortOrder', $sortOrder, PDO::PARAM_INT);
-	$query->execute();
-	
-	$itineraryMsg = "Đã thêm lộ trình thành công";
-}
+	<div id="package-alert" style="display:none; margin-bottom: 1.5rem;"></div>
 
-// Handle Itinerary Update
-if(isset($_POST['updateItinerary'])) {
-	$id = intval($_POST['itineraryId']);
-	$timeLabel = $_POST['timeLabel'];
-	$activity = $_POST['activity'];
-	$sortOrder = intval($_POST['sortOrder']);
-	
-	$sql = "UPDATE tblitinerary SET TimeLabel = :timeLabel, Activity = :activity, SortOrder = :sortOrder WHERE ItineraryId = :id";
-	$query = $dbh->prepare($sql);
-	$query->bindParam(':id', $id, PDO::PARAM_INT);
-	$query->bindParam(':timeLabel', $timeLabel, PDO::PARAM_STR);
-	$query->bindParam(':activity', $activity, PDO::PARAM_STR);
-	$query->bindParam(':sortOrder', $sortOrder, PDO::PARAM_INT);
-	$query->execute();
-	
-	$itineraryMsg = "Đã cập nhật lộ trình thành công";
-}
-
-// Handle Itinerary Delete
-if(isset($_GET['delItinerary'])) {
-	$id = intval($_GET['delItinerary']);
-	$sql = "DELETE FROM tblitinerary WHERE ItineraryId = :id";
-	$query = $dbh->prepare($sql);
-	$query->bindParam(':id', $id, PDO::PARAM_INT);
-	$query->execute();
-	
-	$itineraryMsg = "Đã xóa lộ trình thành công";
-	header('Location: ' . BASE_URL . 'admin/update-package.php?pid=' . $pid);
-	exit;
-}
-
-// Handle Package Update
-if(isset($_POST['submit']))
-{
-$pname = trim($_POST['packagename'] ?? '');
-$ptype = trim($_POST['packagetype'] ?? '');	
-$plocation = trim($_POST['packagelocation'] ?? '');
-$tourduration = trim($_POST['tourduration'] ?? '');
-$pprice = intval($_POST['packageprice'] ?? 0);	
-$pfeatures = trim($_POST['packagefeatures'] ?? '');
-$pdetails = trim($_POST['packagedetails'] ?? '');	
-
-// Validate inputs
-if (empty($pname) || empty($ptype) || empty($plocation) || empty($tourduration) || $pprice <= 0 || empty($pfeatures) || empty($pdetails)) {
-	$error = "Vui lòng điền đầy đủ thông tin";
-} else {
-	$sql="update tbltourpackages set PackageName=:pname,PackageType=:ptype,PackageLocation=:plocation,TourDuration=:tourduration,PackagePrice=:pprice,PackageFetures=:pfeatures,PackageDetails=:pdetails where PackageId=:pid";
-$query = $dbh->prepare($sql);
-$query->bindParam(':pname',$pname,PDO::PARAM_STR);
-$query->bindParam(':ptype',$ptype,PDO::PARAM_STR);
-$query->bindParam(':plocation',$plocation,PDO::PARAM_STR);
-$query->bindParam(':tourduration',$tourduration,PDO::PARAM_STR);
-$query->bindParam(':pprice',$pprice,PDO::PARAM_INT);
-$query->bindParam(':pfeatures',$pfeatures,PDO::PARAM_STR);
-$query->bindParam(':pdetails',$pdetails,PDO::PARAM_STR);
-	$query->bindParam(':pid',$pid,PDO::PARAM_INT);
-	$query->execute();
-	$msg="Cập nhật gói tour thành công";
-}
-}
-
-	// Get package info
-	$sql = "SELECT * from tbltourpackages where PackageId=:pid";
-	$query = $dbh -> prepare($sql);
-	$query -> bindParam(':pid', $pid, PDO::PARAM_INT);
-	$query->execute();
-	$package = $query->fetch(PDO::FETCH_OBJ);
-	
-	// Get itineraries
-	$sql = "SELECT * FROM tblitinerary WHERE PackageId = :pid ORDER BY SortOrder ASC, ItineraryId ASC";
-	$query = $dbh->prepare($sql);
-	$query->bindParam(':pid', $pid, PDO::PARAM_INT);
-	$query->execute();
-	$itineraries = $query->fetchAll(PDO::FETCH_OBJ);
-	
-	$pageTitle = "GoTravel Admin | Cập nhật gói tour";
-	$currentPage = 'manage-packages';
-	include('includes/layout-start.php');
-	?>
-		<section class="admin-page-head">
-			<div>
-				<h1>Cập nhật gói tour <?php echo Helper::formatPackageId($package->PackageId); ?></h1>
-				<p>Điều chỉnh thông tin gói tour, quản lý hình ảnh và lộ trình.</p>
-			</div>
-		</section>
-		<?php if(!$package){?><div class="alert error">Không tìm thấy gói tour.</div><?php } ?>
-		<?php if($msg){?><div class="alert success"><?php echo htmlentities($msg);?></div><?php } ?>
-		<?php if($error){?><div class="alert error"><?php echo htmlentities($error);?></div><?php } ?>
-		<?php if(isset($itineraryMsg)){?><div class="alert success"><?php echo htmlentities($itineraryMsg);?></div><?php } ?>
-		<?php 
-		if(isset($_SESSION['package_msg'])) {
-			echo '<div class="alert success">' . htmlentities($_SESSION['package_msg']) . '</div>';
-			unset($_SESSION['package_msg']);
-		}
-		?>
-		
-		<?php if($package): ?>
-		<!-- Package Information Form -->
-		<section class="card">
-			<h3>Thông tin gói tour</h3>
-			<form name="package" method="post" class="form-stack">
-				<div class="form-grid">
-					<div class="form-group">
-						<label>Mã gói tour</label>
-						<input type="text" value="<?php echo Helper::formatPackageId($package->PackageId); ?>" disabled>
-					</div>
-					<div class="form-group">
-						<label for="packagename">Tên gói</label>
-						<input type="text" name="packagename" id="packagename" value="<?php echo htmlentities($package->PackageName);?>" required>
-					</div>
-					<div class="form-group">
-						<label for="packagetype" style="display: flex; align-items: center; gap: 0.5rem;">
-							Loại gói
-							<span class="tooltip-icon" onclick="openPackageTypeModal()" title="Xem chi tiết các loại gói" style="cursor: pointer; display: inline-flex; justify-content: center; align-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.8rem; font-weight: bold;">?</span>
-						</label>
-						<select name="packagetype" id="packagetype" required>
-							<option value="">-- Chọn loại gói --</option>
-							<option value="Tour tiết kiệm" <?php if($package->PackageType == 'Tour tiết kiệm') echo 'selected'; ?>>Tour tiết kiệm</option>
-							<option value="Tour tiêu chuẩn" <?php if($package->PackageType == 'Tour tiêu chuẩn') echo 'selected'; ?>>Tour tiêu chuẩn</option>
-							<option value="Tour cao cấp" <?php if($package->PackageType == 'Tour cao cấp') echo 'selected'; ?>>Tour cao cấp</option>
-							<option value="Tour riêng" <?php if($package->PackageType == 'Tour riêng') echo 'selected'; ?>>Tour riêng</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<label for="packagelocation">Địa điểm</label>
-						<input type="text" name="packagelocation" id="packagelocation" value="<?php echo htmlentities($package->PackageLocation);?>" required>
-					</div>
-					<div class="form-group">
-						<label for="tourduration">Thời gian tour</label>
-						<input type="text" name="tourduration" id="tourduration" value="<?php echo htmlentities($package->TourDuration);?>" placeholder="VD: 2 Ngày 1 Đêm" required>
-					</div>
-					<div class="form-group">
-						<label for="packageprice">Giá gói (VNĐ)</label>
-						<input type="number" min="0" step="1000" name="packageprice" id="packageprice" value="<?php echo htmlentities($package->PackagePrice);?>" required>
-						<small style="color: var(--muted); font-size: 0.85rem;">Giá hiện tại: <?php echo number_format($package->PackagePrice, 0, ',', '.') . ' đ'; ?></small>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="packagefeatures">Điểm nổi bật</label>
-					<input type="text" name="packagefeatures" id="packagefeatures" value="<?php echo htmlentities($package->PackageFetures);?>" required>
-				</div>
-				<div class="form-group">
-					<label for="packagedetails">Chi tiết gói</label>
-					<textarea name="packagedetails" id="packagedetails" required><?php echo htmlentities($package->PackageDetails);?></textarea>
-				</div>
-				<div class="form-group">
-					<label>Hình ảnh hiện tại</label>
-					<div style="display:flex;gap:1rem;align-items:center;">
-						<img src="<?php echo BASE_URL; ?>admin/packageimages/<?php echo htmlentities($package->PackageImage);?>" alt="Ảnh gói tour" style="width:120px;border-radius:0.5rem;">
-						<a class="btn btn-ghost" href="<?php echo BASE_URL; ?>admin/change-image.php?imgid=<?php echo htmlentities($package->PackageId);?>">Thay đổi hình</a>
-					</div>
-				</div>
-				<div class="form-group">
-					<label>Ngày cập nhật gần nhất</label>
-					<?php
-						$lastUpdate = ($package->UpdationDate && $package->UpdationDate !== '0000-00-00 00:00:00')
-							? $package->UpdationDate
-							: 'Chưa cập nhật';
-					?>
-					<input type="text" value="<?php echo htmlentities($lastUpdate);?>" disabled>
-				</div>
-				<button type="submit" name="submit" class="btn btn-primary">Lưu thay đổi</button>
-			</form>
-		</section>
-
-		<!-- Itinerary Management Section -->
-		<section class="card" style="margin-top: 2rem;">
-			<h3>Quản lý lộ trình chi tiết</h3>
-			<p style="color: var(--muted); margin-bottom: 1.5rem;">Thêm, sửa hoặc xóa các điểm trong lộ trình tour.</p>
+	<form id="updatePackageForm" class="form-stack">
+        <input type="hidden" name="_method" value="PUT">
+		<div class="form-grid-2-1" style="display:grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: flex-start;">
 			
-			<?php if(count($itineraries) > 0) { ?>
-				<div style="overflow-x: auto; margin-bottom: 2rem;">
-					<table class="table">
-						<thead>
-							<tr>
-								<th style="width: 50px;">STT</th>
-								<th style="width: 200px;">Thời gian</th>
-								<th>Hoạt động</th>
-								<th style="width: 80px;">Thứ tự</th>
-								<th style="width: 150px;">Thao tác</th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php 
-							$cnt = 1;
-							foreach($itineraries as $item) { ?>
-								<tr data-id="<?php echo $item->ItineraryId; ?>" 
-								    data-time="<?php echo htmlspecialchars($item->TimeLabel, ENT_QUOTES); ?>" 
-								    data-activity="<?php echo htmlspecialchars($item->Activity, ENT_QUOTES); ?>" 
-								    data-sort="<?php echo $item->SortOrder; ?>">
-									<td><?php echo $cnt++; ?></td>
-									<td><?php echo htmlentities($item->TimeLabel); ?></td>
-									<td><?php echo htmlentities($item->Activity); ?></td>
-									<td><?php echo $item->SortOrder; ?></td>
-									<td>
-										<div style="display: flex; gap: 0.5rem;">
-											<button type="button" class="btn btn-primary btn-small btn-edit-itinerary">Sửa</button>
-											<a href="?pid=<?php echo $pid; ?>&delItinerary=<?php echo $item->ItineraryId; ?>" 
-											   class="btn btn-danger btn-small" 
-											   onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
-										</div>
-									</td>
-								</tr>
-							<?php } ?>
-						</tbody>
-					</table>
-				</div>
-			<?php } else { ?>
-				<p style="text-align: center; padding: 2rem; color: var(--muted);">Chưa có lộ trình nào. Hãy thêm lộ trình bên dưới.</p>
-			<?php } ?>
-			
-			<!-- Add/Edit Itinerary Form -->
-			<div style="background: var(--bg); padding: 1.5rem; border-radius: 8px;">
-				<h4 style="margin-bottom: 1rem;" id="itineraryFormTitle">Thêm lộ trình mới</h4>
-				<form method="post" id="itineraryForm" class="form-stack">
-					<input type="hidden" name="itineraryId" id="itineraryId" value="">
-					<input type="hidden" name="sortOrder" id="sortOrder" value="0">
-					
-					<div class="form-grid">
+			<div class="left-col">
+				<section class="card">
+					<h3>Thông tin cơ bản</h3>
+					<div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-top: 1rem;">
 						<div class="form-group">
-							<label for="timeLabel">Thời gian *</label>
-							<input type="text" name="timeLabel" id="timeLabel" required 
-							       placeholder="VD: Ngày 1 - Sáng, 08:00 - 10:00">
+							<label for="packagename">Tên gói tour</label>
+							<input type="text" name="packagename" id="packagename" required>
+						</div>
+						<div class="form-group">
+							<label for="packagetype">Loại gói</label>
+							<select name="packagetype" id="packagetype" required>
+								<option value="">-- Chọn loại gói --</option>
+								<option value="Tour tiết kiệm">Tour tiết kiệm</option>
+								<option value="Tour tiêu chuẩn">Tour tiêu chuẩn</option>
+								<option value="Tour cao cấp">Tour cao cấp</option>
+								<option value="Tour riêng">Tour riêng</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="packagelocation">Địa điểm</label>
+							<input type="text" name="packagelocation" id="packagelocation" required>
+						</div>
+						<div class="form-group">
+							<label for="tourduration">Thời gian tour</label>
+							<input type="text" name="tourduration" id="tourduration" placeholder="VD: 3 Ngày 2 Đêm" required>
+						</div>
+						<div class="form-group">
+							<label for="packageprice">Giá gói (VNĐ)</label>
+							<input type="number" name="packageprice" id="packageprice" required>
+						</div>
+						<div class="form-group">
+							<label for="packagefeatures">Điểm nổi bật (tóm tắt)</label>
+							<input type="text" name="packagefeatures" id="packagefeatures" required>
 						</div>
 					</div>
-					
 					<div class="form-group">
-						<label for="activity">Hoạt động *</label>
-						<textarea name="activity" id="activity" required 
-						          placeholder="Mô tả chi tiết hoạt động trong thời gian này..."></textarea>
+						<label for="packagedetails">Chi tiết gói tour</label>
+						<textarea name="packagedetails" id="packagedetails" rows="8" required></textarea>
 					</div>
-					
-					<div style="display: flex; gap: 1rem;">
-						<button type="submit" name="addItinerary" id="btnAddItinerary" class="btn">Thêm lộ trình</button>
-						<button type="submit" name="updateItinerary" id="btnUpdateItinerary" class="btn" style="display: none; background: var(--accent);">Cập nhật</button>
-						<button type="button" onclick="resetItineraryForm()" class="btn btn-ghost">Hủy / Làm mới</button>
-					</div>
-				</form>
-			</div>
-		</section>
-		<?php endif; ?>
+				</section>
 
-		<!-- Package Type Modal -->
-		<div id="packageTypeModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-			<div class="modal-content" style="background-color: var(--card-bg, #fff); margin: 10% auto; padding: 2rem; border-radius: 8px; width: 80%; max-width: 600px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-				<span class="close" onclick="closePackageTypeModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
-				<h3 style="margin-bottom: 1.5rem; color: var(--text-primary);">Chi tiết các loại gói tour</h3>
-				
-				<div style="margin-bottom: 1.5rem;">
-					<h4 style="color: var(--primary);">1. Gói Tiết kiệm (Economy)</h4>
-					<p style="margin-bottom: 0.5rem; line-height: 1.5;"><strong>Mô tả:</strong> "Hành trình tối ưu chi phí nhưng vẫn đảm bảo trải nghiệm trọn vẹn những điểm đến tiêu biểu nhất. Gói này sử dụng hệ thống khách sạn 2-3 sao sạch sẽ, phương tiện di chuyển đời mới và các bữa ăn đặc sản địa phương cơ bản. Lựa chọn hoàn hảo cho các bạn trẻ ưa khám phá hoặc nhóm khách muốn tiết kiệm ngân sách."</p>
-					<p style="color: var(--accent); font-weight: 500;">Thông điệp chính: Tiết kiệm tối đa - Khám phá trọn vẹn.</p>
-				</div>
-				
-				<div style="margin-bottom: 1.5rem;">
-					<h4 style="color: var(--primary);">2. Gói Tiêu chuẩn (Standard)</h4>
-					<p style="margin-bottom: 0.5rem; line-height: 1.5;"><strong>Mô tả:</strong> "Sự kết hợp hoàn hảo giữa chất lượng dịch vụ và mức giá hợp lý. Quý khách sẽ được lưu trú tại hệ thống khách sạn 3-4 sao tiện nghi, thực đơn ăn uống đa dạng và lịch trình được thiết kế cân bằng giữa tham quan và nghỉ ngơi. Đây là dòng tour 'quốc dân' được 80% gia đình và nhân viên văn phòng lựa chọn."</p>
-					<p style="color: var(--accent); font-weight: 500;">Thông điệp chính: Dịch vụ chỉn chu - Giá cả hợp lý.</p>
-				</div>
-				
-				<div style="margin-bottom: 1.5rem;">
-					<h4 style="color: var(--primary);">3. Gói Cao cấp (Premium)</h4>
-					<p style="margin-bottom: 0.5rem; line-height: 1.5;"><strong>Mô tả:</strong> "Nâng tầm trải nghiệm kỳ nghỉ với những dịch vụ đẳng cấp nhất. Quý khách sẽ tận hưởng không gian nghỉ dưỡng tại các resort/khách sạn 4-5 sao sang trọng, di chuyển bằng xe Limousine đời mới hoặc vé máy bay giờ đẹp. Lịch trình bao gồm các điểm tham quan độc quyền, tiệc tối cao cấp và hướng dẫn viên chuyên nghiệp suốt tuyến."</p>
-					<p style="color: var(--accent); font-weight: 500;">Thông điệp chính: Đẳng cấp thượng lưu - Trải nghiệm độc bản.</p>
-				</div>
-				
-				<div style="margin-bottom: 1.5rem;">
-					<h4 style="color: var(--primary);">4. Gói Tour riêng (Private)</h4>
-					<p style="margin-bottom: 0.5rem; line-height: 1.5;"><strong>Mô tả:</strong> "Hoàn toàn riêng tư và linh hoạt theo ý muốn của bạn. Không còn cảnh phải chờ đợi đoàn đông, hành trình này được thiết kế dành riêng cho gia đình hoặc nhóm bạn của bạn. Bạn có thể tự do thay đổi thời gian khởi hành, yêu cầu thêm các điểm check-in yêu thích và có xe cùng hướng dẫn viên phục vụ riêng biệt."</p>
-					<p style="color: var(--accent); font-weight: 500;">Thông điệp chính: Tự do tối đa - Cá nhân hóa hành trình.</p>
-				</div>
+				<section class="card" style="margin-top: 1.5rem;">
+					<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+						<h3>Lịch trình chi tiết (Itinerary)</h3>
+						<button type="button" id="btnAddDay" class="btn btn-secondary btn-small">+ Thêm ngày/mốc thời gian</button>
+					</div>
+					<div id="itineraryContainer">
+						<!-- Dynamic itinerary blocks will be injected here -->
+					</div>
+				</section>
+			</div>
+
+			<div class="right-col">
+				<section class="card">
+					<h3>Hình ảnh tour</h3>
+					<div id="currentImageContainer" style="margin: 1rem 0; text-align:center;">
+						<img id="packagePreview" src="" alt="Preview" style="max-width:100%; border-radius:8px; display:none;">
+						<div id="noImage" class="empty-state">Chưa có ảnh</div>
+					</div>
+					<div class="form-group">
+						<label for="packageimage">Thay đổi ảnh mới</label>
+						<input type="file" name="packageimage" id="packageimage" accept="image/*">
+					</div>
+				</section>
+
+				<section class="card" style="margin-top: 1.5rem; position: sticky; top: 1rem;">
+					<h3>Thao tác</h3>
+					<p style="font-size:0.9rem; color:#666; margin-bottom:1.5rem;">Đảm bảo các thông tin đã chính xác trước khi cập nhật.</p>
+					<button type="submit" id="saveBtn" class="btn btn-primary w-100" style="padding:1rem;">Cập nhật gói tour</button>
+				</section>
 			</div>
 		</div>
-		
-		<script>
-		// Modal controls
-		function openPackageTypeModal() {
-			document.getElementById('packageTypeModal').style.display = 'block';
-		}
-		
-		function closePackageTypeModal() {
-			document.getElementById('packageTypeModal').style.display = 'none';
-		}
-		
-		window.onclick = function(event) {
-			var modal = document.getElementById('packageTypeModal');
-			if (event.target == modal) {
-				modal.style.display = 'none';
-			}
-		}
+	</form>
 
-		// Itinerary management
-		document.addEventListener('DOMContentLoaded', function() {
-			document.querySelectorAll('.btn-edit-itinerary').forEach(btn => {
-				btn.addEventListener('click', function(e) {
-					e.stopPropagation();
-					const row = this.closest('tr');
-					const id = row.dataset.id;
-					const timeLabel = row.dataset.time;
-					const activity = row.dataset.activity;
-					const sortOrder = row.dataset.sort;
-					
-					editItinerary(id, timeLabel, activity, sortOrder);
-				});
-			});
-		});
-		
-		function editItinerary(id, timeLabel, activity, sortOrder) {
-			document.getElementById('itineraryFormTitle').textContent = 'Chỉnh sửa lộ trình';
-			document.getElementById('itineraryId').value = id;
-			document.getElementById('timeLabel').value = timeLabel;
-			document.getElementById('activity').value = activity;
-			document.getElementById('sortOrder').value = sortOrder;
-			document.getElementById('btnAddItinerary').style.display = 'none';
-			document.getElementById('btnUpdateItinerary').style.display = 'inline-block';
-			
-			// Scroll to form
-			document.getElementById('itineraryForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-		}
-		
-		function resetItineraryForm() {
-			document.getElementById('itineraryFormTitle').textContent = 'Thêm lộ trình mới';
-			document.getElementById('itineraryId').value = '';
-			document.getElementById('timeLabel').value = '';
-			document.getElementById('activity').value = '';
-			document.getElementById('sortOrder').value = '0';
-			document.getElementById('btnAddItinerary').style.display = 'inline-block';
-			document.getElementById('btnUpdateItinerary').style.display = 'none';
-		}
-		</script>
-	<?php include('includes/layout-end.php'); ?>
-<?php } ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pid = <?php echo $pid; ?>;
+    const form = document.getElementById('updatePackageForm');
+    const itineraryContainer = document.getElementById('itineraryContainer');
+    const alertBox = document.getElementById('package-alert');
+    const saveBtn = document.getElementById('saveBtn');
+    const token = localStorage.getItem('jwt_token');
+
+    if (!pid) {
+        showError('Mã gói tour không hợp lệ.');
+        return;
+    }
+
+    // Load data from API
+    async function fetchPackageData() {
+        try {
+            const response = await fetch((window.BASE_API_URL || '/tour1/api/') + 'admin/packages/' + pid, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                fillForm(result.data);
+            } else {
+                showError(result.message);
+            }
+        } catch (error) {
+            showError('Lỗi kết nối máy chủ.');
+        }
+    }
+
+    function fillForm(data) {
+        document.getElementById('packagename').value = data.PackageName;
+        document.getElementById('packagetype').value = data.PackageType;
+        document.getElementById('packagelocation').value = data.PackageLocation;
+        document.getElementById('tourduration').value = data.TourDuration;
+        document.getElementById('packageprice').value = data.PackagePrice;
+        document.getElementById('packagefeatures').value = data.PackageFetures;
+        document.getElementById('packagedetails').value = data.PackageDetails;
+
+        if (data.PackageImage) {
+            const img = document.getElementById('packagePreview');
+            img.src = '/tour1/public/packageimages/' + data.PackageImage;
+            img.style.display = 'block';
+            document.getElementById('noImage').style.display = 'none';
+        }
+
+        // Render itineraries
+        itineraryContainer.innerHTML = '';
+        if (data.itineraries && data.itineraries.length > 0) {
+            data.itineraries.forEach(item => addItineraryRow(item.TimeLabel, item.Activity));
+        } else {
+            addItineraryRow(); // Add one empty row if none
+        }
+    }
+
+    function addItineraryRow(timeLabel = '', activity = '') {
+        const div = document.createElement('div');
+        div.className = 'itinerary-block card';
+        div.style.marginBottom = '1rem';
+        div.style.background = '#f9fafb';
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem;">
+                <h4 class="day-label">Mốc thời gian</h4>
+                <button type="button" class="btn btn-danger btn-small remove-day">Xóa</button>
+            </div>
+            <div class="form-group">
+                <input type="text" class="it-time" value="${timeLabel}" placeholder="VD: Ngày 1 - Sáng" required>
+            </div>
+            <div class="form-group">
+                <textarea class="it-activity" rows="3" placeholder="Hoạt động..." required>${activity}</textarea>
+            </div>
+        `;
+        
+        div.querySelector('.remove-day').addEventListener('click', () => {
+            div.remove();
+            updateDayLabels();
+        });
+        
+        itineraryContainer.appendChild(div);
+        updateDayLabels();
+    }
+
+    function updateDayLabels() {
+        const labels = itineraryContainer.querySelectorAll('.day-label');
+        labels.forEach((label, index) => {
+            label.textContent = `Lịch trình #${index + 1}`;
+        });
+    }
+
+    document.getElementById('btnAddDay').addEventListener('click', () => addItineraryRow());
+
+    // Submit Form
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Đang lưu...';
+        alertBox.style.display = 'none';
+
+        const formData = new FormData(form);
+        
+        // Collect itineraries
+        const itineraries = [];
+        const blocks = itineraryContainer.querySelectorAll('.itinerary-block');
+        blocks.forEach(block => {
+            itineraries.push({
+                timeLabel: block.querySelector('.it-time').value,
+                activity: block.querySelector('.it-activity').value
+            });
+        });
+        formData.append('itineraryData', JSON.stringify(itineraries));
+
+        try {
+            const response = await fetch((window.BASE_API_URL || '/tour1/api/') + 'admin/packages/' + pid, {
+                method: 'POST', // Use POST + _method: PUT for multipart support in PHP
+                headers: { 'Authorization': 'Bearer ' + token },
+                body: formData
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                showSuccess(result.message);
+                setTimeout(() => { window.location.reload(); }, 1500);
+            } else {
+                showError(result.message);
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Cập nhật gói tour';
+            }
+        } catch (error) {
+            showError('Lỗi kết nối máy chủ.');
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Cập nhật gói tour';
+        }
+    });
+
+    function showError(msg) {
+        alertBox.className = 'alert error';
+        alertBox.textContent = msg;
+        alertBox.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showSuccess(msg) {
+        alertBox.className = 'alert success';
+        alertBox.textContent = msg;
+        alertBox.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    fetchPackageData();
+});
+</script>
+<style>
+.itinerary-block { border: 1px solid #e5e7eb; transition: all 0.2s; }
+.itinerary-block:hover { border-color: var(--primary); }
+.w-100 { width: 100%; }
+</style>
+<?php include('includes/layout-end.php'); ?>

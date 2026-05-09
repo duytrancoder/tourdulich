@@ -149,4 +149,66 @@ class AuthController {
             Response::error('Lỗi kiểm tra dữ liệu', null, 500);
         }
     }
+
+    /**
+     * POST /api/auth/admin-login — Public
+     * Đăng nhập dành cho Quản trị viên
+     */
+    public function adminLogin() {
+        $data = json_decode(file_get_contents('php://input'), true);
+        $username = trim($data['username'] ?? '');
+        $password = $data['password'] ?? '';
+
+        if (empty($username) || empty($password)) {
+            Response::error("Vui lòng nhập đầy đủ thông tin", null, 400);
+        }
+
+        try {
+            $db = \Api\Core\Database::getConnection();
+            $stmt = $db->prepare("SELECT id, UserName, Password FROM admin WHERE UserName = ? LIMIT 1");
+            $stmt->execute([$username]);
+            $admin = $stmt->fetch();
+
+            if ($admin) {
+                $passwordValid = false;
+                // Support MD5 legacy
+                if (strlen($admin['Password']) === 32 && ctype_xdigit($admin['Password'])) {
+                    if ($admin['Password'] === md5($password)) {
+                        $passwordValid = true;
+                        // Upgrade to password_hash
+                        $newHash = password_hash($password, PASSWORD_DEFAULT);
+                        $updateStmt = $db->prepare("UPDATE admin SET Password = ? WHERE id = ?");
+                        $updateStmt->execute([$newHash, $admin['id']]);
+                    }
+                } else {
+                    $passwordValid = password_verify($password, $admin['Password']);
+                }
+
+                if ($passwordValid) {
+                    $tokenPayload = [
+                        'id' => $admin['id'],
+                        'email' => $admin['UserName'],
+                        'name' => 'Administrator',
+                        'role' => 'admin'
+                    ];
+                    $token = JWTHandler::encode($tokenPayload);
+
+                    Response::success([
+                        'token' => $token,
+                        'user' => [
+                            'id' => $admin['id'],
+                            'name' => 'Administrator',
+                            'username' => $admin['UserName']
+                        ]
+                    ], "Đăng nhập Admin thành công!");
+                } else {
+                    Response::error("Mật khẩu không chính xác", null, 401);
+                }
+            } else {
+                Response::error("Tài khoản không tồn tại", null, 404);
+            }
+        } catch (\Exception $e) {
+            Response::error("Có lỗi xảy ra khi đăng nhập", null, 500);
+        }
+    }
 }

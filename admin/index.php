@@ -1,103 +1,82 @@
-<?php
-session_start();
-include('includes/config.php');
-$loginError = '';
-if(isset($_POST['login']))
-{
-	$uname = trim($_POST['username'] ?? '');
-	$password = $_POST['password'] ?? '';
-	
-	if (empty($uname) || empty($password)) {
-		$loginError = "Vui lòng nhập đầy đủ thông tin";
-	} else {
-		$sql = "SELECT UserName,Password FROM admin WHERE UserName=:uname";
-		$query = $dbh->prepare($sql);
-		$query->bindParam(':uname', $uname, PDO::PARAM_STR);
-		$query->execute();
-		$admin = $query->fetch(PDO::FETCH_OBJ);
-		
-		if ($admin) {
-			// Support both old MD5 and new password_hash
-			$passwordValid = false;
-			if (strlen($admin->Password) === 32 && ctype_xdigit($admin->Password)) {
-				// Old MD5 hash - verify and upgrade
-				if ($admin->Password === md5($password)) {
-					$passwordValid = true;
-					// Upgrade to password_hash
-					$newHash = password_hash($password, PASSWORD_DEFAULT);
-					$updateSql = "UPDATE admin SET Password=:newpassword WHERE UserName=:uname";
-					$updateQuery = $dbh->prepare($updateSql);
-					$updateQuery->bindParam(':uname', $uname, PDO::PARAM_STR);
-					$updateQuery->bindParam(':newpassword', $newHash, PDO::PARAM_STR);
-					$updateQuery->execute();
-				}
-			} else {
-				// New password_hash
-				$passwordValid = password_verify($password, $admin->Password);
-			}
-			
-			if ($passwordValid) {
-				$_SESSION['alogin'] = $uname;
-				
-				// Generate Admin JWT Token
-				require_once dirname(__DIR__) . '/vendor/autoload.php';
-				// Require JWTHandler manually in case autoload doesn't cover Api\Core natively here
-				require_once dirname(__DIR__) . '/api/core/JWTHandler.php';
-				
-				$payload = [
-					'id' => 0,
-					'email' => $uname, // admin username
-					'name' => 'Administrator',
-					'role' => 'admin'
-				];
-				$token = \Api\Core\JWTHandler::encode($payload);
-				
-				// Set cookie to transfer to localstorage on next page
-				setcookie('admin_jwt_token', $token, time() + 86400, '/');
-				
-				header('location:dashboard.php');
-				exit;
-			} else {
-				$loginError = "Thông tin đăng nhập không hợp lệ";
-			}
-		} else {
-			$loginError = "Thông tin đăng nhập không hợp lệ";
-		}
-	}
-}
-?>
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>GoTravel Admin | Đăng nhập</title>
-	<link rel="stylesheet" href="<?php echo BASE_URL; ?>admin/css/style.css">
+    <!-- CSS Injection from PHP BASE_URL if possible, or relative -->
+	<link rel="stylesheet" href="../admin/css/style.css">
 	<script>
-		// Clear any leftover admin tokens when visiting login page
+		// Clear any leftover tokens when visiting login page
 		localStorage.removeItem('jwt_token');
 		document.cookie = "admin_jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        
+        // Define Base API URL
+        window.BASE_API_URL = window.location.origin + '/tour1/api/';
 	</script>
 </head>
 <body class="auth-page" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../admin/packageimages/tour_halong.webp') no-repeat center center; background-size: cover;">
 	<div class="auth-card">
 		<h1 style="color:#fff">Đăng nhập quản trị</h1>
 		<p class="helper-text" style="color:#e5e7eb">Sử dụng thông tin tài khoản được cấp để truy cập hệ thống quản trị.</p>
-		<?php if($loginError){?><div class="alert error"><?php echo htmlentities($loginError);?></div><?php } ?>
-		<form method="post">
+		
+        <div id="login-alert" style="display:none; margin-bottom: 1rem;"></div>
+
+		<form id="adminLoginForm">
 			<div class="form-group">
 				<label for="username" style="color:#fff">Tên đăng nhập</label>
-				<input type="text" name="username" id="username" required>
+				<input type="text" id="username" required>
 			</div>
 			<div class="form-group">
 				<label for="password" style="color:#fff">Mật khẩu</label>
-				<input type="password" name="password" id="password" required>
+				<input type="password" id="password" required>
 			</div>
-			<button type="submit" name="login" class="btn btn-primary">Đăng nhập</button>
+			<button type="submit" id="loginBtn" class="btn btn-primary">Đăng nhập</button>
 		</form>
-		<p class="helper-text"><a href="<?php echo BASE_URL; ?>" style="color:#e5e7eb">← Quay lại trang khách</a></p>
+		<p class="helper-text"><a href="/tour1/" style="color:#e5e7eb">← Quay lại trang khách</a></p>
 	</div>
-	<script src="<?php echo BASE_URL; ?>admin/js/app.js" defer></script>
+
+    <script>
+    document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const alertBox = document.getElementById('login-alert');
+        const btn = document.getElementById('loginBtn');
+        
+        btn.disabled = true;
+        btn.textContent = 'Đang đăng nhập...';
+        alertBox.style.display = 'none';
+
+        try {
+            const response = await fetch(window.BASE_API_URL + 'auth/admin-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                // Store JWT
+                localStorage.setItem('jwt_token', result.data.token);
+                // Redirect to dashboard
+                window.location.href = 'dashboard.php';
+            } else {
+                alertBox.className = 'alert error';
+                alertBox.textContent = result.message;
+                alertBox.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Đăng nhập';
+            }
+        } catch (error) {
+            alertBox.className = 'alert error';
+            alertBox.textContent = 'Lỗi kết nối máy chủ.';
+            alertBox.style.display = 'block';
+            btn.disabled = false;
+            btn.textContent = 'Đăng nhập';
+        }
+    });
+    </script>
 </body>
 </html>
