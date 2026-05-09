@@ -2,6 +2,7 @@
 namespace Api\Controllers;
 
 use Api\Core\Response;
+use Api\Core\Messages;
 use Api\Core\Database;
 
 /**
@@ -34,7 +35,7 @@ class PublicEnquiryController {
         if (empty($description))                                $errors['description'] = 'Nội dung không được để trống';
 
         if (!empty($errors)) {
-            Response::error('Dữ liệu không hợp lệ', $errors, 422);
+            Response::error(Messages::ERROR_INVALID_DATA, $errors, 422);
         }
 
         try {
@@ -44,9 +45,9 @@ class PublicEnquiryController {
             );
             $stmt->execute([$fname, $email, $mobile, $subject, $description]);
 
-            Response::success(null, 'Yêu cầu liên hệ của bạn đã được gửi. Chúng tôi sẽ phản hồi trong 2 giờ!', 201);
+            Response::success(null, Messages::ENQUIRY_SUBMIT_SUCCESS, 201);
         } catch (\Exception $e) {
-            Response::error('Có lỗi xảy ra, vui lòng thử lại', null, 500);
+            Response::error(Messages::ERROR_SYSTEM, null, 500);
         }
     }
 }

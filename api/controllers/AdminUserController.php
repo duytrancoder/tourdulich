@@ -3,6 +3,7 @@ namespace Api\Controllers;
 
 use Api\Core\Response;
 use Api\Core\JWTHandler;
+use Api\Core\Messages;
 use Api\Core\Database;
 use PDO;
 
@@ -14,7 +15,7 @@ class AdminUserController {
         // Authenticate as Admin
         $user = JWTHandler::verifyBearerToken();
         if ($user->role !== 'admin') {
-            Response::error("Bạn không có quyền truy cập", null, 403);
+            Response::error(Messages::ERROR_FORBIDDEN, null, 403);
         }
         $this->db = Database::getConnection();
     }
@@ -50,9 +51,9 @@ class AdminUserController {
             $stmt = $this->db->prepare($sql);
             $stmt->execute($params);
             $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            Response::success($users, "Lấy danh sách người dùng thành công");
+            Response::success($users, Messages::SUCCESS);
         } catch (\Exception $e) {
-            Response::error("Lỗi khi truy vấn dữ liệu", null, 500);
+            Response::error(Messages::ERROR_DATABASE, null, 500);
         }
     }
 
@@ -62,7 +63,7 @@ class AdminUserController {
     public function delete($id) {
         $userId = intval($id);
         if ($userId <= 0) {
-            Response::error("ID người dùng không hợp lệ", null, 400);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         try {
@@ -70,12 +71,12 @@ class AdminUserController {
             $stmt->execute([$userId]);
             
             if ($stmt->rowCount() > 0) {
-                Response::success(null, "Xóa người dùng thành công");
+                Response::success(null, Messages::SUCCESS);
             } else {
-                Response::error("Người dùng không tồn tại hoặc đã bị xóa", null, 404);
+                Response::error(Messages::ERROR_INVALID_DATA, null, 404);
             }
         } catch (\Exception $e) {
-            Response::error("Lỗi khi xóa người dùng", null, 500);
+            Response::error(Messages::ERROR_SYSTEM, null, 500);
         }
     }
 }

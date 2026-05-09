@@ -3,6 +3,7 @@ namespace Api\Controllers;
 
 use Api\Core\Response;
 use Api\Core\JWTHandler;
+use Api\Core\Messages;
 use Api\Core\Database;
 use PDO;
 
@@ -30,7 +31,7 @@ class UserWishlistController {
             return (int)$row['PackageId'];
         }, $results);
         
-        Response::success(['packageIds' => $packageIds], "Lấy danh sách ID yêu thích thành công");
+        Response::success(['packageIds' => $packageIds], Messages::WISHLIST_FETCH_SUCCESS);
     }
 
     /**
@@ -53,19 +54,15 @@ class UserWishlistController {
                 // Remove
                 $delStmt = $this->db->prepare("DELETE FROM tblwishlist WHERE UserEmail = ? AND PackageId = ?");
                 $delStmt->execute([$this->userEmail, $packageId]);
-                Response::success([
-                    'inWishlist' => false
-                ], 'Đã xóa khỏi danh sách yêu thích');
+                Response::success(['inWishlist' => false], Messages::WISHLIST_REMOVED);
             } else {
                 // Add
                 $insStmt = $this->db->prepare("INSERT INTO tblwishlist (UserEmail, PackageId) VALUES (?, ?)");
                 $insStmt->execute([$this->userEmail, $packageId]);
-                Response::success([
-                    'inWishlist' => true
-                ], 'Đã thêm vào danh sách yêu thích');
+                Response::success(['inWishlist' => true], Messages::WISHLIST_ADDED);
             }
         } catch (\Exception $e) {
-            Response::error('Có lỗi xảy ra. Vui lòng thử lại', null, 500);
+            Response::error(Messages::ERROR_SYSTEM, null, 500);
         }
     }
 }

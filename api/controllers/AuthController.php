@@ -3,6 +3,7 @@ namespace Api\Controllers;
 
 use Api\Core\Response;
 use Api\Core\JWTHandler;
+use Api\Core\Messages;
 use Api\Models\User;
 
 class AuthController {
@@ -18,11 +19,11 @@ class AuthController {
         $password = $data->password ?? '';
 
         if (empty($email) || empty($password)) {
-            Response::error("Vui lòng nhập đầy đủ thông tin", null, 400);
+            Response::error(Messages::ERROR_MISSING_INFO, null, 400);
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            Response::error("Email không hợp lệ", null, 400);
+            Response::error(Messages::AUTH_EMAIL_INVALID, null, 400);
         }
 
         $userModel = new User();
@@ -46,9 +47,9 @@ class AuthController {
                     'name' => $user['FullName'],
                     'email' => $user['EmailId']
                 ]
-            ], "Đăng nhập thành công!");
+            ], Messages::AUTH_LOGIN_SUCCESS);
         } else {
-            Response::error("Email hoặc mật khẩu không chính xác", null, 401);
+            Response::error(Messages::AUTH_INVALID_CREDENTIALS, null, 401);
         }
     }
 

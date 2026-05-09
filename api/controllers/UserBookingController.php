@@ -3,6 +3,7 @@ namespace Api\Controllers;
 
 use Api\Core\Response;
 use Api\Core\JWTHandler;
+use Api\Core\Messages;
 use Api\Core\Database;
 use PDO;
 
@@ -29,26 +30,26 @@ class UserBookingController {
         $comment = trim($data->comment ?? '');
 
         if ($pid <= 0) {
-            Response::error("Gói tour không hợp lệ", null, 400);
+            Response::error(Messages::TOUR_NOT_FOUND, null, 400);
         }
 
         if (empty($departureDate)) {
-            Response::error("Vui lòng chọn ngày khởi hành", null, 400);
+            Response::error(Messages::ERROR_MISSING_INFO, null, 400);
         }
 
         if ($numberofpeople < 1 || $numberofpeople > 100) {
-            Response::error("Số người phải từ 1 đến 100", null, 400);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         $departureTimestamp = strtotime($departureDate);
         $todayTimestamp = strtotime('today');
 
         if ($departureTimestamp === false) {
-            Response::error("Ngày không hợp lệ", null, 400);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         if ($departureTimestamp < $todayTimestamp) {
-            Response::error("Ngày khởi hành không thể là ngày trong quá khứ", null, 400);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         $stmt = $this->db->prepare("SELECT PackagePrice FROM tbltourpackages WHERE PackageId = ?");
@@ -56,7 +57,7 @@ class UserBookingController {
         $package = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if (!$package) {
-            Response::error("Gói tour không tồn tại", null, 404);
+            Response::error(Messages::TOUR_NOT_FOUND, null, 404);
         }
 
         $totalprice = $package['PackagePrice'] * $numberofpeople;
@@ -75,12 +76,12 @@ class UserBookingController {
             $lastInsertId = $this->db->lastInsertId();
 
             if ($lastInsertId) {
-                Response::success(['bookingId' => $lastInsertId], "Đặt tour thành công!");
+                Response::success(['bookingId' => $lastInsertId], Messages::BOOKING_SUCCESS);
             } else {
-                Response::error("Có lỗi xảy ra. Vui lòng thử lại", null, 500);
+                Response::error(Messages::ERROR_SYSTEM, null, 500);
             }
         } catch (\Exception $e) {
-            Response::error("Có lỗi xảy ra: " . $e->getMessage(), null, 500);
+            Response::error(Messages::ERROR_DATABASE, null, 500);
         }
     }
 
@@ -90,7 +91,7 @@ class UserBookingController {
     public function cancel($id) {
         $bookingId = intval($id);
         if ($bookingId <= 0) {
-            Response::error("ID Đặt tour không hợp lệ", null, 400);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         $stmt = $this->db->prepare("SELECT FromDate FROM tblbooking WHERE BookingId = ? AND UserEmail = ? AND status = 0");
@@ -112,7 +113,7 @@ class UserBookingController {
             if (!$date1 || !$date2) {
                 // If parsing fails, allow cancel just in case, but warn
                 // actually we'll just throw error
-                Response::error("Lỗi định dạng ngày, không thể kiểm tra điều kiện hủy.", null, 500);
+                Response::error(Messages::ERROR_SYSTEM, null, 500);
             }
             
             $diff = date_diff($date1, $date2);
@@ -126,15 +127,15 @@ class UserBookingController {
                 $updStmt = $this->db->prepare("UPDATE tblbooking SET status = ?, CancelledBy = ?, CancelReason = ? WHERE BookingId = ? AND UserEmail = ?");
                 
                 if ($updStmt->execute([$status, $cancelby, $cancelReason, $bookingId, $this->userEmail])) {
-                    Response::success(null, "Hủy đặt tour thành công");
+                    Response::success(null, Messages::BOOKING_CANCEL_SUCCESS);
                 } else {
-                    Response::error("Có lỗi xảy ra. Vui lòng thử lại", null, 500);
+                    Response::error(Messages::ERROR_SYSTEM, null, 500);
                 }
             } else {
-                Response::error("Bạn không thể hủy đặt tour trước 24 giờ", null, 400);
+                Response::error(Messages::BOOKING_CANCEL_DENIED, null, 400);
             }
         } else {
-            Response::error("Không tìm thấy đặt tour hoặc tour không thể hủy", null, 404);
+            Response::error(Messages::BOOKING_NOT_FOUND, null, 404);
         }
     }
 }

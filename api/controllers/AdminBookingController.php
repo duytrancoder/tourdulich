@@ -3,6 +3,7 @@ namespace Api\Controllers;
 
 use Api\Core\Response;
 use Api\Core\JWTHandler;
+use Api\Core\Messages;
 use Api\Core\Database;
 use PDO;
 
@@ -13,7 +14,7 @@ class AdminBookingController {
     public function __construct() {
         $user = JWTHandler::verifyBearerToken();
         if ($user->role !== 'admin') {
-            Response::error("Bạn không có quyền truy cập", null, 403);
+            Response::error(Messages::ERROR_FORBIDDEN, null, 403);
         }
         $this->db = Database::getConnection();
     }
@@ -64,9 +65,9 @@ class AdminBookingController {
                 $b['ToDateFormatted'] = date('d/m/Y', strtotime($b['ToDate']));
             }
 
-            Response::success($bookings, "Lấy danh sách đặt tour thành công");
+            Response::success($bookings, Messages::BOOKING_FETCH_SUCCESS);
         } catch (\Exception $e) {
-            Response::error("Lỗi khi truy vấn dữ liệu: " . $e->getMessage(), null, 500);
+            Response::error(Messages::ERROR_DATABASE . ": " . $e->getMessage(), null, 500);
         }
     }
 
@@ -94,12 +95,12 @@ class AdminBookingController {
                 $booking['RegDateFormatted'] = date('d/m/Y H:i', strtotime($booking['RegDate']));
                 $booking['FromDateFormatted'] = date('d/m/Y', strtotime($booking['FromDate']));
                 $booking['ToDateFormatted'] = date('d/m/Y', strtotime($booking['ToDate']));
-                Response::success($booking, "Lấy chi tiết đặt tour thành công");
+                Response::success($booking, Messages::BOOKING_DETAIL_SUCCESS);
             } else {
-                Response::error("Không tìm thấy đặt tour", null, 404);
+                Response::error(Messages::BOOKING_NOT_FOUND, null, 404);
             }
         } catch (\Exception $e) {
-            Response::error("Lỗi khi truy vấn dữ liệu", null, 500);
+            Response::error(Messages::ERROR_DATABASE, null, 500);
         }
     }
 
@@ -112,7 +113,7 @@ class AdminBookingController {
         $adminRemark = $data['adminRemark'] ?? '';
 
         if ($status === null) {
-            Response::error("Thiếu trạng thái cập nhật", null, 400);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         try {
@@ -120,9 +121,9 @@ class AdminBookingController {
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$status, $adminRemark, $id]);
 
-            Response::success(null, "Cập nhật trạng thái đặt tour thành công");
+            Response::success(null, Messages::BOOKING_UPDATE_SUCCESS);
         } catch (\Exception $e) {
-            Response::error("Lỗi khi cập nhật dữ liệu", null, 500);
+            Response::error(Messages::ERROR_SYSTEM, null, 500);
         }
     }
 }

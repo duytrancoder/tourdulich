@@ -3,6 +3,7 @@ namespace Api\Controllers;
 
 use Api\Core\Response;
 use Api\Core\JWTHandler;
+use Api\Core\Messages;
 use Api\Core\Database;
 
 /**
@@ -34,7 +35,7 @@ class UserIssueController {
         if (strlen($description) > 5000)           $errors['description'] = 'Mô tả không được vượt quá 5000 ký tự';
 
         if (!empty($errors)) {
-            Response::error('Dữ liệu không hợp lệ', $errors, 422);
+            Response::error(Messages::ERROR_INVALID_DATA, $errors, 422);
         }
 
         try {
@@ -43,9 +44,9 @@ class UserIssueController {
             );
             $stmt->execute([$this->userEmail, $issue, $description]);
 
-            Response::success(null, 'Yêu cầu hỗ trợ đã được gửi. Chúng tôi sẽ phản hồi sớm nhất có thể!', 201);
+            Response::success(null, Messages::ISSUE_SUBMIT_SUCCESS, 201);
         } catch (\Exception $e) {
-            Response::error('Có lỗi xảy ra, vui lòng thử lại', null, 500);
+            Response::error(Messages::ERROR_SYSTEM, null, 500);
         }
     }
 }

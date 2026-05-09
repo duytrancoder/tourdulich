@@ -3,6 +3,7 @@ namespace Api\Controllers;
 
 use Api\Core\Response;
 use Api\Core\JWTHandler;
+use Api\Core\Messages;
 use Api\Core\Database;
 use PDO;
 
@@ -13,7 +14,7 @@ class AdminIssueController {
     public function __construct() {
         $user = JWTHandler::verifyBearerToken();
         if ($user->role !== 'admin') {
-            Response::error("Bạn không có quyền truy cập", null, 403);
+            Response::error(Messages::ERROR_FORBIDDEN, null, 403);
         }
         $this->db = Database::getConnection();
     }
@@ -35,9 +36,9 @@ class AdminIssueController {
                 $issue['PostingDateFormatted'] = date('d/m/Y H:i', strtotime($issue['PostingDate']));
             }
 
-            Response::success($issues, "Lấy danh sách hỗ trợ thành công");
+            Response::success($issues, Messages::ISSUE_FETCH_SUCCESS);
         } catch (\Exception $e) {
-            Response::error("Lỗi khi truy vấn dữ liệu", null, 500);
+            Response::error(Messages::ERROR_DATABASE, null, 500);
         }
     }
 
@@ -50,7 +51,7 @@ class AdminIssueController {
         $remark = trim($data['remark'] ?? '');
 
         if (empty($remark)) {
-            Response::error("Vui lòng nhập ghi chú xử lý", null, 400);
+            Response::error(Messages::ERROR_MISSING_INFO, null, 400);
         }
 
         try {
@@ -58,9 +59,9 @@ class AdminIssueController {
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$remark, $id]);
 
-            Response::success(null, "Đã cập nhật ghi chú xử lý yêu cầu");
+            Response::success(null, Messages::ISSUE_UPDATE_SUCCESS);
         } catch (\Exception $e) {
-            Response::error("Lỗi khi cập nhật dữ liệu", null, 500);
+            Response::error(Messages::ERROR_SYSTEM, null, 500);
         }
     }
 }

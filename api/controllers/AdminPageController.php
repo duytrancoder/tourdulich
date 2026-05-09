@@ -3,6 +3,7 @@ namespace Api\Controllers;
 
 use Api\Core\Response;
 use Api\Core\JWTHandler;
+use Api\Core\Messages;
 use Api\Core\Database;
 use PDO;
 
@@ -14,7 +15,7 @@ class AdminPageController {
         // Authenticate as Admin
         $user = JWTHandler::verifyBearerToken();
         if ($user->role !== 'admin') {
-            Response::error("Bạn không có quyền truy cập", null, 403);
+            Response::error(Messages::ERROR_FORBIDDEN, null, 403);
         }
         $this->db = Database::getConnection();
     }
@@ -29,12 +30,12 @@ class AdminPageController {
             $detail = $stmt->fetchColumn();
             
             if ($detail !== false) {
-                Response::success(['detail' => $detail], "Lấy nội dung trang thành công");
+                Response::success(['detail' => $detail], Messages::SUCCESS);
             } else {
-                Response::error("Trang không tồn tại", null, 404);
+                Response::error(Messages::ERROR_INVALID_DATA, null, 404);
             }
         } catch (\Exception $e) {
-            Response::error("Lỗi khi lấy nội dung trang", null, 500);
+            Response::error(Messages::ERROR_DATABASE, null, 500);
         }
     }
 
@@ -46,16 +47,16 @@ class AdminPageController {
         $detail = $data['detail'] ?? '';
 
         if (empty($detail)) {
-            Response::error("Nội dung không được để trống", null, 400);
+            Response::error(Messages::ERROR_MISSING_INFO, null, 400);
         }
 
         try {
             $stmt = $this->db->prepare("UPDATE tblpages SET detail = ? WHERE type = ?");
             $stmt->execute([$detail, $id]);
             
-            Response::success(null, "Cập nhật trang thành công");
+            Response::success(null, Messages::TOUR_UPDATE_SUCCESS);
         } catch (\Exception $e) {
-            Response::error("Lỗi khi cập nhật trang", null, 500);
+            Response::error(Messages::ERROR_SYSTEM, null, 500);
         }
     }
 }

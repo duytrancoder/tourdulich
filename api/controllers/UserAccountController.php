@@ -3,6 +3,7 @@ namespace Api\Controllers;
 
 use Api\Core\Response;
 use Api\Core\JWTHandler;
+use Api\Core\Messages;
 use Api\Core\Database;
 use PDO;
 
@@ -71,10 +72,10 @@ class UserAccountController {
                 'profile'  => $profile,
                 'bookings' => $bookings,
                 'wishlist' => $wishlist
-            ], "Lấy thông tin tài khoản thành công");
+            ], Messages::PROFILE_FETCH_SUCCESS);
 
         } catch (\Exception $e) {
-            Response::error("Lỗi truy vấn dữ liệu: " . $e->getMessage(), null, 500);
+            Response::error(Messages::ERROR_DATABASE, null, 500);
         }
     }
 
@@ -93,11 +94,11 @@ class UserAccountController {
         $gender      = trim($data['gender']       ?? '');
 
         if (empty($name)) {
-            Response::error("Họ và tên không được để trống", null, 400);
+            Response::error(Messages::ERROR_MISSING_INFO, null, 400);
         }
 
         if (!preg_match('/^[0-9]{10}$/', $mobileno)) {
-            Response::error("Số điện thoại phải có đúng 10 chữ số", null, 400);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         try {
@@ -106,9 +107,9 @@ class UserAccountController {
             );
             $stmt->execute([$name, $mobileno, $address, $dateOfBirth ?: null, $gender, $this->userEmail]);
 
-            Response::success(null, "Hồ sơ đã được cập nhật thành công");
+            Response::success(null, Messages::PROFILE_UPDATE_SUCCESS);
         } catch (\Exception $e) {
-            Response::error("Có lỗi xảy ra khi cập nhật", null, 500);
+            Response::error(Messages::ERROR_SYSTEM, null, 500);
         }
     }
 
@@ -124,15 +125,15 @@ class UserAccountController {
         $confirmPassword  = $data['confirmpassword']  ?? '';
 
         if (empty($currentPassword) || empty($newPassword)) {
-            Response::error("Vui lòng nhập đầy đủ thông tin", null, 400);
+            Response::error(Messages::ERROR_MISSING_INFO, null, 400);
         }
 
         if (strlen($newPassword) < 6) {
-            Response::error("Mật khẩu mới phải có ít nhất 6 ký tự", null, 400);
+            Response::error(Messages::AUTH_PASSWORD_MIN, null, 400);
         }
 
         if ($confirmPassword !== '' && $newPassword !== $confirmPassword) {
-            Response::error("Mật khẩu mới và xác nhận không khớp", null, 400);
+            Response::error(Messages::PWD_MISMATCH, null, 400);
         }
 
         // Lấy hash hiện tại
@@ -141,7 +142,7 @@ class UserAccountController {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$user) {
-            Response::error("Không tìm thấy tài khoản", null, 404);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 404);
         }
 
         // Kiểm tra mật khẩu hiện tại (hỗ trợ cả MD5 cũ và password_hash mới)
@@ -154,7 +155,7 @@ class UserAccountController {
         }
 
         if (!$isValid) {
-            Response::error("Mật khẩu hiện tại không chính xác", null, 401);
+            Response::error(Messages::PWD_CURRENT_WRONG, null, 401);
         }
 
         // Hash và lưu mật khẩu mới
@@ -162,6 +163,6 @@ class UserAccountController {
         $stmt = $this->db->prepare("UPDATE tblusers SET Password = ? WHERE EmailId = ?");
         $stmt->execute([$newHash, $this->userEmail]);
 
-        Response::success(null, "Đổi mật khẩu thành công");
+        Response::success(null, Messages::PWD_CHANGE_SUCCESS);
     }
 }

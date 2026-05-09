@@ -3,6 +3,7 @@ namespace Api\Controllers;
 
 use Api\Core\Response;
 use Api\Core\JWTHandler;
+use Api\Core\Messages;
 use Api\Models\Tour;
 
 class AdminTourController {
@@ -25,7 +26,7 @@ class AdminTourController {
         $tourModel = new Tour();
         $tours = $tourModel->getAll($search, $type, $location);
 
-        Response::success($tours, "Lấy danh sách tour thành công");
+        Response::success($tours, Messages::TOUR_FETCH_SUCCESS);
     }
 
     /**
@@ -42,11 +43,11 @@ class AdminTourController {
         $details = $_POST['packagedetails'] ?? '';
 
         if (empty($name) || empty($type) || empty($location) || empty($duration) || empty($features) || empty($details)) {
-            Response::error("Vui lòng điền đầy đủ thông tin", null, 400);
+            Response::error(Messages::ERROR_MISSING_INFO, null, 400);
         }
 
         if ($price <= 0) {
-            Response::error("Giá gói tour không hợp lệ", null, 400);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         $imageName = '';
@@ -56,7 +57,7 @@ class AdminTourController {
             $filetype = pathinfo($filename, PATHINFO_EXTENSION);
             
             if (!in_array(strtolower($filetype), $allowed)) {
-                Response::error("Chỉ chấp nhận file ảnh (jpg, jpeg, png, gif)", null, 400);
+                Response::error(Messages::TOUR_IMAGE_INVALID, null, 400);
             }
 
             // Sanitized image name
@@ -71,10 +72,10 @@ class AdminTourController {
             }
 
             if (!move_uploaded_file($_FILES['packageimage']['tmp_name'], $uploadPath)) {
-                Response::error("Không thể lưu ảnh", null, 500);
+                Response::error(Messages::ERROR_SYSTEM, null, 500);
             }
         } else {
-            Response::error("Vui lòng chọn hình ảnh", null, 400);
+            Response::error(Messages::ERROR_MISSING_INFO, null, 400);
         }
 
         $tourModel = new Tour();
@@ -91,9 +92,9 @@ class AdminTourController {
                     }
                 }
             }
-            Response::success(['id' => $id], "Tạo gói tour thành công", 201);
+            Response::success(['id' => $id], Messages::TOUR_CREATE_SUCCESS, 201);
         } else {
-            Response::error("Lỗi khi lưu vào CSDL", null, 500);
+            Response::error(Messages::ERROR_DATABASE, null, 500);
         }
     }
 
@@ -106,9 +107,9 @@ class AdminTourController {
         
         if ($tour) {
             $tour['itineraries'] = $tourModel->getItineraries($id);
-            Response::success($tour, "Lấy chi tiết tour thành công");
+            Response::success($tour, Messages::TOUR_DETAIL_SUCCESS);
         } else {
-            Response::error("Gói tour không tồn tại", null, 404);
+            Response::error(Messages::TOUR_NOT_FOUND, null, 404);
         }
     }
 
@@ -129,13 +130,13 @@ class AdminTourController {
         $details = $_POST['packagedetails'] ?? '';
 
         if (empty($name) || empty($type) || empty($location) || empty($duration) || empty($features) || empty($details)) {
-            Response::error("Vui lòng điền đầy đủ thông tin", null, 400);
+            Response::error(Messages::ERROR_MISSING_INFO, null, 400);
         }
 
         $tourModel = new Tour();
         $existingTour = $tourModel->getById($id);
         if (!$existingTour) {
-            Response::error("Gói tour không tồn tại", null, 404);
+            Response::error(Messages::TOUR_NOT_FOUND, null, 404);
         }
 
         $data = [
@@ -170,9 +171,9 @@ class AdminTourController {
                     }
                 }
             }
-            Response::success(null, "Cập nhật gói tour thành công");
+            Response::success(null, Messages::TOUR_UPDATE_SUCCESS);
         } else {
-            Response::error("Lỗi khi cập nhật dữ liệu", null, 500);
+            Response::error(Messages::ERROR_SYSTEM, null, 500);
         }
     }
 
@@ -182,9 +183,9 @@ class AdminTourController {
     public function delete($id) {
         $tourModel = new Tour();
         if ($tourModel->delete($id)) {
-            Response::success(null, "Xóa gói tour thành công");
+            Response::success(null, Messages::TOUR_DELETE_SUCCESS);
         } else {
-            Response::error("Không thể xóa gói tour", null, 500);
+            Response::error(Messages::ERROR_SYSTEM, null, 500);
         }
     }
 }

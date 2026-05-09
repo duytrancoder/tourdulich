@@ -3,6 +3,7 @@ namespace Api\Controllers;
 
 use Api\Core\Response;
 use Api\Core\JWTHandler;
+use Api\Core\Messages;
 use Api\Core\Database;
 use PDO;
 
@@ -31,11 +32,11 @@ class UserReviewController {
 
         // Validate input
         if ($bookingId <= 0 || $packageId <= 0) {
-            Response::error("Dữ liệu đặt tour không hợp lệ", null, 400);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         if ($rating < 1 || $rating > 5) {
-            Response::error("Vui lòng chọn số sao từ 1 đến 5", null, 400);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         // Kiểm tra booking có thuộc user này và đã hoàn thành (status=3) không
@@ -48,14 +49,14 @@ class UserReviewController {
         $booking = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$booking) {
-            Response::error("Đơn hàng không hợp lệ hoặc tour chưa hoàn thành", null, 403);
+            Response::error(Messages::REVIEW_NOT_ALLOWED, null, 403);
         }
 
         // Kiểm tra đã review chưa
         $stmt = $this->db->prepare("SELECT id FROM tblreviews WHERE BookingId = ? LIMIT 1");
         $stmt->execute([$bookingId]);
         if ($stmt->fetch()) {
-            Response::error("Bạn đã đánh giá tour này rồi", null, 409);
+            Response::error(Messages::REVIEW_ALREADY_EXISTS, null, 409);
         }
 
         // Lưu review
@@ -79,10 +80,10 @@ class UserReviewController {
 
             Response::success([
                 'reviews' => $reviews
-            ], "Cảm ơn bạn đã đánh giá!", 201);
+            ], Messages::REVIEW_SUBMIT_SUCCESS, 201);
 
         } catch (\Exception $e) {
-            Response::error("Không thể lưu đánh giá. Vui lòng thử lại", null, 500);
+            Response::error(Messages::ERROR_SYSTEM, null, 500);
         }
     }
 
@@ -93,7 +94,7 @@ class UserReviewController {
     public function getByPackage($packageId) {
         $packageId = intval($packageId);
         if ($packageId <= 0) {
-            Response::error("ID tour không hợp lệ", null, 400);
+            Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         $stmt = $this->db->prepare(
@@ -115,6 +116,6 @@ class UserReviewController {
             'reviews'    => $reviews,
             'avg_rating' => round((float)$stats['avg_rating'], 1),
             'total'      => (int)$stats['total']
-        ], "Lấy danh sách đánh giá thành công");
+        ], Messages::SUCCESS);
     }
 }
