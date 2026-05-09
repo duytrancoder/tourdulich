@@ -11,8 +11,13 @@
 		localStorage.removeItem('jwt_token');
 		document.cookie = "admin_jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         
-        // Define Base API URL
-        window.BASE_API_URL = window.location.origin + '/tour1/api/';
+        // Define Base API URL with fallback
+        const pathParts = window.location.pathname.split('/');
+        const baseFolder = pathParts[1] === 'tour1' ? '/tour1' : '';
+        window.BASE_API_URL = window.location.origin + baseFolder + '/api/';
+        
+        console.log("Admin API URL initialized:", window.BASE_API_URL);
+
 	</script>
 </head>
 <body class="auth-page" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('../admin/packageimages/tour_halong.webp') no-repeat center center; background-size: cover;">

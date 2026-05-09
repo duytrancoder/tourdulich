@@ -30,7 +30,10 @@
     }
 
     // Inject Base API URL cho toàn bộ các script admin
-    window.BASE_API_URL = window.location.origin + '/tour1/api/';
+    const pathParts = window.location.pathname.split('/');
+    const baseFolder = pathParts[1] === 'tour1' ? '/tour1' : '';
+    window.BASE_API_URL = window.location.origin + baseFolder + '/api/';
+
 
     // Toàn cục hàm logout
     window.adminLogout = function() {

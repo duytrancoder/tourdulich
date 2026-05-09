@@ -194,6 +194,9 @@ class AuthController {
                     ];
                     $token = JWTHandler::encode($tokenPayload);
 
+                    // Bridge to legacy PHP sessions
+                    $_SESSION['alogin'] = $admin['UserName'];
+
                     Response::success([
                         'token' => $token,
                         'user' => [
@@ -202,6 +205,8 @@ class AuthController {
                             'username' => $admin['UserName']
                         ]
                     ], "Đăng nhập Admin thành công!");
+
+
                 } else {
                     Response::error("Mật khẩu không chính xác", null, 401);
                 }

@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 // Suppress PHP errors/warnings from corrupting JSON output
 // Errors will be caught via try/catch in controllers instead
 ini_set('display_errors', 0);
