@@ -284,8 +284,15 @@ function renderBookings(bookings) {
             statusIcon = "times-circle";
         }
 
-        const dateObj = new Date(booking.regdate);
-        const formattedRegDate = !isNaN(dateObj) ? dateObj.toLocaleDateString('vi-VN') : booking.regdate;
+        let formattedRegDate = booking.regdate;
+        try {
+            const dateObj = new Date(booking.regdate.replace(/-/g, "/")); // Replace - with / for better browser compatibility
+            if (!isNaN(dateObj)) {
+                formattedRegDate = dateObj.toLocaleDateString('vi-VN');
+            }
+        } catch (e) {
+            console.error("Date parse error", e);
+        }
 
         html += `
             <div class="booking-card">
@@ -316,6 +323,23 @@ function renderBookings(bookings) {
                             <span>Đặt ngày ${formattedRegDate}</span>
                         </div>
                     </div>
+
+                    ${booking.admin_notes ? `
+                        <div class="admin-message">
+                            <div class="admin-message-header">
+                                <i class="fas fa-comment-dots admin-message-icon"></i>
+                                <span class="admin-message-title">Phản hồi từ Admin</span>
+                            </div>
+                            <div class="admin-message-content">${booking.admin_notes}</div>
+                        </div>
+                    ` : ''}
+
+                    ${booking.cancelreason ? `
+                        <div class="booking-comment" style="margin-top:0.5rem; border-left-color: var(--danger);">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Lý do hủy: ${booking.cancelreason}</span>
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="booking-footer" style="display:flex; justify-content:space-between; align-items:center;">
                     <a href="${window.BASE_URL_FROM_PHP}package/details/${booking.pkgid}" class="btn btn-ghost btn-compact">

@@ -45,11 +45,12 @@ class UserAccountController {
                     b.UpdationDate    AS upddate,
                     b.Comment         AS comment,
                     b.CustomerMessage AS customermessage,
-                    p.PackageName     AS packagename,
+                    COALESCE(p.PackageName, 'Gói tour đã bị xóa') AS packagename,
                     p.PackagePrice    AS packageprice,
+                    b.AdminNotes      AS admin_notes,
                     (SELECT COUNT(*) FROM tblreviews r WHERE r.BookingId = b.BookingId) AS hasreview
                  FROM tblbooking b
-                 JOIN tbltourpackages p ON p.PackageId = b.PackageId
+                 LEFT JOIN tbltourpackages p ON p.PackageId = b.PackageId
                  WHERE b.UserEmail = ?
                  ORDER BY b.RegDate DESC"
             );
@@ -61,7 +62,7 @@ class UserAccountController {
                 "SELECT w.id AS wishlist_id, p.PackageId, p.PackageName, p.PackageType, p.PackageLocation,
                         p.PackagePrice, p.PackageFetures, p.PackageImage, p.TourDuration
                  FROM tblwishlist w
-                 JOIN tbltourpackages p ON w.PackageId = p.PackageId
+                 LEFT JOIN tbltourpackages p ON w.PackageId = p.PackageId
                  WHERE w.UserEmail = ?
                  ORDER BY w.CreatedAt DESC"
             );

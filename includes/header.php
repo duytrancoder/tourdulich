@@ -4,7 +4,7 @@
 <script>
 // Dynamic base URLs — injected by PHP, removes hardcoded /tour1/ dependency
 window.BASE_URL_FROM_PHP = '<?php echo BASE_URL; ?>';
-window.BASE_API_URL = '<?php echo BASE_URL; ?>api/';
+window.BASE_API_URL = '<?php echo rtrim(BASE_URL, "/"); ?>/api/';
 </script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
