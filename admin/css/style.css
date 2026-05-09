@@ -541,7 +541,7 @@ button, input, select, textarea {
 }
 
 .status-chip.is-pending {
-  color: var(--text-primary);
+  color: var(--warning);
 }
 
 .status-chip.is-approved {
@@ -550,6 +550,10 @@ button, input, select, textarea {
 
 .status-chip.is-cancelled {
   color: var(--danger);
+}
+
+.status-chip.is-completed {
+  color: var(--brand);
 }
 
 .admin-footer {

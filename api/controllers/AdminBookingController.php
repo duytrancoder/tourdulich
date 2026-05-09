@@ -38,11 +38,11 @@ class AdminBookingController {
                     b.UpdationDate,
                     b.NumberOfPeople,
                     b.TotalPrice,
-                    u.FullName as UserName,
-                    p.PackageName
+                    COALESCE(u.FullName, 'Người dùng đã bị xóa') as UserName,
+                    COALESCE(p.PackageName, 'Gói tour đã bị xóa') as PackageName
                 FROM tblbooking b
-                JOIN tblusers u ON b.UserEmail = u.EmailId
-                JOIN tbltourpackages p ON b.PackageId = p.PackageId
+                LEFT JOIN tblusers u ON b.UserEmail = u.EmailId
+                LEFT JOIN tbltourpackages p ON b.PackageId = p.PackageId
                 WHERE 1=1";
         
         $params = [];
@@ -77,13 +77,14 @@ class AdminBookingController {
     public function show($id) {
         $sql = "SELECT 
                     b.*, 
-                    u.FullName as UserName, 
+                    b.AdminNotes as AdminRemark,
+                    COALESCE(u.FullName, 'Người dùng đã bị xóa') as UserName, 
                     u.MobileNumber,
-                    p.PackageName,
+                    COALESCE(p.PackageName, 'Gói tour đã bị xóa') as PackageName,
                     p.PackageLocation
                 FROM tblbooking b
-                JOIN tblusers u ON b.UserEmail = u.EmailId
-                JOIN tbltourpackages p ON b.PackageId = p.PackageId
+                LEFT JOIN tblusers u ON b.UserEmail = u.EmailId
+                LEFT JOIN tbltourpackages p ON b.PackageId = p.PackageId
                 WHERE b.BookingId = ? LIMIT 1";
         
         try {
@@ -110,16 +111,22 @@ class AdminBookingController {
     public function update($id) {
         $data = json_decode(file_get_contents('php://input'), true);
         $status = $data['status'] ?? null;
-        $adminRemark = $data['adminRemark'] ?? '';
+        $adminRemark = $data['adminRemark'] ?? null;
 
         if ($status === null) {
             Response::error(Messages::ERROR_INVALID_DATA, null, 400);
         }
 
         try {
-            $sql = "UPDATE tblbooking SET status = ?, AdminRemark = ?, UpdationDate = CURRENT_TIMESTAMP WHERE BookingId = ?";
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([$status, $adminRemark, $id]);
+            if ($adminRemark !== null) {
+                $sql = "UPDATE tblbooking SET status = ?, AdminNotes = ?, UpdationDate = CURRENT_TIMESTAMP WHERE BookingId = ?";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([$status, $adminRemark, $id]);
+            } else {
+                $sql = "UPDATE tblbooking SET status = ?, UpdationDate = CURRENT_TIMESTAMP WHERE BookingId = ?";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([$status, $id]);
+            }
 
             Response::success(null, Messages::BOOKING_UPDATE_SUCCESS);
         } catch (\Exception $e) {

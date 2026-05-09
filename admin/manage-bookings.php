@@ -88,12 +88,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         bookingsList.innerHTML = bookings.map(b => {
-            let statusOptions = `
-                <option value="0" ${b.status == 0 ? 'selected' : ''}>Chờ xử lý</option>
-                <option value="1" ${b.status == 1 ? 'selected' : ''}>Xác nhận</option>
-                <option value="2" ${b.status == 2 ? 'selected' : ''}>Hủy bỏ</option>
-                <option value="3" ${b.status == 3 ? 'selected' : ''}>Hoàn thành</option>
-            `;
+            let statusText = 'Chờ xử lý';
+            let statusClass = 'is-pending';
+
+            if (b.status == 1) { statusText = 'Đã xác nhận'; statusClass = 'is-approved'; }
+            if (b.status == 2) { statusText = 'Đã hủy'; statusClass = 'is-cancelled'; }
+            if (b.status == 3) { statusText = 'Hoàn thành'; statusClass = 'is-completed'; }
 
             return `
                 <tr>
@@ -103,9 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${b.FromDateFormatted}</td>
                     <td>${new Intl.NumberFormat('vi-VN').format(b.TotalPrice)} VND</td>
                     <td>
-                        <select class="form-control" style="width:auto;" onchange="updateBookingStatus(${b.BookingId}, this.value)">
-                            ${statusOptions}
-                        </select>
+                        <span class="status-chip ${statusClass}">${statusText}</span>
                     </td>
                     <td>
                         <a class="btn btn-ghost" href="view-booking.php?bid=${b.BookingId}">Chi tiết</a>
@@ -115,33 +113,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }).join('');
     }
 
-    window.updateBookingStatus = async function(id, newStatus) {
-        if (!confirm('Bạn có muốn thay đổi trạng thái đơn hàng này?')) {
-            fetchBookings(); // Reset select
-            return;
-        }
-
-        try {
-            const response = await fetch((window.BASE_API_URL || '/tour1/api/') + `admin/bookings/${id}`, {
-                method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token 
-                },
-                body: JSON.stringify({ status: newStatus })
-            });
-            const result = await response.json();
-
-            if (result.success) {
-                showSuccess(result.message);
-                fetchBookings();
-            } else {
-                showError(result.message);
-            }
-        } catch (error) {
-            showError('Lỗi khi cập nhật trạng thái.');
-        }
-    };
 
     function showError(msg) {
         alertBox.className = 'alert error';
