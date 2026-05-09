@@ -61,6 +61,14 @@ $router->get('/api/secure-ping', function() {
 $router->post('/api/auth/login', 'AuthController@login');
 $router->post('/api/auth/register', 'AuthController@register');
 
+// Admin Tour Routes (Protected by JWT)
+$router->get('/api/admin/tours', 'AdminTourController@index');
+$router->post('/api/admin/tours', 'AdminTourController@create');
+$router->delete('/api/admin/tours/{id}', 'AdminTourController@delete');
+
+// User Account Routes (Protected by JWT)
+$router->get('/api/user/account', 'UserAccountController@index');
+
 // Dispatch the request
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $requestUri = $_SERVER['REQUEST_URI'];

@@ -61,6 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem('jwt_token', response.data.data.token);
                     localStorage.setItem('user_data', JSON.stringify(response.data.data.user));
                     
+                    // Lưu thêm vào Cookie (Bridge cho giao đoạn refactor) để các trang PHP cũ đọc được
+                    document.cookie = `jwt_token=${response.data.data.token}; path=/; max-age=86400; SameSite=Strict`;
+
                     alert('Đăng nhập thành công!');
                     window.location.reload(); // Reload để cập nhật UI header (hoặc dùng JS DOM update)
                 } else {
@@ -117,4 +120,57 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // 3. Check and update UI based on Login State
+    checkLoginState();
+
+    // 4. Handle Logout
+    const btnLogout = document.getElementById('btn-logout');
+    if (btnLogout) {
+        btnLogout.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('user_data');
+            document.cookie = "jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            
+            // Nếu có hàm API logout thì gọi, không thì reload lại trang PHP để nó xóa $_SESSION
+            window.location.href = window.BASE_URL_FROM_PHP ? window.BASE_URL_FROM_PHP + 'user/logout' : '/tour1/user/logout';
+        });
+    }
 });
+
+// Hàm cập nhật giao diện dựa trên Token
+function checkLoginState() {
+    const token = localStorage.getItem('jwt_token');
+    const userDataStr = localStorage.getItem('user_data');
+    
+    const btnLogin = document.getElementById('btn-show-login');
+    const navUserMenu = document.getElementById('navUserMenu');
+    const userDisplayName = document.getElementById('user-display-name');
+    const linkIssue = document.getElementById('nav-link-issue');
+    const linkEnquiry = document.getElementById('nav-link-enquiry');
+
+    if (token && userDataStr) {
+        try {
+            const user = JSON.parse(userDataStr);
+            // Đã đăng nhập
+            if (btnLogin) btnLogin.style.display = 'none';
+            if (navUserMenu) navUserMenu.style.display = 'block';
+            if (userDisplayName) userDisplayName.textContent = user.name || user.email;
+            
+            // Toggle nav links
+            if (linkIssue) linkIssue.style.display = 'inline-block';
+            if (linkEnquiry) linkEnquiry.style.display = 'none';
+        } catch (e) {
+            console.error('Invalid user data', e);
+        }
+    } else {
+        // Chưa đăng nhập
+        if (btnLogin) btnLogin.style.display = 'block';
+        if (navUserMenu) navUserMenu.style.display = 'none';
+        
+        // Toggle nav links
+        if (linkIssue) linkIssue.style.display = 'none';
+        if (linkEnquiry) linkEnquiry.style.display = 'inline-block';
+    }
+}

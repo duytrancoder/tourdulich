@@ -10,9 +10,9 @@ class Database {
 
     // Database configurations
     private $host = 'localhost';
-    private $db_name = 'tour1'; // Change this if your database name is different
-    private $username = 'root'; // Change if needed
-    private $password = '';     // Change if needed
+    private $db_name = 'webdulich'; // Updated to correct database name
+    private $username = 'root'; 
+    private $password = '';     
     
     private function __construct() {
         try {

@@ -1,0 +1,73 @@
+<?php
+namespace Api\Models;
+
+use Api\Core\Database;
+use PDO;
+
+class Tour {
+    private $db;
+
+    public function __construct() {
+        $this->db = Database::getConnection();
+    }
+
+    public function getAll($search = '', $type = '', $location = '') {
+        $sql = "SELECT * FROM tbltourpackages WHERE 1=1";
+        $params = [];
+
+        if (!empty($search)) {
+            $sql .= " AND (PackageName LIKE :search_name OR PackageId = :search_id)";
+            $params[':search_name'] = '%' . $search . '%';
+            $normalizedSearchId = preg_replace('/^#?PKG-?/i', '', $search);
+            $params[':search_id'] = ctype_digit($normalizedSearchId) ? (int)$normalizedSearchId : 0;
+        }
+
+        if (!empty($type)) {
+            $sql .= " AND PackageType LIKE :type";
+            $params[':type'] = '%' . $type . '%';
+        }
+
+        if (!empty($location)) {
+            $sql .= " AND PackageLocation LIKE :location";
+            $params[':location'] = '%' . $location . '%';
+        }
+
+        $sql .= " ORDER BY PackageId DESC";
+        
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function create($name, $type, $location, $duration, $price, $features, $details, $image) {
+        $sql = "INSERT INTO tbltourpackages(PackageName, PackageType, PackageLocation, TourDuration, PackagePrice, PackageFetures, PackageDetails, PackageImage) 
+                VALUES(:name, :type, :loc, :dur, :price, :feat, :det, :img)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':name' => $name,
+            ':type' => $type,
+            ':loc' => $location,
+            ':dur' => $duration,
+            ':price' => $price,
+            ':feat' => $features,
+            ':det' => $details,
+            ':img' => $image
+        ]);
+        return $this->db->lastInsertId();
+    }
+
+    public function addItinerary($packageId, $timeLabel, $activity, $sortOrder) {
+        $sql = "INSERT INTO tblitinerary (PackageId, TimeLabel, Activity, SortOrder) VALUES (?, ?, ?, ?)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$packageId, $timeLabel, $activity, $sortOrder]);
+    }
+
+    public function delete($id) {
+        $sql = "DELETE FROM tbltourpackages WHERE PackageId = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([':id' => $id]);
+    }
+}

@@ -49,5 +49,21 @@ spl_autoload_register(function ($className) {
 });
 
 require_once ROOT . "/core/App.php";
+
+// JWT Bridge: Khôi phục $_SESSION từ JWT Cookie cho các trang PHP cũ
+if (isset($_COOKIE['jwt_token']) && empty($_SESSION['login'])) {
+    try {
+        require_once ROOT . '/vendor/autoload.php';
+        $decoded = \Firebase\JWT\JWT::decode($_COOKIE['jwt_token'], new \Firebase\JWT\Key('GoTravel_Secret_Key_2026_Secure!@#', 'HS256'));
+        if (isset($decoded->data->email)) {
+            $_SESSION['login'] = $decoded->data->email;
+        }
+    } catch (Exception $e) {
+        // Token invalid
+    }
+} else if (!isset($_COOKIE['jwt_token']) && !empty($_SESSION['login'])) {
+    unset($_SESSION['login']);
+}
+
 $app = new App();
 

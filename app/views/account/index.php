@@ -19,7 +19,7 @@
 			<p>Quản lý thông tin cá nhân, lịch sử đặt tour và danh sách yêu thích.</p>
 		</section>
 
-		<?php if ($data["error"]) { ?><div class="alert error"><strong>Lỗi:</strong> <?php echo htmlentities($data["error"]); ?></div><?php } elseif ($data["msg"]) { ?><div class="alert success"><strong>Thành công:</strong> <?php echo htmlentities($data["msg"]); ?></div><?php } ?>
+		<!-- Thông báo giờ được xử lý bằng Alert/JS -->
 
 		<div class="account-container">
 			<!-- Tab Navigation -->
@@ -50,52 +50,9 @@
 						<h3>Thông tin cá nhân</h3>
 						<p class="helper-text">Thông tin này sẽ được tự động điền khi bạn đặt tour.</p>
 						
-						<?php if ($data["user"]): ?>
-						<form name="profileForm" method="post" class="form-stack" action="<?php echo BASE_URL; ?>user/updateProfileExtended" enctype="multipart/form-data">
-							<div class="form-grid">
-								<div class="form-group">
-									<label for="name">Họ và tên <span class="required">*</span></label>
-									<input type="text" name="name" id="name" value="<?php echo htmlentities($data["user"]->FullName); ?>" required>
-								</div>
-								<div class="form-group">
-									<label for="mobileno">Số điện thoại <span class="required">*</span></label>
-									<input type="text" name="mobileno" id="mobileno" maxlength="10" value="<?php echo htmlentities($data["user"]->MobileNumber); ?>" required>
-								</div>
-							</div>
-
-							<div class="form-group">
-								<label>Email</label>
-								<input type="email" value="<?php echo htmlentities($data["user"]->EmailId); ?>" disabled>
-								<p class="helper-text">Email không thể thay đổi vì đây là tài khoản đăng nhập của bạn.</p>
-							</div>
-
-							<div class="form-group">
-								<label for="address">Địa chỉ</label>
-								<input type="text" name="address" id="address" value="<?php echo htmlentities($data["user"]->Address ?? ''); ?>" placeholder="Số nhà, đường, quận/huyện, tỉnh/thành phố">
-								<p class="helper-text">Địa chỉ để xe đưa đón (nếu có).</p>
-							</div>
-
-							<div class="form-grid">
-								<div class="form-group">
-									<label for="dateofbirth">Ngày sinh</label>
-									<input type="date" name="dateofbirth" id="dateofbirth" value="<?php echo htmlentities($data["user"]->DateOfBirth ?? ''); ?>">
-								</div>
-								<div class="form-group">
-									<label for="gender">Giới tính</label>
-									<select name="gender" id="gender">
-										<option value="">Chọn giới tính</option>
-										<option value="Nam" <?php if (($data["user"]->Gender ?? '') === 'Nam') echo 'selected'; ?>>Nam</option>
-										<option value="Nữ" <?php if (($data["user"]->Gender ?? '') === 'Nữ') echo 'selected'; ?>>Nữ</option>
-										<option value="Khác" <?php if (($data["user"]->Gender ?? '') === 'Khác') echo 'selected'; ?>>Khác</option>
-									</select>
-								</div>
-							</div>
-
-							<button type="submit" name="submit" class="btn">
-								<i class="fas fa-save"></i> Lưu thay đổi
-							</button>
-						</form>
-						<?php endif; ?>
+						<div id="profile-tab-content">
+							<p style="text-align:center;">Đang tải thông tin...</p>
+						</div>
 					</div>
 				</div>
 
@@ -105,115 +62,9 @@
 						<h3>Lịch sử đặt tour</h3>
 						<p class="helper-text">Theo dõi tất cả các tour bạn đã đặt và trạng thái của chúng.</p>
 						
-						<?php if (count($data["bookings"]) > 0): ?>
-							<div class="bookings-grid">
-								<?php foreach ($data["bookings"] as $booking): 
-									$statusText = "Chờ xử lý";
-									$statusClass = "is-pending";
-									$statusIcon = "clock";
-									if ($booking->status == 1) {
-										$statusText = "Đã xác nhận";
-										$statusClass = "is-approved";
-										$statusIcon = "check-circle";
-									}
-									if ($booking->status == 3) {
-										$statusText = "Đã hoàn thành";
-										$statusClass = "is-completed";
-										$statusIcon = "flag-checkered";
-									}
-									if ($booking->status == 2) {
-										$statusText = "Đã hủy";
-										$statusClass = "is-cancelled";
-										$statusIcon = "times-circle";
-									}
-								?>
-								<div class="booking-card">
-									<div class="booking-header">
-										<span class="booking-code">#BK<?php echo htmlentities($booking->bookid); ?></span>
-										<span class="status-chip <?php echo $statusClass; ?>">
-											<i class="fas fa-<?php echo $statusIcon; ?>"></i>
-											<?php echo htmlentities($statusText); ?>
-										</span>
-									</div>
-									<div class="booking-body">
-										<h4 class="booking-tour-name">
-											<a href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities($booking->pkgid); ?>">
-												<?php echo htmlentities($booking->packagename); ?>
-											</a>
-										</h4>
-										<div class="booking-details">
-											<div class="booking-detail-item">
-												<i class="fas fa-calendar"></i>
-												<span>Ngày khởi hành: <?php echo htmlentities($booking->fromdate); ?></span>
-											</div>
-											<div class="booking-detail-item">
-												<i class="fas fa-money-bill-wave"></i>
-												<span class="booking-price"><?php echo Controller::formatVND($booking->packageprice); ?></span>
-											</div>
-											<div class="booking-detail-item">
-												<i class="fas fa-clock"></i>
-												<span>Đặt ngày <?php echo date('d/m/Y', strtotime($booking->regdate)); ?></span>
-											</div>
-											<?php if ($booking->status == 2 && !empty($booking->cancelby)): ?>
-											<div class="booking-detail-item">
-												<i class="fas fa-times-circle" style="color: var(--danger);"></i>
-												<span>Đã hủy - 
-													<a href="#" onclick="showCancelReason(event, '<?php echo htmlentities($booking->cancelreason ?? 'Không có thông tin'); ?>')" style="text-decoration: underline; cursor: pointer; color: var(--primary);">Xem lý do</a>
-												</span>
-											</div>
-											<?php endif; ?>
-										</div>
-										<?php if (!empty($booking->comment)): ?>
-										<div class="booking-comment">
-											<i class="fas fa-comment"></i>
-											<span><?php echo htmlentities($booking->comment); ?></span>
-										</div>
-										<?php endif; ?>
-										
-										<?php if (!empty($booking->customermessage)): ?>
-										<div class="admin-message">
-											<div class="admin-message-header">
-												<span class="admin-message-icon">📨</span>
-												<span class="admin-message-title">Lời nhắn từ Admin</span>
-											</div>
-											<div class="admin-message-content"><?php echo nl2br(htmlentities($booking->customermessage)); ?></div>
-										</div>
-										<?php endif; ?>
-									</div>
-									<div class="booking-footer">
-										<a href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities($booking->pkgid); ?>" class="btn btn-ghost btn-compact">
-											<i class="fas fa-eye"></i> Xem chi tiết
-										</a>
-										<?php if ((int) $booking->status === 0): ?>
-										<a class="btn btn-compact" style="background: var(--danger);" href="<?php echo BASE_URL; ?>tour/cancel/<?php echo htmlentities($booking->bookid); ?>" onclick="return confirm('Bạn có chắc chắn muốn hủy đặt tour này không?');">
-											<i class="fas fa-times"></i> Hủy đơn
-										</a>
-										<?php endif; ?>
-										<?php if ($booking->status == 3 && empty($booking->hasreview)): ?>
-										<button
-											type="button"
-											class="btn btn-secondary btn-compact js-open-review"
-											data-booking-id="<?php echo htmlentities($booking->bookid); ?>"
-											data-package-id="<?php echo htmlentities($booking->pkgid); ?>"
-										>
-											<i class="fas fa-star"></i> Đánh giá và nhận xét
-										</button>
-										<?php elseif ($booking->status == 3): ?>
-										<span class="link-muted">Bạn đã đánh giá tour này</span>
-										<?php endif; ?>
-									</div>
-								</div>
-								<?php endforeach; ?>
-							</div>
-						<?php else: ?>
-							<div class="empty-state">
-								<i class="fas fa-inbox" style="font-size: 3rem; color: var(--muted); margin-bottom: 1rem;"></i>
-								<p>Bạn chưa có đặt tour nào.</p>
-								<a href="<?php echo BASE_URL; ?>package" class="btn">
-									<i class="fas fa-search"></i> Khám phá tour
-								</a>
-							</div>
-						<?php endif; ?>
+						<div id="bookings-tab-content">
+							<p style="text-align:center;">Đang tải dữ liệu...</p>
+						</div>
 					</div>
 				</div>
 
@@ -250,58 +101,9 @@
 						<h3>Tour yêu thích</h3>
 						<p class="helper-text">Danh sách các tour bạn đã lưu để xem sau.</p>
 						
-						<?php if (count($data["wishlistItems"]) > 0): ?>
-							<div class="tour-grid">
-								<?php foreach ($data["wishlistItems"] as $item): ?>
-								<div class="tour-card">
-									<div class="badge"><?php echo htmlentities($item->PackageType); ?></div>
-
-									<div class="tour-card__media">
-										<img src="<?php echo BASE_URL; ?>admin/packageimages/<?php echo htmlentities($item->PackageImage); ?>"
-											alt="<?php echo htmlentities($item->PackageName); ?>">
-
-										<button class="wishlist-heart active" type="button" data-package-id="<?php echo htmlentities($item->PackageId); ?>"
-											aria-label="Xóa khỏi danh sách yêu thích" title="Xóa khỏi danh sách yêu thích">
-											<i class="fas fa-heart"></i>
-										</button>
-
-										<div class="tour-card__duration">
-											<i class="fas fa-calendar-alt"></i>
-											<span><?php echo htmlentities($item->TourDuration); ?></span>
-										</div>
-									</div>
-
-									<div class="tour-card__content">
-										<div class="tour-card__location">
-											<i class="fas fa-map-marker-alt"></i>
-											<span><?php echo htmlentities($item->PackageLocation); ?></span>
-										</div>
-
-										<h3 class="tour-card__title"><?php echo htmlentities($item->PackageName); ?></h3>
-										<p class="tour-card__desc"><?php echo htmlentities($item->PackageFetures); ?></p>
-
-										<div class="tour-card__footer">
-											<div>
-												<span class="tour-card__price-label">GIÁ TỪ</span>
-												<div class="tour-card__price"><?php echo Controller::formatVND($item->PackagePrice); ?></div>
-											</div>
-											<a class="tour-card__btn" href="<?php echo BASE_URL; ?>package/details/<?php echo htmlentities($item->PackageId); ?>">
-												Chi tiết
-											</a>
-										</div>
-									</div>
-								</div>
-								<?php endforeach; ?>
-							</div>
-						<?php else: ?>
-							<div class="empty-state">
-								<i class="fas fa-heart-broken" style="font-size: 3rem; color: var(--muted); margin-bottom: 1rem;"></i>
-								<p>Bạn chưa có tour yêu thích nào.</p>
-								<a href="<?php echo BASE_URL; ?>package" class="btn">
-									<i class="fas fa-search"></i> Khám phá tour
-								</a>
-							</div>
-						<?php endif; ?>
+						<div id="wishlist-tab-content">
+							<p style="text-align:center;">Đang tải dữ liệu...</p>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -352,5 +154,6 @@
 		alert('Lý do hủy đơn:\n\n' + reason);
 	}
 </script>
+<script src="<?php echo BASE_URL; ?>assets/js/api/account.js?v=1.0"></script>
 </body>
 </html>

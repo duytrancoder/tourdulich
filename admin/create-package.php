@@ -5,161 +5,7 @@ include('includes/config.php');
 require_once dirname(__DIR__) . '/core/Helper.php';
 Helper::requireAdminLogin();
 
-$packageCreated = false;
-$newPackageId = null;
-
-// Handle Itinerary Add (only if package exists)
-if(isset($_POST['addItinerary']) && isset($_GET['pid'])) {
-	$pid = intval($_GET['pid']);
-	$timeLabel = $_POST['timeLabel'];
-	$activity = $_POST['activity'];
-	
-	$sql = "SELECT COALESCE(MAX(SortOrder), 0) + 1 as NextOrder FROM tblitinerary WHERE PackageId = :pid";
-	$query = $dbh->prepare($sql);
-	$query->bindParam(':pid', $pid, PDO::PARAM_INT);
-	$query->execute();
-	$result = $query->fetch(PDO::FETCH_OBJ);
-	$sortOrder = $result->NextOrder;
-	
-	$sql = "INSERT INTO tblitinerary (PackageId, TimeLabel, Activity, SortOrder) VALUES (:pid, :timeLabel, :activity, :sortOrder)";
-	$query = $dbh->prepare($sql);
-	$query->bindParam(':pid', $pid, PDO::PARAM_INT);
-	$query->bindParam(':timeLabel', $timeLabel, PDO::PARAM_STR);
-	$query->bindParam(':activity', $activity, PDO::PARAM_STR);
-	$query->bindParam(':sortOrder', $sortOrder, PDO::PARAM_INT);
-	$query->execute();
-	
-	$itineraryMsg = "Đã thêm lộ trình thành công";
-}
-
-// Handle Itinerary Update
-if(isset($_POST['updateItinerary']) && isset($_GET['pid'])) {
-	$pid = intval($_GET['pid']);
-	$id = intval($_POST['itineraryId']);
-	$timeLabel = $_POST['timeLabel'];
-	$activity = $_POST['activity'];
-	$sortOrder = intval($_POST['sortOrder']);
-	
-	$sql = "UPDATE tblitinerary SET TimeLabel = :timeLabel, Activity = :activity, SortOrder = :sortOrder WHERE ItineraryId = :id";
-	$query = $dbh->prepare($sql);
-	$query->bindParam(':id', $id, PDO::PARAM_INT);
-	$query->bindParam(':timeLabel', $timeLabel, PDO::PARAM_STR);
-	$query->bindParam(':activity', $activity, PDO::PARAM_STR);
-	$query->bindParam(':sortOrder', $sortOrder, PDO::PARAM_INT);
-	$query->execute();
-	
-	$itineraryMsg = "Đã cập nhật lộ trình thành công";
-}
-
-// Handle Itinerary Delete
-if(isset($_GET['delItinerary']) && isset($_GET['pid'])) {
-	$pid = intval($_GET['pid']);
-	$id = intval($_GET['delItinerary']);
-	$sql = "DELETE FROM tblitinerary WHERE ItineraryId = :id";
-	$query = $dbh->prepare($sql);
-	$query->bindParam(':id', $id, PDO::PARAM_INT);
-	$query->execute();
-	
-	$itineraryMsg = "Đã xóa lộ trình thành công";
-	header('Location: ' . BASE_URL . 'admin/create-package.php?pid=' . $pid);
-	exit;
-}
-
-// Handle Package Creation
-if(isset($_POST['submit']))
-{
-$pname = trim($_POST['packagename'] ?? '');
-$ptype = trim($_POST['packagetype'] ?? '');	
-$plocation = trim($_POST['packagelocation'] ?? '');
-$tourduration = trim($_POST['tourduration'] ?? '');
-$pprice = intval($_POST['packageprice'] ?? 0);	
-$pfeatures = trim($_POST['packagefeatures'] ?? '');
-$pdetails = trim($_POST['packagedetails'] ?? '');	
-$pimage = '';
-
-// Get itinerary data from hidden field
-$itineraryData = isset($_POST['itineraryData']) ? $_POST['itineraryData'] : '';
-
-// Validate inputs
-if (empty($pname) || empty($ptype) || empty($plocation) || empty($tourduration) || $pprice <= 0 || empty($pfeatures) || empty($pdetails)) {
-	$error = "Vui lòng điền đầy đủ thông tin";
-} elseif (!isset($_FILES["packageimage"]) || $_FILES["packageimage"]["error"] !== UPLOAD_ERR_OK) {
-	$error = "Vui lòng chọn hình ảnh";
-} else {
-	// Validate file upload using Helper class
-	$validation = Helper::validateImage($_FILES["packageimage"]);
-	if (!$validation['valid']) {
-		$error = $validation['error'];
-	} else {
-		// Sanitize filename
-		$pimage = Helper::sanitizeFilename($_FILES["packageimage"]["name"]);
-		$uploadPath = "packageimages/" . $pimage;
-		
-		if (move_uploaded_file($_FILES["packageimage"]["tmp_name"], $uploadPath)) {
-			// File uploaded successfully, continue with database insert
-		} else {
-			$error = "Không thể tải lên file. Vui lòng thử lại";
-		}
-	}
-}
-
-if (!isset($error)) {
-	try {
-		// Start transaction
-		$dbh->beginTransaction();
-		
-		// Insert package
-		$sql="INSERT INTO tbltourpackages(PackageName,PackageType,PackageLocation,TourDuration,PackagePrice,PackageFetures,PackageDetails,PackageImage) VALUES(:pname,:ptype,:plocation,:tourduration,:pprice,:pfeatures,:pdetails,:pimage)";
-		$query = $dbh->prepare($sql);
-		$query->bindParam(':pname',$pname,PDO::PARAM_STR);
-		$query->bindParam(':ptype',$ptype,PDO::PARAM_STR);
-		$query->bindParam(':plocation',$plocation,PDO::PARAM_STR);
-		$query->bindParam(':tourduration',$tourduration,PDO::PARAM_STR);
-		$query->bindParam(':pprice',$pprice,PDO::PARAM_INT);
-		$query->bindParam(':pfeatures',$pfeatures,PDO::PARAM_STR);
-		$query->bindParam(':pdetails',$pdetails,PDO::PARAM_STR);
-		$query->bindParam(':pimage',$pimage,PDO::PARAM_STR);
-		$query->execute();
-		$lastInsertId = $dbh->lastInsertId();
-		
-		// Insert itineraries if any
-		if($lastInsertId && !empty($itineraryData)) {
-			$itineraries = json_decode($itineraryData, true);
-			if(is_array($itineraries) && count($itineraries) > 0) {
-				$sqlItinerary = "INSERT INTO tblitinerary (PackageId, TimeLabel, Activity, SortOrder) VALUES (:pid, :timeLabel, :activity, :sortOrder)";
-				$queryItinerary = $dbh->prepare($sqlItinerary);
-				
-				foreach($itineraries as $item) {
-					$queryItinerary->bindParam(':pid', $lastInsertId, PDO::PARAM_INT);
-					$queryItinerary->bindParam(':timeLabel', $item['timeLabel'], PDO::PARAM_STR);
-					$queryItinerary->bindParam(':activity', $item['activity'], PDO::PARAM_STR);
-					$queryItinerary->bindParam(':sortOrder', $item['sortOrder'], PDO::PARAM_INT);
-					$queryItinerary->execute();
-				}
-			}
-		}
-		
-		// Commit transaction
-		$dbh->commit();
-		
-		if($lastInsertId) {
-			$packageCreated = true;
-			$newPackageId = $lastInsertId;
-			$itineraryCount = is_array(json_decode($itineraryData, true)) ? count(json_decode($itineraryData, true)) : 0;
-			$msg = "Tạo gói tour thành công! " . ($itineraryCount > 0 ? "Đã thêm $itineraryCount lộ trình." : "Bạn có thể thêm lộ trình bên dưới.");
-			// Redirect to same page with package ID to enable itinerary management
-			header('Location: ' . BASE_URL . 'admin/create-package.php?pid=' . $lastInsertId . '&created=1');
-			exit;
-		} else {
-			$error="Có lỗi xảy ra. Vui lòng thử lại";
-		}
-	} catch(Exception $e) {
-		// Rollback on error
-		$dbh->rollBack();
-		$error = "Có lỗi xảy ra: " . $e->getMessage();
-	}
-}
-}
+// Chức năng POST / PUT / DELETE đã được chuyển sang Backend REST API (/api/controllers/AdminTourController.php)
 
 // Check if we're viewing a created package
 if(isset($_GET['pid'])) {
@@ -239,7 +85,7 @@ if(isset($_GET['pid'])) {
 		<!-- Package Creation Form -->
 		<section class="card">
 			<h3>Thông tin gói tour</h3>
-			<form name="package" method="post" enctype="multipart/form-data" class="form-stack" id="packageForm">
+			<form name="package" class="form-stack" id="packageForm">
 				<input type="hidden" name="itineraryData" id="itineraryDataInput" value="">
 				<div class="form-grid">
 					<div class="form-group">
@@ -597,4 +443,5 @@ if(isset($_GET['pid'])) {
 			}
 		});
 		</script>
+		<script src="<?php echo BASE_URL; ?>assets/js/api/admin-tours.js"></script>
 	<?php include('includes/layout-end.php'); ?>

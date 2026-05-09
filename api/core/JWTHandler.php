@@ -56,11 +56,12 @@ class JWTHandler {
     public static function verifyBearerToken() {
         $headers = apache_request_headers();
         
-        $authHeader = null;
         if (isset($headers['Authorization'])) {
             $authHeader = $headers['Authorization'];
         } else if (isset($headers['authorization'])) {
             $authHeader = $headers['authorization'];
+        } else if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
         }
 
         if (!$authHeader) {

@@ -1,6 +1,6 @@
 <?php
-$isLoggedIn = !empty($_SESSION["login"]);
-$userEmail  = $isLoggedIn ? htmlentities($_SESSION["login"]) : ''; ?>
+// Trạng thái đăng nhập giờ đây do Frontend Javascript (JWT) quyết định.
+?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <header class="site-header">
 	<div class="nav-bar">
@@ -22,38 +22,33 @@ $userEmail  = $isLoggedIn ? htmlentities($_SESSION["login"]) : ''; ?>
 				<a href="<?php echo BASE_URL; ?>package">Gói du lịch</a>
 				<a href="<?php echo BASE_URL; ?>page/privacy">Chính sách</a>
 				<a href="<?php echo BASE_URL; ?>page/terms">Điều khoản</a>
-				<?php if ($isLoggedIn): ?>
-					<a href="<?php echo BASE_URL; ?>issue">Yêu cầu hỗ trợ</a>
-				<?php else: ?>
-					<a href="<?php echo BASE_URL; ?>enquiry">Gửi hỏi đáp</a>
-				<?php endif; ?>
+				<a href="<?php echo BASE_URL; ?>issue" id="nav-link-issue" style="display:none;">Yêu cầu hỗ trợ</a>
+				<a href="<?php echo BASE_URL; ?>enquiry" id="nav-link-enquiry">Gửi hỏi đáp</a>
 			</nav>
 
 			<!-- Account area (right side) -->
-			<div class="nav-account">
-				<?php if ($isLoggedIn): ?>
-					<!-- Logged-in: icon + email + dropdown -->
-					<div class="nav-user-menu" id="navUserMenu">
-						<button class="nav-user-btn" type="button" id="navUserBtn" aria-expanded="false" aria-haspopup="true">
-							<i class="fas fa-user-circle nav-user-icon"></i>
-							<span class="nav-user-email"><?php echo $userEmail; ?></span>
-							<i class="fas fa-chevron-down nav-user-caret"></i>
-						</button>
-						<div class="nav-user-dropdown" id="navUserDropdown" role="menu">
-							<a class="nav-user-item" href="<?php echo BASE_URL; ?>user/account" role="menuitem">
-								<i class="fas fa-id-card"></i> Tài khoản của tôi
-							</a>
-							<a class="nav-user-item nav-user-item--danger" href="<?php echo BASE_URL; ?>user/logout" role="menuitem">
-								<i class="fas fa-sign-out-alt"></i> Đăng xuất
-							</a>
-						</div>
-					</div>
-				<?php else: ?>
-					<!-- Not logged-in: login button -->
-					<button class="nav-login-btn btn" type="button" data-modal-target="signin-modal">
-						Đăng nhập
+			<div class="nav-account" id="auth-container">
+				<!-- Not logged-in: login button (Default state) -->
+				<button class="nav-login-btn btn" type="button" data-modal-target="signin-modal" id="btn-show-login">
+					Đăng nhập
+				</button>
+
+				<!-- Logged-in state (Hidden by default, shown via JS) -->
+				<div class="nav-user-menu" id="navUserMenu" style="display: none;">
+					<button class="nav-user-btn" type="button" id="navUserBtn" aria-expanded="false" aria-haspopup="true">
+						<i class="fas fa-user-circle nav-user-icon"></i>
+						<span class="nav-user-email" id="user-display-name">Loading...</span>
+						<i class="fas fa-chevron-down nav-user-caret"></i>
 					</button>
-				<?php endif; ?>
+					<div class="nav-user-dropdown" id="navUserDropdown" role="menu">
+						<a class="nav-user-item" href="<?php echo BASE_URL; ?>user/account" role="menuitem">
+							<i class="fas fa-id-card"></i> Tài khoản của tôi
+						</a>
+						<a class="nav-user-item nav-user-item--danger" href="#" id="btn-logout" role="menuitem">
+							<i class="fas fa-sign-out-alt"></i> Đăng xuất
+						</a>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

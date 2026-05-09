@@ -9,70 +9,7 @@ header('location:index.php');
 exit;
 }
 
-$msg = '';
-$error = '';
-if(isset($_GET['del']))
-{
-	$delid=intval($_GET['del']);
-	$sql = "DELETE FROM tbltourpackages WHERE PackageId=:delid";
-	$query = $dbh->prepare($sql);
-	$query -> bindParam(':delid',$delid, PDO::PARAM_INT);
-	if($query -> execute()){
-		$msg="Đã xóa gói tour thành công";
-	}else{
-		$error="Không thể xóa gói tour. Vui lòng thử lại.";
-	}
-}
-
-$pageTitle = "GoTravel Admin | Quản lý gói tour";
-$currentPage = 'manage-packages';
-
-// Search functionality
-$search = isset($_GET['search']) ? trim($_GET['search']) : '';
-$searchType = isset($_GET['type']) ? trim($_GET['type']) : '';
-$searchLocation = isset($_GET['location']) ? trim($_GET['location']) : '';
-$normalizedSearchId = preg_replace('/^#?PKG-?/i', '', $search);
-
-$sql = "SELECT * FROM tbltourpackages WHERE 1=1";
-
-if (!empty($search)) {
-	$sql .= " AND (PackageName LIKE :search_name";
-	if (ctype_digit($normalizedSearchId)) {
-		$sql .= " OR PackageId = :search_id";
-	}
-	$sql .= ")";
-}
-
-if (!empty($searchType)) {
-	$sql .= " AND PackageType LIKE :type";
-	$params[':type'] = '%' . $searchType . '%';
-}
-
-if (!empty($searchLocation)) {
-	$sql .= " AND PackageLocation LIKE :location";
-	$params[':location'] = '%' . $searchLocation . '%';
-}
-
-$sql .= " ORDER BY PackageId DESC";
-
-$query = $dbh->prepare($sql);
-
-if (!empty($search)) {
-	$query->bindValue(':search_name', '%' . $search . '%', PDO::PARAM_STR);
-	if (ctype_digit($normalizedSearchId)) {
-		$query->bindValue(':search_id', (int)$normalizedSearchId, PDO::PARAM_INT);
-	}
-}
-
-if (!empty($searchType)) {
-	$query->bindValue(':type', '%' . $searchType . '%', PDO::PARAM_STR);
-}
-
-if (!empty($searchLocation)) {
-	$query->bindValue(':location', '%' . $searchLocation . '%', PDO::PARAM_STR);
-}
-$query->execute();
-$results=$query->fetchAll(PDO::FETCH_OBJ);
+// PHP Query đã được gỡ bỏ. Dữ liệu sẽ được load qua REST API bằng Javascript.
 
 include('includes/layout-start.php');
 ?>
@@ -88,7 +25,7 @@ include('includes/layout-start.php');
 		
 		<!-- Search Form -->
 		<section class="card" style="margin-bottom: 1.5rem;">
-			<form method="get" action="" class="form-stack">
+			<form id="search-form-admin" class="form-stack">
 				<div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
 					<div class="form-group">
 						<label for="search">Tìm theo mã/ tên gói</label>
@@ -132,39 +69,12 @@ include('includes/layout-start.php');
 						</tr>
 					</thead>
 					<tbody>
-					<?php
-					if($query->rowCount() > 0)
-					{
-						foreach($results as $result)
-						{	?>
-						<tr>
-							<td><?php echo Helper::formatPackageId($result->PackageId);?></td>
-							<td><?php echo htmlentities($result->PackageName);?></td>
-							<td><?php echo htmlentities($result->PackageType);?></td>
-							<td><?php echo htmlentities($result->PackageLocation);?></td>
-							<td><?php echo htmlentities($result->TourDuration);?></td>
-							<td><?php echo number_format($result->PackagePrice, 0, ',', '.') . ' đ';?></td>
-							<td><?php echo date('d/m/Y', strtotime($result->Creationdate));?></td>
-							<td>
-								<div style="display: flex; gap: 0.5rem; align-items: center;">
-									<a class="btn btn-primary" href="<?php echo BASE_URL; ?>admin/update-package.php?pid=<?php echo htmlentities($result->PackageId);?>">Sửa</a>
-									<a class="btn btn-danger" href="<?php echo BASE_URL; ?>admin/manage-packages.php?del=<?php echo htmlentities($result->PackageId);?>" onclick="return confirm('Bạn có chắc chắn muốn xóa gói tour này không?');">Xóa</a>
-								</div>
-							</td>
-						</tr>
-					<?php }} else { ?>
-						<tr><td colspan="8"><div class="empty-state">
-							<?php if(!empty($search) || !empty($searchType) || !empty($searchLocation)) { ?>
-								Không tìm thấy gói tour phù hợp. <a href="<?php echo BASE_URL; ?>admin/manage-packages.php">Xóa bộ lọc</a>
-							<?php } else { ?>
-								Chưa có gói tour nào.
-							<?php } ?>
-						</div></td></tr>
-					<?php } ?>
+					<!-- Nội dung bảng sẽ được render bởi Javascript (admin-tours.js) -->
 					</tbody>
 				</table>
 			</div>
 		</section>
 	</main>
 </div>
+<script src="<?php echo BASE_URL; ?>assets/js/api/admin-tours.js"></script>
 <?php include('includes/layout-end.php');?>

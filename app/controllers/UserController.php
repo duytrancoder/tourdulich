@@ -12,29 +12,15 @@ class UserController extends Controller {
     }
 
     public function account() {
-        if (strlen($_SESSION['login']) == 0) {
-            header('location:' . BASE_URL);
-            exit;
-        }
-
-        $userModel = $this->model('UserModel');
-        $bookingModel = $this->model('BookingModel');
-        $wishlistModel = $this->model('WishlistModel');
-        
-        $userEmail = $_SESSION['login'];
-        $user = $userModel->getUserByEmail($userEmail);
-        $bookings = $bookingModel->getBookingsByUserEmail($userEmail);
-        $wishlistItems = $wishlistModel->getWishlistByUser($userEmail);
-
+        // Mọi dữ liệu giờ sẽ được lấy qua REST API (AJAX) bằng JS ở frontend
+        // PHP controller này chỉ còn nhiệm vụ trả về HTML Shell
         $data = [
-            'user' => $user,
-            'bookings' => $bookings,
-            'wishlistItems' => $wishlistItems,
-            'error' => $_SESSION['error'] ?? null,
-            'msg' => $_SESSION['msg'] ?? null
+            'user' => null,
+            'bookings' => [],
+            'wishlistItems' => [],
+            'error' => null,
+            'msg' => null
         ];
-        unset($_SESSION['error'], $_SESSION['msg']);
-
         $this->view('account/index', $data);
     }
 
