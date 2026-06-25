@@ -29,7 +29,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./database.sql:/docker-entrypoint-initdb.d/database.sql
-adminer:
+  adminer:
     image: adminer:latest
     container_name: gotravel_adminer
     ports:
