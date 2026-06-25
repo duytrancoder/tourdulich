@@ -10,7 +10,7 @@ services:
       - .:/var/www/html
     environment:
       DB_HOST: db
-      DB_USER: root
+      DB_USER: webdulich
       DB_PASS: rootpassword
       DB_NAME: webdulich
     depends_on:
@@ -24,6 +24,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: webdulich
+      MYSQL_USER: webdulich
+      MYSQL_PASSWORD: rootpassword
     ports:
       - "3306:3306"
     volumes:
