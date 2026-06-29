@@ -11,13 +11,13 @@
     # Prevent directory listing
     Options -Indexes
     
-    # Redirect root to public directory
-    RewriteCond %{REQUEST_URI} ^/tour1/?$
+    # Redirect root to public directory (supports both local /tour1 and production /)
+    RewriteCond %{REQUEST_URI} ^/(?:tour1/?)?$
     RewriteRule ^(.*)$ public/index.php [L]
     
-    # Route /api/ to the new API entry point
-    RewriteCond %{REQUEST_URI} ^/tour1/api/?
-    RewriteRule ^api/(.*)$ api/index.php [L,QSA]
+    # Route /api/ to the new API entry point (supports both local /tour1/api/ and production /api/)
+    RewriteCond %{REQUEST_URI} ^/(?:tour1/)?api/?
+    RewriteRule ^(?:tour1/)?api/(.*)$ api/index.php [L,QSA]
 
     # Redirect all other requests to the public directory
     RewriteCond %{REQUEST_FILENAME} !-f
