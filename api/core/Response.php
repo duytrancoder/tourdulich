@@ -10,13 +10,11 @@ class Response {
      * @param int $statusCode HTTP Status Code (default 200)
      */
     public static function success($data = null, $message = "Success", $statusCode = 200) {
-        http_response_code($statusCode);
-        echo json_encode([
+         self::send([
             'success' => true,
             'message' => $message,
             'data' => $data
-        ]);
-        exit;
+        ], $statusCode);
     }
 
     /**
@@ -27,17 +25,23 @@ class Response {
      * @param int $statusCode HTTP Status Code (default 400)
      */
     public static function error($message = "Error", $errors = null, $statusCode = 400) {
-        http_response_code($statusCode);
         $response = [
             'success' => false,
             'message' => $message
         ];
-        
+
         if ($errors !== null) {
             $response['errors'] = $errors;
         }
-        
-        echo json_encode($response);
+
+        self::send($response, $statusCode);
+    }
+
+    private static function send(array $payload, $statusCode) {
+        http_response_code($statusCode);
+        header('Content-Type: application/json; charset=UTF-8');
+
+        echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
 }
