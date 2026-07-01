@@ -1,6 +1,9 @@
 
 .env
 .svn
+# Environment
+
+# IDE
 .idea/
 .vscode/
 .sql
