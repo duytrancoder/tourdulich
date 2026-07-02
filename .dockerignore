@@ -1,0 +1,9 @@
+.git
+.gitignore
+.dockerignore
+docker-compose.yml
+readme.md
+HUONG_DAN_CHAY_DU_AN.md
+.idea/
+.vscode/
+.DS_Store
