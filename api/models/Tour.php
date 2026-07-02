@@ -72,6 +72,12 @@ class Tour {
     }
 
     public function addItinerary($packageId, $timeLabel, $activity, $sortOrder) {
+        $timeLabel = trim($timeLabel);
+        $activity = trim($activity);
+        $sortOrder = max(1, (int)$sortOrder);
+        if ($timeLabel === '' || $activity === '') {
+        return false;
+        }
         $sql = "INSERT INTO tblitinerary (PackageId, TimeLabel, Activity, SortOrder) VALUES (?, ?, ?, ?)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([$packageId, $timeLabel, $activity, $sortOrder]);
