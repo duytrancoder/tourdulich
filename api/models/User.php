@@ -15,6 +15,7 @@ class User {
      * Get user by email
      */
     public function getByEmail($email) {
+        $email = strtolower(trim($email));
         $stmt = $this->db->prepare("SELECT * FROM tblusers WHERE EmailId = ? LIMIT 1");
         $stmt->execute([$email]);
         return $stmt->fetch();
