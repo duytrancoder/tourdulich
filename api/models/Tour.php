@@ -72,6 +72,12 @@ class Tour {
     }
 
     public function addItinerary($packageId, $timeLabel, $activity, $sortOrder) {
+        $timeLabel = trim($timeLabel);
+        $activity = trim($activity);
+        $sortOrder = max(1, (int)$sortOrder);
+        if ($timeLabel === '' || $activity === '') {
+        return false;
+        }
         $sql = "INSERT INTO tblitinerary (PackageId, TimeLabel, Activity, SortOrder) VALUES (?, ?, ?, ?)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([$packageId, $timeLabel, $activity, $sortOrder]);
@@ -109,8 +115,17 @@ class Tour {
     }
 
     public function delete($id) {
+        if ($this->bookedTour($id)) {
+            return false;
+        }
         $sql = "DELETE FROM tbltourpackages WHERE PackageId = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':id' => $id]);
+    }
+
+    public function bookedTour($id) {
+    $stmt = $this->db->prepare("SELECT COUNT(*) FROM tblbooking WHERE PackageId = ?");
+    $stmt->execute([(int)$id]);
+    return (int)$stmt->fetchColumn() > 0;
     }
 }

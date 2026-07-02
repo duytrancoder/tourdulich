@@ -61,7 +61,8 @@ class Helper {
      * @return bool
      */
     public static function validatePhone($phone) {
-        return preg_match('/^[0-9]{10}$/', $phone);
+        $phone = trim($phone);
+        return preg_match('/^(0|\+84)[0-9]{9}$/', $phone);
     }
     
     /**
