@@ -1,0 +1,5 @@
+# Chặn các file cấu hình cá nhân của IDE và log rác
+.vscode/
+.idea/
+*.log
+.DS_Store
