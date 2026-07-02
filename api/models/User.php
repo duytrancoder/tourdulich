@@ -15,7 +15,7 @@ class User {
      * Get user by email
      */
     public function getByEmail($email) {
-        $stmt = $this->db->prepare("SELECT * FROM tblusers WHERE EmailId = ?");
+        $stmt = $this->db->prepare("SELECT * FROM tblusers WHERE EmailId = ? LIMIT 1");
         $stmt->execute([$email]);
         return $stmt->fetch();
     }
@@ -24,6 +24,9 @@ class User {
      * Create new user
      */
     public function create($fullName, $mobile, $email, $password) {
+        if ($this->getByEmail($email)) {
+            return false;
+        }
         $hashedPassword = md5($password); // Note: Keep using md5 for legacy compatibility or upgrade to password_hash if starting fresh. Here keeping legacy.
         
         $stmt = $this->db->prepare("INSERT INTO tblusers(FullName, MobileNumber, EmailId, Password) VALUES(?, ?, ?, ?)");
